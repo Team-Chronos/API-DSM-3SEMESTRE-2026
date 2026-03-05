@@ -133,7 +133,7 @@
       <td><a href="https://www.linkedin.com/in/gabriel-henrique-a1330a26a/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a></td>
     </tr>
     <tr>
-      <td>Aline Raquel/td>
+      <td>Aline Raquel</td>
       <td>Desenvolvedor</td>
       <td><a href="https://github.com/AlineRaquelC"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"></a></td>
       <td><a href="https://www.linkedin.com/in/aline-oliveira-60ab6265?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a></td>
@@ -145,7 +145,7 @@
       <td><a href="https://www.linkedin.com/in/lucas-gabriel-marins-dos-santos-56b529246?utm_source=share_via&utm_content=profile&utm_medium=member_android"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a></td>
     </tr>
     <tr>
-      <td>Enrico Germano/td>
+      <td>Enrico Germano</td>
       <td>Desenvolvedor</td>
       <td><a href="https://github.com/EnricoGermano"><img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white"></a></td>
       <td><a href="https://www.linkedin.com/in/enrico-de-chiara-germano-022894204/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white"></a></td>
