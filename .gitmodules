@@ -1,4 +1,4 @@
 [submodule "services-gestao-projetos"]
 	path = services/gestao-projetos
 	url = https://github.com/Team-Chronos/API3-servico-gestao-projetos.git
-	branch = main
+	branch = dev
