@@ -4,9 +4,10 @@ import type { Item } from "../../types/item"
 interface ApontamentoListaTarefasProps {
   tarefas?: Tarefa[],
   itens?: Item[],
+  setTarefa: (tarefa: Tarefa) => void
 }
 
-function ApontamentoListaTarefas({ tarefas, itens }: ApontamentoListaTarefasProps){
+function ApontamentoListaTarefas({ tarefas, itens, setTarefa }: ApontamentoListaTarefasProps){
 
   return(
     <>
@@ -21,12 +22,14 @@ function ApontamentoListaTarefas({ tarefas, itens }: ApontamentoListaTarefasProp
           {itens?.map((item) => (
             <li key={item.id} className={`flex flex-col gap-y-2`}>
               <h4 className={`font-medium`}>{item.nome}</h4>
-              <ul className={`flex flex-col gap-y-2 pl-3`}>
+              <ul className={`flex flex-col gap-y-1 pl-3`}>
               {tarefas
                 ?.filter((tarefa) => tarefa.item_id === item.id)
                 .map((tarefa) => (
                   <li key={tarefa.id}>
-                    <h5 className={`text-sm`}>{tarefa.titulo}</h5>
+                    <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>
+                      <h5 className={`text-sm`}>{tarefa.titulo}</h5>
+                    </button>
                   </li>
               ))}
               </ul>

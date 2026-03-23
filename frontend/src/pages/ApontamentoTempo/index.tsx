@@ -1,8 +1,8 @@
 import { useState } from "react"
-import LinhaTempo from "../../components/LinhaTempo"
 import ApontamentoListaTarefas from "../../components/ApontamentoListaTarefas"
 import type { Tarefa } from "../../types/tarefa"
 import type { Item } from "../../types/item"
+import TarefasInfo from "../../components/TarefasInfo"
 
 function ApontamentoTempo(){
   const [ tarefas, setTarefas ] = useState<Tarefa[]>([
@@ -10,7 +10,7 @@ function ApontamentoTempo(){
     id: 1,
     titulo: "Implementar login",
     descricao: "Criar autenticação com JWT",
-    prazo: "2026-03-25",
+    tempoMaximoMinutos: 25,
     status: "pendente",
     responsavel_id: 1,
     item_id: 0
@@ -19,7 +19,7 @@ function ApontamentoTempo(){
     id: 2,
     titulo: "Criar tela de dashboard",
     descricao: "Layout inicial com gráficos",
-    prazo: "2026-03-28",
+    tempoMaximoMinutos: 28,
     status: "em andamento",
     responsavel_id: 2,
     item_id: 1
@@ -27,7 +27,7 @@ function ApontamentoTempo(){
   {
     id: 3,
     titulo: "Configurar banco de dados",
-    prazo: "2026-03-22",
+    tempoMaximoMinutos: 22,
     status: "concluido",
     responsavel_id: 1,
     item_id: 2
@@ -36,7 +36,7 @@ function ApontamentoTempo(){
     id: 4,
     titulo: "Implementar API de tarefas",
     descricao: "CRUD completo de tarefas",
-    prazo: "2026-03-30",
+    tempoMaximoMinutos: 30,
     status: "pendente",
     responsavel_id: 3,
     item_id: 0
@@ -45,7 +45,7 @@ function ApontamentoTempo(){
     id: 5,
     titulo: "Adicionar validações",
     descricao: "Validar inputs no frontend",
-    prazo: "2026-03-27",
+    tempoMaximoMinutos: 27,
     status: "em andamento",
     responsavel_id: 2,
     item_id: 1
@@ -53,7 +53,7 @@ function ApontamentoTempo(){
   {
     id: 6,
     titulo: "Deploy da aplicação",
-    prazo: "2026-04-01",
+    tempoMaximoMinutos: 1,
     status: "pendente",
     responsavel_id: 3,
     item_id: 2
@@ -76,15 +76,19 @@ function ApontamentoTempo(){
     descricao: "Tarefas de deploy, infraestrutura e integração contínua"
   }
 ])
+  const [ tarefaSelecionada, setTarefaSelecionada ] = useState<Tarefa>()
   
   return(
     <>
-      <div className={`w-full p-4`}>
+      <div className={`w-full p-4 text-gray-50`}>
         <div className={`w-full h-full flex flex-row bg-mist-900 rounded-lg p-4`}>
           <div className={`grow max-w-4/12 xl:max-w-3/12 min-w-max bg-mist-800 rounded-bl-md rounded-tl-md border-r-2 border-r-mist-700`}>
-            <ApontamentoListaTarefas tarefas={tarefas} itens={itens} />
+            <ApontamentoListaTarefas tarefas={tarefas} itens={itens} setTarefa={setTarefaSelecionada} />
           </div>
           <div className={`grow bg-mist-800 rounded-br-md rounded-tr-md`}>
+            {tarefaSelecionada && (
+              <TarefasInfo tarefa={tarefaSelecionada} setTarefa={setTarefaSelecionada} />
+            )}
           </div>
         </div>
       </div>

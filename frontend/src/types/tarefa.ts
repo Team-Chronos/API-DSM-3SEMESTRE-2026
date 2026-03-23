@@ -2,7 +2,7 @@ export type Tarefa = {
   id: number,
   titulo: String,
   descricao?: String,
-  prazo: String,
+  tempoMaximoMinutos: number,
   status: String
   
   responsavel_id?: number,
