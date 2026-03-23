@@ -110,6 +110,7 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
  <a href="https://github.com/"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/></a>
  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-white?style=for-the-badge&logo=react&logoColor=white&color=%23087ea4"/></a>
   <a href="https://www.java.com/"><img src="https://img.shields.io/badge/Java-white?style=for-the-badge&logo=openjdk&logoColor=white&color=%23ED8B00"/></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-white?style=for-the-badge&logo=springboot&logoColor=white&color=%236DB33F"/></a>
 </h4>
 
 ## 🎓 Equipe <a id="equipe"></a>
