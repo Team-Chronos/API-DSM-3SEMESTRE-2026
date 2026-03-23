@@ -5,11 +5,47 @@ function CadastroProfissional() {
   const [email, setEmail] = useState("");
   const [cargo, setCargo] = useState("");
 
+  const [busca, setBusca] = useState("");
+  const [projetosSelecionados, setProjetosSelecionados] = useState<number[]>([]);
+
   const projetos = [
     { id: 1, nome: "Projeto A" },
     { id: 2, nome: "Projeto B" },
     { id: 3, nome: "Projeto C" }
   ];
+
+  // 🔍 Filtrar projetos
+  const projetosFiltrados = projetos.filter((proj) =>
+    proj.nome.toLowerCase().includes(busca.toLowerCase())
+  );
+
+  // ✅ Selecionar / desselecionar
+  const toggleProjeto = (id: number) => {
+    if (projetosSelecionados.includes(id)) {
+      setProjetosSelecionados(projetosSelecionados.filter(p => p !== id));
+    } else {
+      setProjetosSelecionados([...projetosSelecionados, id]);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!nome || !email || !cargo) {
+      alert("Preencha os campos obrigatórios");
+      return;
+    }
+
+    const dados = {
+      nome,
+      email,
+      cargo,
+      projetosIds: projetosSelecionados 
+    };
+
+    console.log(dados);
+    alert("Profissional cadastrado!");
+  };
 
   return (
     <div className="w-full max-w-3xl mx-auto">
@@ -20,11 +56,11 @@ function CadastroProfissional() {
 
       <div className="bg-gray-800 p-8 rounded-xl shadow-md">
 
-        <form className="flex flex-col gap-6">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
-          {/* Nome */}
+          {/* Nome **/}
           <div>
-            <label className="text-sm text-gray-300">Nome</label>
+            <label className="text-sm text-gray-300">Nome *</label>
             <input
               type="text"
               value={nome}
@@ -35,7 +71,7 @@ function CadastroProfissional() {
 
           {/* Email */}
           <div>
-            <label className="text-sm text-gray-300">Email</label>
+            <label className="text-sm text-gray-300">Email *</label>
             <input
               type="email"
               value={email}
@@ -46,32 +82,48 @@ function CadastroProfissional() {
 
           {/* Cargo */}
           <div>
-            <label className="text-sm text-gray-300">Cargo</label>
+            <label className="text-sm text-gray-300">Cargo *</label>
             <input
               type="text"
               value={cargo}
               onChange={(e) => setCargo(e.target.value)}
               className="w-full mt-2 p-4 rounded-lg bg-gray-700 border border-gray-600 outline-none"
-              placeholder="Ex: Desenvolvedor, QA, PO"
             />
           </div>
 
-          {/* Projetos */}
+          {/* Projetos (OPCIONAL) */}
           <div>
             <label className="text-sm text-gray-300">
-              Projetos vinculados
+              Projetos vinculados (opcional)
             </label>
 
-            <select
-              multiple
-              className="w-full mt-2 p-4 rounded-lg bg-gray-700 border border-gray-600 h-40"
-            >
-              {projetos.map((proj) => (
-                <option key={proj.id} value={proj.id}>
+            {/* Busca */}
+            <input
+              type="text"
+              placeholder="Buscar projeto..."
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              className="w-full mt-2 mb-3 p-3 rounded-lg bg-gray-700 border border-gray-600 outline-none"
+            />
+
+            {/* Lista */}
+            <div className="max-h-40 overflow-y-auto flex flex-col gap-2">
+
+              {projetosFiltrados.map((proj) => (
+                <label
+                  key={proj.id}
+                  className="flex items-center gap-2 bg-gray-700 p-2 rounded-lg cursor-pointer"
+                >
+                  <input
+                    type="checkbox"
+                    checked={projetosSelecionados.includes(proj.id)}
+                    onChange={() => toggleProjeto(proj.id)}
+                  />
                   {proj.nome}
-                </option>
+                </label>
               ))}
-            </select>
+
+            </div>
           </div>
 
           {/* Botão */}
