@@ -111,7 +111,8 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4e4e4e'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3e3e3e'}
               disabled={carregando}
-            >Concluir
+            >
+              Concluir
             </button>
           </div>
         </form>

@@ -29,7 +29,11 @@ interface Coluna {
   tarefas: Tarefa[];
 }
 
-export default function DragDropTarefas() {
+interface DragDropTarefasProps {
+  onAbrirModalItem?: (tarefaId: number) => void;
+}
+
+export default function DragDropTarefas({ onAbrirModalItem }: DragDropTarefasProps) {
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: 'pendente', titulo: 'Pendente', status: 'PENDENTE', tarefas: [] },
     { id: 'em_andamento', titulo: 'Em Andamento', status: 'EM_ANDAMENTO', tarefas: [] },
@@ -103,6 +107,18 @@ export default function DragDropTarefas() {
     }
   };
 
+  const handleAbrirVisualizar = (tarefa: Tarefa) => {
+    setTarefaSelecionada(tarefa);
+    setModalVisualizarAberto(true);
+  };
+
+  const handleAbrirModalItem = (tarefaId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onAbrirModalItem) {
+      onAbrirModalItem(tarefaId);
+    }
+  };
+
   if (loading) return <div className="p-6 text-white">Carregando...</div>;
 
   return (
@@ -113,7 +129,10 @@ export default function DragDropTarefas() {
             <Droppable key={coluna.id} id={coluna.id} titulo={coluna.titulo}>
               <div className="space-y-2">
                 {coluna.tarefas.map((tarefa) => (
-                  <div key={tarefa.id} onClick={() => { setTarefaSelecionada(tarefa); setModalVisualizarAberto(true); }}>
+                  <div 
+                    key={tarefa.id} 
+                    onClick={() => handleAbrirVisualizar(tarefa)}
+                  >
                     <Draggable 
                       id={tarefa.id.toString()}
                       tarefa={{
@@ -121,6 +140,7 @@ export default function DragDropTarefas() {
                         responsavel: tarefa.responsavelId?.toString() || 'N/A',
                         prazo: new Date()
                       }}
+                      onAddItem={(e) => handleAbrirModalItem(tarefa.id, e)}
                     />
                   </div>
                 ))}

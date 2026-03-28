@@ -26,8 +26,9 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar }: Prop
   const carregarItens = async () => {
     setCarregando(true);
     try {
-      const response = await Api.get(`/itens/tarefa/${tarefa.id}`);
-      setItens(response.data);
+      const response = await Api.get(`/tarefa/${tarefa.id}`);
+      const data = response.data;
+      setItens(Array.isArray(data) ? data : [data]);
     } catch (err) {
       console.error("Erro ao carregar itens:", err);
       setItens([]);
@@ -66,7 +67,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar }: Prop
             <div className="max-h-48 overflow-y-auto space-y-2 pr-2 custom-scrollbar">
               {carregando ? (
                 <p className="text-gray-500 animate-pulse">A carregar itens...</p>
-              ) : itens.length > 0 ? (
+              ) : itens.length > 0 && itens[0]?.id ? (
                 itens.map(item => (
                   <div key={item.id} className="p-3 rounded bg-[#2a2a2a] border-l-4 border-blue-500 shadow-sm">
                     <div className="text-white text-sm font-semibold">{item.nome}</div>

@@ -14,6 +14,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
   const [tempoMaximoMinutos, setTempoMaximoMinutos] = useState("");
   const [status, setStatus] = useState("");
   const [tipoId, setTipoId] = useState<string>("");
+  const [projetoId, setProjetoId] = useState<string>("");
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
 
@@ -39,10 +40,11 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
     const dadosTarefa = { 
       titulo, 
       descricao, 
-      responsavelId: Number(responsavelId),
+      responsavelId: responsavelId ? Number(responsavelId) : null,
       tempoMaximoMinutos: Number(tempoMaximoMinutos),
       status: statusMap[status] || status,
-      tipoTarefaId: Number(tipoId)
+      tipoTarefaId: Number(tipoId),
+      projetoId: projetoId ? Number(projetoId) : null
     };
 
     try {
@@ -54,6 +56,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
       setTempoMaximoMinutos("");
       setStatus("");
       setTipoId("");
+      setProjetoId("");
       
       onFechar();
       if (onSucesso) onSucesso();
@@ -73,7 +76,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
           setErro("Erro ao criar tarefa! Verifique os dados e tente novamente.");
         }
       } else {
-        setErro("Erro ao criar tarefa! Verifique os dados e tente novamente.");
+        setErro("Erro ao criar tarefa! Verifique sua conexão com o servidor.");
       }
     } finally {
       setCarregando(false);
@@ -120,12 +123,11 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
           
           <input
             type="number"
-            placeholder="Responsável (ID)"
+            placeholder="Responsável (ID) - Opcional"
             value={responsavelId}
             onChange={(e) => setResponsavelId(e.target.value)}
             className="border p-2 rounded text-white"
             style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
-            required
           />
           
           <input
@@ -151,6 +153,15 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
             <option value="Concluída">Concluída</option>
           </select>
           
+          <input
+            type="number"
+            placeholder="Projeto ID - Opcional"
+            value={projetoId}
+            onChange={(e) => setProjetoId(e.target.value)}
+            className="border p-2 rounded text-white"
+            style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
+          />
+          
           <select
             value={tipoId}
             onChange={(e) => setTipoId(e.target.value)}
@@ -161,7 +172,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
             <option value="">Selecione o tipo</option>
             <option value="1">Desenvolvimento</option>
             <option value="2">Teste</option>
-            <option value="3">Analise</option>
+            <option value="3">Análise</option>
           </select>
 
           <div className="flex justify-end gap-2 mt-2">
@@ -183,7 +194,8 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#4e4e4e'}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#3e3e3e'}
               disabled={carregando}
-            >Concluir
+            >
+              Concluir
             </button>
           </div>
         </form>

@@ -14,9 +14,10 @@ interface Tarefa {
 type DraggableProps = {
   id: UniqueIdentifier;
   tarefa: Tarefa;
+  onAddItem?: (e: React.MouseEvent) => void;
 };
 
-export function Draggable({ id, tarefa }: DraggableProps) {
+export function Draggable({ id, tarefa, onAddItem }: DraggableProps) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id,
   });
@@ -80,8 +81,14 @@ export function Draggable({ id, tarefa }: DraggableProps) {
         </div>
       </div>
 
-      <div className="mt-2 pt-2 border-t border-[#3e3e3e] flex justify-end">
-         <span className="text-[10px] text-gray-600 uppercase font-bold">Clique para detalhes</span>
+      <div className="mt-2 pt-2 border-t border-[#3e3e3e] flex justify-between items-center">
+        <button
+          onClick={onAddItem}
+          className="text-[10px] text-blue-400 hover:text-blue-300 font-bold transition-colors pointer-events-auto"
+        >
+          + Adicionar Item
+        </button>
+        <span className="text-[10px] text-gray-600 uppercase font-bold">Clique para detalhes</span>
       </div>
     </div>
   );
