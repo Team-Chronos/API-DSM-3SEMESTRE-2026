@@ -117,7 +117,7 @@ function ApontamentoTempo(){
           </div>
           <div className={`grow bg-mist-800 rounded-br-md rounded-tr-md`}>
             {tarefaSelecionada && (
-              <TarefasInfo tarefa={tarefaSelecionada} item={itens?.find((item) => item.id == tarefaSelecionada.item_id)} setTarefa={setTarefaSelecionada} />
+              <TarefasInfo reloadTarefas={buscarTarefas} tarefa={tarefaSelecionada} item={itens?.find((item) => item.id == tarefaSelecionada.item_id)} setTarefa={setTarefaSelecionada} />
             )}
           </div>
         </div>

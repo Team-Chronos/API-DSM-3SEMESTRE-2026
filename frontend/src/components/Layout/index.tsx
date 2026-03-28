@@ -1,4 +1,5 @@
 import { Outlet } from "react-router-dom"
+import { ToastContainer } from "react-toastify"
 
 function Layout(){
     return(
@@ -9,6 +10,9 @@ function Layout(){
                 <Outlet />
             </main>
             <footer></footer>
+            <ToastContainer
+                theme="dark"
+            />
         </>
     )
 }

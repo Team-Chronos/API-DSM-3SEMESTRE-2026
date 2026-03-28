@@ -3,16 +3,19 @@ import type { Tarefa } from "../../../types/tarefa"
 import type { RegistroHorasTarefa } from "../../../types/registroTempo"
 import type { Item } from "../../../types/item"
 import TabelaRegistroHoras from "./TabelaRegistroHoras"
+import ModalCadastro from "./ModalCadastro"
 
 interface TarefasInfoProps {
     tarefa: Tarefa
     item?: Item
     setTarefa: (tarefa: Tarefa | undefined) => void
+    reloadTarefas: () => void
 }
 
-function TarefasInfo({ tarefa, item, setTarefa }: TarefasInfoProps) {
+function TarefasInfo({ tarefa, item, setTarefa, reloadTarefas }: TarefasInfoProps) {
     const [registroHorasTarefa, setRegistroHorasTarefa] = useState<RegistroHorasTarefa>()
     const [ porcentagemTempo, setPorcentagemTempo ] = useState<number>(0)
+    const [ modalCadastro, setModalCadastro ] = useState<boolean>(false)
 
     async function buscarRegistroHorasTarefa() {
         try {
@@ -103,7 +106,10 @@ function TarefasInfo({ tarefa, item, setTarefa }: TarefasInfoProps) {
                                     ></div>
                                 </div>
                                 <p className={`mt-2 text-gray-200 text-sm`}>{registroHorasTarefa?.tempoMinutos} min / {tarefa.tempoMaximoMinutos} min</p>
-                                <button className={`text-sm w-fit self-center bg-violet-700 hover:bg-violet-800 active:bg-violet-900 shadow-violet-600 hover:shadow-none shadow-inner cursor-pointer rounded-lg py-2 px-4 mt-4`}>
+                                <button
+                                    className={`text-sm w-fit self-center bg-violet-700 hover:bg-violet-800 active:bg-violet-900 shadow-violet-600 hover:shadow-none shadow-inner cursor-pointer rounded-lg py-2 px-4 mt-4`}
+                                    onClick={() => setModalCadastro(true)}
+                                >
                                     Registrar tempo
                                 </button>
                             </div>
@@ -115,6 +121,18 @@ function TarefasInfo({ tarefa, item, setTarefa }: TarefasInfoProps) {
                     </div>
                 </div>
             </div>
+            <ModalCadastro
+                tempoMaximoMinutos={tarefa.tempoMaximoMinutos}
+                tempoRegistradoMinutos={registroHorasTarefa?.tempoMinutos || 0}
+                tarefaId={tarefa.id}
+                open={modalCadastro}
+                onClose={() => {
+                    setModalCadastro(false)
+                    reloadTarefas()
+                }}
+            >
+
+            </ModalCadastro>
         </>
     )
 }
