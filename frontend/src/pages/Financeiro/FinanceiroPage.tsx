@@ -1,11 +1,8 @@
 import IndicadoresGrid from "../../components/dashboard/IndicadoresGrid";
 import ListaProfissionais from "../../components/dashboard/ListaProfissionais";
 import ListaProjetos from "../../components/dashboard/ListaProjetos";
-import {
-  dashboardMock,
-  profissionaisMock,
-  projetosMock,
-} from "../../Teste/FincanceiroMock";
+import SemConteudo from "../../components/ui/SemConteudo";
+import { useDashboardFinanceiro } from "../../hooks/useDashboardFinanceiro";
 
 function valorValido(valor: number): boolean {
   return Number.isFinite(valor);
@@ -32,17 +29,68 @@ function formatarInteiro(valor: number): string {
   return new Intl.NumberFormat("pt-BR").format(valor);
 }
 
-export default function PaginaDashboardFinanceiro() {
+export default function FinanceiroPage() {
+  const { dashboard, projetos, profissionais, loading, error, recarregar } =
+    useDashboardFinanceiro();
+
+  if (loading) {
+    return (
+      <section className="min-h-screen bg-[#1b1b1f] px-6 py-10 text-white">
+        <div className="mx-auto w-full max-w-7xl space-y-5">
+          <div className="grid gap-5 md:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-44 animate-pulse rounded-[28px] bg-[#232329]"
+              />
+            ))}
+          </div>
+
+          <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="grid gap-5 md:grid-cols-2">
+              <div className="h-[620px] animate-pulse rounded-[28px] bg-[#232329]" />
+              <div className="h-[620px] animate-pulse rounded-[28px] bg-[#232329]" />
+            </div>
+
+            <div className="h-[681px] animate-pulse rounded-[28px] bg-[#5b21b6]" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (error || !dashboard) {
+    return (
+      <section className="min-h-screen bg-[#1b1b1f] px-6 py-10 text-white">
+        <div className="mx-auto w-full max-w-7xl">
+          <SemConteudo
+            title="Erro ao carregar financeiro"
+            description={error ?? "Não foi possível carregar os dados."}
+          />
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => void recarregar()}
+              className="rounded-2xl bg-violet-600 px-5 py-3 font-medium text-white transition hover:bg-violet-500"
+            >
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="min-h-screen bg-[#1b1b1f] text-white">
       <div className="mx-auto w-full max-w-7xl px-6 py-10">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-5">
-            <IndicadoresGrid dashboard={dashboardMock} />
+            <IndicadoresGrid dashboard={dashboard} />
 
             <section className="grid gap-5 md:grid-cols-2">
-              <ListaProjetos projetos={projetosMock} />
-              <ListaProfissionais profissionais={profissionaisMock} />
+              <ListaProjetos projetos={projetos} />
+              <ListaProfissionais profissionais={profissionais} />
             </section>
           </div>
 
@@ -53,13 +101,8 @@ export default function PaginaDashboardFinanceiro() {
                   Desenvolvedores
                 </p>
                 <p className="mt-4 text-6xl font-semibold leading-none">
-                  {formatarInteiro(dashboardMock.totalDesenvolvedores)}
+                  {formatarInteiro(dashboard.totalDesenvolvedores)}
                 </p>
-                {!valorValido(dashboardMock.totalDesenvolvedores) && (
-                  <p className="mt-3 text-sm text-white/60">
-                    Sem dados disponíveis
-                  </p>
-                )}
               </div>
 
               <div>
@@ -67,13 +110,8 @@ export default function PaginaDashboardFinanceiro() {
                   Custo Total Projetos
                 </p>
                 <p className="mt-4 text-6xl font-semibold leading-tight">
-                  {formatarMoeda(dashboardMock.custoTotal)}
+                  {formatarMoeda(dashboard.custoTotal)}
                 </p>
-                {!valorValido(dashboardMock.custoTotal) && (
-                  <p className="mt-3 text-sm text-white/60">
-                    Sem dados disponíveis
-                  </p>
-                )}
               </div>
 
               <div>
@@ -81,13 +119,8 @@ export default function PaginaDashboardFinanceiro() {
                   Projetos Concluídos
                 </p>
                 <p className="mt-4 text-6xl font-semibold leading-none">
-                  {formatarInteiro(dashboardMock.projetosConcluidos)}
+                  {formatarInteiro(dashboard.projetosConcluidos)}
                 </p>
-                {!valorValido(dashboardMock.projetosConcluidos) && (
-                  <p className="mt-3 text-sm text-white/60">
-                    Sem dados disponíveis
-                  </p>
-                )}
               </div>
             </div>
           </aside>

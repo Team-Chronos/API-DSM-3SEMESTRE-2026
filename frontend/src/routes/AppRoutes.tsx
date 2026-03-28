@@ -5,7 +5,6 @@ import AppLayout from "../components/Layout/AppLayout";
 const Layout = lazy(() => import("../components/Layout"))
 const ApontamentoTempo = lazy(() => (import("../pages/ApontamentoTempo")))
 const DashboardPage = lazy(() => (import("../pages/Financeiro/FinanceiroPage")))
-
 const AppRoutes = createBrowserRouter([
     {
         path: "/",

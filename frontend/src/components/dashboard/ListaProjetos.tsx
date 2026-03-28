@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import SemConteudo from "../ui/SemConteudo";
 import Search from "../ui/Search";
 import ModalDetalheProjeto from "../modais/ModalDetalheProjeto";
+import { apiFinanceiro } from "../../lib/apiFinanceiro";
 import type { ProjetoDetalhe, ProjetoFinanceiro } from "../../types/financeiro";
 
 interface ListaProjetosProps {
@@ -24,49 +25,15 @@ function formatarHoras(valor: number): string {
   }).format(valor)}h`;
 }
 
-function criarDetalheMock(projeto: ProjetoFinanceiro): ProjetoDetalhe {
-  const valorHoraProjeto =
-    projeto.totalHoras > 0 ? projeto.custoTotal / projeto.totalHoras : 0;
-
-  return {
-    projetoId: projeto.projetoId,
-    nomeProjeto: projeto.nomeProjeto,
-    tipoProjeto: projeto.tipoProjeto,
-    totalHoras: projeto.totalHoras,
-    custoTotal: projeto.custoTotal,
-    valorHoraProjeto,
-    totalProfissionais: 3,
-    profissionais: [
-      {
-        usuarioId: 1,
-        usuarioNome: "Ana Souza",
-        horasTrabalhadas: projeto.totalHoras * 0.45,
-        valorHoraProjeto,
-        valorBaseCalculado: projeto.custoTotal * 0.45,
-      },
-      {
-        usuarioId: 2,
-        usuarioNome: "Bruno Lima",
-        horasTrabalhadas: projeto.totalHoras * 0.3,
-        valorHoraProjeto,
-        valorBaseCalculado: projeto.custoTotal * 0.3,
-      },
-      {
-        usuarioId: 3,
-        usuarioNome: "Carla Mendes",
-        horasTrabalhadas: projeto.totalHoras * 0.25,
-        valorHoraProjeto,
-        valorBaseCalculado: projeto.custoTotal * 0.25,
-      },
-    ],
-  };
-}
-
 export default function ListaProjetos({ projetos }: ListaProjetosProps) {
   const [buscaAberta, setBuscaAberta] = useState(false);
   const [busca, setBusca] = useState("");
   const [projetoSelecionado, setProjetoSelecionado] =
     useState<ProjetoDetalhe | null>(null);
+  const [carregandoProjetoId, setCarregandoProjetoId] = useState<number | null>(
+    null
+  );
+  const [erroDetalhe, setErroDetalhe] = useState<string | null>(null);
 
   const projetosFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -83,6 +50,24 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
       );
     });
   }, [projetos, busca]);
+
+  async function abrirDetalheProjeto(projetoId: number) {
+    try {
+      setErroDetalhe(null);
+      setCarregandoProjetoId(projetoId);
+
+      const detalhe = await apiFinanceiro.buscarProjetoDetalhe(projetoId);
+      setProjetoSelecionado(detalhe);
+    } catch (err) {
+      const mensagem =
+        err instanceof Error
+          ? err.message
+          : "Erro ao carregar detalhe do projeto";
+      setErroDetalhe(mensagem);
+    } finally {
+      setCarregandoProjetoId(null);
+    }
+  }
 
   return (
     <>
@@ -144,6 +129,10 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
               </div>
             </div>
           </div>
+
+          {erroDetalhe && (
+            <p className="mt-3 text-sm text-red-300">{erroDetalhe}</p>
+          )}
         </div>
 
         <div className="h-[500px] overflow-y-auto pr-1">
@@ -159,9 +148,8 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
                   key={projeto.projetoId}
                   type="button"
                   className="block w-full rounded-[24px] bg-[#54545a] p-6 text-left transition hover:bg-[#5c5c63]"
-                  onClick={() =>
-                    setProjetoSelecionado(criarDetalheMock(projeto))
-                  }
+                  onClick={() => void abrirDetalheProjeto(projeto.projetoId)}
+                  disabled={carregandoProjetoId === projeto.projetoId}
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="min-w-0">
@@ -175,7 +163,9 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
 
                     <div className="shrink-0 text-right">
                       <p className="text-[16px] text-white/75">
-                        {formatarHoras(projeto.totalHoras)}
+                        {carregandoProjetoId === projeto.projetoId
+                          ? "..."
+                          : formatarHoras(projeto.totalHoras)}
                       </p>
                     </div>
                   </div>
