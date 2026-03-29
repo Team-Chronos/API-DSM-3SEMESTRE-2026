@@ -4,8 +4,12 @@ import AppRoutes from './routes/AppRoutes'
 function App() {
 
   return (
-    <RouterProvider router={AppRoutes} />
+    <RouterProvider router={AppRoutes} 
+    />
+    
+    
   )
+  
 }
 
 export default App
