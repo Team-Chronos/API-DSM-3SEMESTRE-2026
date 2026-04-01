@@ -1,9 +1,19 @@
 [submodule "services-gestao-projetos"]
 	path = services/gestao-projetos
 	url = https://github.com/Team-Chronos/API3-servico-gestao-projetos.git
-	branch = dev
+	branch = main
 
 [submodule "services-controle-horas"]
 	path = services/controle-horas
 	url = https://github.com/Team-Chronos/API3-servico-controle-de-tempo.git
-	branch = dev
+	branch = main
+
+[submodule "services-gestao-profissionais"]
+	path = services/gestao-profissionais
+	url = https://github.com/EnricoGermano/API3-servico-profissionais.git
+	branch = main
+
+[submodule "services-gestao-tarefas"]
+	path = services/gestao-tarefas
+	url = https://github.com/gabsact4/API3-servico-gestao-de-tarefas.git
+	branch = main

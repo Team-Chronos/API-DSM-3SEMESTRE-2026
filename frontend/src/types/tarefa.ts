@@ -5,6 +5,8 @@ export type Tarefa = {
   tempoMaximoMinutos: number,
   status: String
   
-  responsavel_id?: number,
-  item_id?: number
+  responsavelId?: number,
+  itemId?: number
+  projetoId: number
+  tipoTarefaId: number
 }

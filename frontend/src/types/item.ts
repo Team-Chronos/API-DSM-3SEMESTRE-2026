@@ -1,5 +1,5 @@
 export type Item = {
-  id: number,
+  idItem: number,
   nome: String,
   descricao: String
 }

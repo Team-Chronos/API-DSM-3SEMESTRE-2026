@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import {LayoutDashboard,FolderKanban,Users,ChevronLeft,LogOut,} from "lucide-react";
+import { LayoutDashboard, FolderKanban, Users, ChevronLeft, Link, LogOut } from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
 
 const NAV_ITEMS = [
-  {to:"/financeiro",icon: LayoutDashboard,label:"Dashboard" },
-  {to:"/projetos",icon: FolderKanban,label: "Projetos"  },
-  {to:"/usuarios",icon: Users,label:"Usuários"  },
+  { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/projetos", icon: FolderKanban, label: "Projetos" },
+  { to: "/profissionais", icon: Users, label: "Profissionais" },
+  { to: "/associacoes", icon: Link, label: "Associações" }
 ];
 
 export default function Sidebar() {
-  const [expanded, setExpanded]= useState(true);
+  const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   function handleLogout() {
