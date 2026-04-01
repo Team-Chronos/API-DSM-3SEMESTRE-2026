@@ -1,10 +1,17 @@
-import { RouterProvider } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, Navigate, RouterProvider } from "react-router-dom";
 import AppRoutes from './routes/AppRoutes'
+import { AuthProvider } from './contexts/AuthContext'
 
-function App() {
+import AppLayout from "./components/layout/AppLayout";
+import Dashboard from "./components/pages/Dashboard";
+import Usuarios from "./components/pages/Usuarios";
+import Projetos from "./components/pages/Projetos";
 
+export default function App() {
   return (
-    <RouterProvider router={AppRoutes} />
+    <AuthProvider>
+      <RouterProvider router={AppRoutes} />
+    </AuthProvider>
   )
 }
 
