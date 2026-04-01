@@ -58,6 +58,10 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ---
 
+## DoR (Definition of Ready) and DoD (Definition of Done)
+**:link: Clique no link abaixo para visualizar o DoD e o DoR em documentos:** 
+> [Definition of Ready and Done](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.0)
+
 ## 🏃‍ DoR - Definition of Ready <a id="dor"></a>
 
 * **Mockup/Protótipo:** incluir representação visual da funcionalidade quando aplicável.
@@ -86,15 +90,15 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ## 🚀 Estratégia de Branch <a id="branch"></a>
 
-[Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
+[Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.tizfg2z79z37)
 
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
 
 | Sprint          |    Período    | Documentação                                     |
 | --------------- | :-----------: | ------------------------------------------------ |
-| 🔖 **SPRINT 1** | 16/03 - 05/04  | [Sprint 1] |
-| 🔖 **SPRINT 2** | 13/04 - 03/05  | [Sprint 2] |
-| 🔖 **SPRINT 3** | 11/05 - 31/05  | [Sprint 3] |
+| 🔖 **SPRINT 1** | 16/03 - 05/04  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
+| 🔖 **SPRINT 2** | 13/04 - 03/05  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
+| 🔖 **SPRINT 3** | 11/05 - 31/05  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
 
 ## 💻 Tecnologias <a id="tecnologias"></a>
 
