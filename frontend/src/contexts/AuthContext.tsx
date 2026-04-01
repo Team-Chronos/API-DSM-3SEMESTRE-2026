@@ -21,16 +21,20 @@ function getDefaultApiUrl(): string {
   const host = window.location.hostname
 
   if (host.endsWith(".app.github.dev")) {
-    return `${window.location.protocol}//${host.replace(/-\d+\.app\.github\.dev$/, "-8081.app.github.dev")}`
+    return `${window.location.protocol}//${host.replace(/-\d+\.app\.github\.dev$/, "-8083.app.github.dev")}`
   }
 
-  return "http://localhost:8081"
+  return "http://localhost:8083"
 }
 
 const RAW_API_URL = import.meta.env.VITE_LOGIN_API_URL ?? getDefaultApiUrl()
 const API_URL = RAW_API_URL.trim().replace(/\/+$/, "")
 
 function getLoginUrl(apiUrl: string): string {
+  if (apiUrl.endsWith("/api/auth")) {
+    return `${apiUrl}/login`
+  }
+
   if (apiUrl.endsWith("/api")) {
     return `${apiUrl}/auth/login`
   }

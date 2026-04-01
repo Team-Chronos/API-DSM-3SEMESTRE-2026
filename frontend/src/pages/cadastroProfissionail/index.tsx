@@ -149,18 +149,6 @@ function CadastroProfissional() {
 
       <div className="bg-[#252525] p-8 rounded-xl shadow-md">
 
-        {mensagem && (
-          <div
-            className={`mb-4 p-3 rounded-lg text-center font-medium
-              ${mensagem.tipo === "sucesso"
-                ? "bg-green-600/20 text-green-400 border border-green-500"
-                : "bg-red-600/20 text-red-400 border border-red-500"
-              }`}
-          >
-            {mensagem.texto}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
 
           {mensagem && (
@@ -232,8 +220,8 @@ function CadastroProfissional() {
             <input
               type="text"
               placeholder="Buscar projeto..."
-              value={buscaProjeto}
-              onChange={(e) => setBuscaProjeto(e.target.value)}
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
               className="w-full mt-2 p-3 rounded-lg bg-[#3e3e3e] border border-[#3e3e3e] outline-none text-white"
             />
 
