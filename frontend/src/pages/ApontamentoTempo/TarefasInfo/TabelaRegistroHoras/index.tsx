@@ -21,7 +21,7 @@ function TabelaRegistroHoras({ registroHorasTarefa }: TabelaRegistroHorasProps){
 
   return(
     <>
-      {registroHorasTarefa ? (
+      {registroHorasTarefa?.registros?.length !== 0 ? (
         <table className={`w-full`}>
           <thead>
             <tr>
@@ -31,7 +31,7 @@ function TabelaRegistroHoras({ registroHorasTarefa }: TabelaRegistroHorasProps){
             </tr>
           </thead>
           <tbody>
-            {registroHorasTarefa.registros
+            {registroHorasTarefa?.registros
               .slice().sort((a, b) => 
                 new Date(b.data_inicio).getTime() - new Date(a.data_inicio).getTime()
               )

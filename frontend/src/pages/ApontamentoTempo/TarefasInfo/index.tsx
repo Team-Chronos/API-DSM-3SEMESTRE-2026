@@ -4,12 +4,13 @@ import type { RegistroHorasTarefa } from "../../../types/registroTempo"
 import type { Item } from "../../../types/item"
 import TabelaRegistroHoras from "./TabelaRegistroHoras"
 import ModalCadastro from "./ModalCadastro"
+import axios from "axios"
 
 interface TarefasInfoProps {
     tarefa: Tarefa
     item?: Item
     setTarefa: (tarefa: Tarefa | undefined) => void
-    reloadTarefas: () => void
+    reloadTarefas: () => Promise<void>
 }
 
 function TarefasInfo({ tarefa, item, setTarefa, reloadTarefas }: TarefasInfoProps) {
@@ -19,47 +20,18 @@ function TarefasInfo({ tarefa, item, setTarefa, reloadTarefas }: TarefasInfoProp
 
     async function buscarRegistroHorasTarefa() {
         try {
-            setRegistroHorasTarefa({
-                registros: [
-                    {
-                        id: 1,
-                        tarefa_id: 1,
-                        data_inicio: "2026-03-23T09:00:00",
-                        data_fim: "2026-03-23T09:45:00",
-                        tempoMinutos: 45
-                    },
-                    {
-                        id: 2,
-                        tarefa_id: 1,
-                        data_inicio: "2026-03-23T10:00:00",
-                        data_fim: "2026-03-23T10:30:00",
-                        tempoMinutos: 30
-                    },
-                    {
-                        id: 3,
-                        tarefa_id: 1,
-                        data_inicio: "2026-03-24T14:00:00",
-                        data_fim: "2026-03-24T15:00:00",
-                        tempoMinutos: 60
-                    },
-                    {
-                        id: 4,
-                        tarefa_id: 1,
-                        data_inicio: "2026-03-24T16:10:00",
-                        data_fim: "2026-03-24T16:40:00",
-                        tempoMinutos: 30
-                    }
-                ],
-                tempoMinutos: 165
-            })
+            const response = await axios.get<RegistroHorasTarefa>("http://localhost:8082/registros/tarefa/" + tarefa.id)
+            setRegistroHorasTarefa(response.data)
         } catch (error: any) {
             console.error("Erro ao buscar registro de horas da tarefa")
         }
     }
 
     useEffect(() => {
-        if (!registroHorasTarefa) return
-        if (!registroHorasTarefa.tempoMinutos) return
+        if (!registroHorasTarefa || !registroHorasTarefa.tempoMinutos) {
+            setPorcentagemTempo(0)
+            return
+        }
 
         setPorcentagemTempo(registroHorasTarefa.tempoMinutos / tarefa.tempoMaximoMinutos)
     }, [registroHorasTarefa, tarefa])
@@ -105,7 +77,7 @@ function TarefasInfo({ tarefa, item, setTarefa, reloadTarefas }: TarefasInfoProp
                                         style={{width: `${porcentagemTempo * 100}%`}}
                                     ></div>
                                 </div>
-                                <p className={`mt-2 text-gray-200 text-sm`}>{registroHorasTarefa?.tempoMinutos} min / {tarefa.tempoMaximoMinutos} min</p>
+                                <p className={`mt-2 text-gray-200 text-sm`}>{registroHorasTarefa?.tempoMinutos || 0} min / {tarefa.tempoMaximoMinutos} min</p>
                                 <button
                                     className={`text-sm w-fit self-center bg-violet-700 hover:bg-violet-800 active:bg-violet-900 shadow-violet-600 hover:shadow-none shadow-inner cursor-pointer rounded-lg py-2 px-4 mt-4`}
                                     onClick={() => setModalCadastro(true)}
@@ -126,9 +98,10 @@ function TarefasInfo({ tarefa, item, setTarefa, reloadTarefas }: TarefasInfoProp
                 tempoRegistradoMinutos={registroHorasTarefa?.tempoMinutos || 0}
                 tarefaId={tarefa.id}
                 open={modalCadastro}
+                reloadTarefas={reloadTarefas}
+                reloadRegistros={buscarRegistroHorasTarefa}
                 onClose={() => {
                     setModalCadastro(false)
-                    reloadTarefas()
                 }}
             >
 

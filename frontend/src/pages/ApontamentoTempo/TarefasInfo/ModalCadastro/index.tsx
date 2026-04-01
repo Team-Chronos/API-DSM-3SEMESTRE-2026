@@ -9,6 +9,8 @@ interface ModalCadastroProps {
   tempoRegistradoMinutos: number
   tarefaId: number
   open: boolean
+  reloadTarefas: () => Promise<void>
+  reloadRegistros: () => Promise<void>
   onClose: () => void
 }
 
@@ -17,7 +19,7 @@ type form = {
   data_fim?: string
 }
 
-function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, open, onClose}: ModalCadastroProps){
+function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, open, reloadTarefas, reloadRegistros, onClose}: ModalCadastroProps){
   if (open == false) return
 
   const [ form, setForm ] = useState<form>({
@@ -42,13 +44,12 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
 
   async function handleFormSubmit(e: React.SubmitEvent){
     e.preventDefault()
-    onClose()
-
+    
     if (form.data_inicio == null || form.data_inicio == undefined){
       setErroDataInicio("A data de início não pode ser nula")
       return
     }
-
+    
     if (form.data_fim){
       if (!validarData(form.data_inicio, form.data_fim)){
         return
@@ -57,17 +58,18 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
         return
       }
     }
-
+    
     if (!tarefaId){
       console.error("Não foi passado tarefaId")
       return
     }
-
+    
     const data = {
       data_inicio: new Date(form.data_inicio).toISOString(),
       data_fim: form.data_fim ? new Date(form.data_fim).toISOString() : undefined,
       tarefa_id: tarefaId
     }
+    onClose()
     try {
       await toast.promise(axios.post("http://localhost:8082/registros", data),
         {
@@ -76,8 +78,10 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
           error: "Erro ao obter resposta"
         }
       )
+      await reloadTarefas()
+      await reloadRegistros()
     } catch (error: any) {
-      console.error("Erro ao enviar formulário")
+      console.error("Erro ao enviar formulário", error)
     }
   }
 

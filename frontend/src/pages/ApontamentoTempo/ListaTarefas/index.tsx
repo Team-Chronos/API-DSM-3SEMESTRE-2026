@@ -32,19 +32,18 @@ function ApontamentoListaTarefas({ tarefas, itens, setTarefa }: ApontamentoLista
         </div>
         <ul className={`flex flex-col gap-4 max-h-96 overflow-y-auto p-0.5`}>
           {itens?.map((item) => (
-            <li key={item.id} className={`flex flex-col gap-y-2`}>
+            <li key={item.idItem} className={`flex flex-col gap-y-2`}>
               <button
                 onClick={() => {
-                  toggleItem(item.id)
-                  console.log(item)
+                  toggleItem(item.idItem)
                 }}                
               >
                 <h3 className="font-medium text-left hover:text-white cursor-pointer">{item.nome}</h3>
               </button>
-              {(aberto === Number(item.id)) && (
-                <ul key={item.id*-1} className={`flex flex-col gap-y-1 pl-3`}>
+              {(aberto === Number(item.idItem)) && (
+                <ul key={item.idItem*-1} className={`flex flex-col gap-y-1 pl-3`}>
                 {tarefas
-                  ?.filter((tarefa) => tarefa.itemId === item.id)
+                  ?.filter((tarefa) => tarefa.itemId === item.idItem)
                   .map((tarefa) => (
                     <li key={tarefa.id}>
                       <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>

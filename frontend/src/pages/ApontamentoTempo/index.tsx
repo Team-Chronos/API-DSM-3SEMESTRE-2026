@@ -16,62 +16,8 @@ function ApontamentoTempo(){
 
   async function buscarTarefas() {
     try {
-      const response = await axios.get<Tarefa[]>(`http://localhost:8081/tarefas/projeto/${projetoId}/responsavel/${1}`)
+      const response = await axios.get<Tarefa[]>(`http://192.168.137.104:8089/tarefas/projeto/${projetoId}/responsavel/${2}`)
       setTarefas(response.data)
-      // setTarefas([
-      //   {
-      //     id: 1,
-      //     titulo: "Implementar login",
-      //     descricao: "Criar autenticação com JWT",
-      //     tempoMaximoMinutos: 250,
-      //     status: "pendente",
-      //     responsavel_id: 1,
-      //     item_id: 0
-      //   },
-      //   {
-      //     id: 2,
-      //     titulo: "Criar tela de dashboard",
-      //     descricao: "Layout inicial com gráficos",
-      //     tempoMaximoMinutos: 140,
-      //     status: "em andamento",
-      //     responsavel_id: 2,
-      //     item_id: 1
-      //   },
-      //   {
-      //     id: 3,
-      //     titulo: "Configurar banco de dados",
-      //     tempoMaximoMinutos: 110,
-      //     status: "concluido",
-      //     responsavel_id: 1,
-      //     item_id: 2
-      //   },
-      //   {
-      //     id: 4,
-      //     titulo: "Implementar API de tarefas",
-      //     descricao: "CRUD completo de tarefas",
-      //     tempoMaximoMinutos: 150,
-      //     status: "pendente",
-      //     responsavel_id: 3,
-      //     item_id: 0
-      //   },
-      //   {
-      //     id: 5,
-      //     titulo: "Adicionar validações",
-      //     descricao: "Validar inputs no frontend",
-      //     tempoMaximoMinutos: 270,
-      //     status: "em andamento",
-      //     responsavel_id: 2,
-      //     item_id: 1
-      //   },
-      //   {
-      //     id: 6,
-      //     titulo: "Deploy da aplicação",
-      //     tempoMaximoMinutos: 37,
-      //     status: "pendente",
-      //     responsavel_id: 3,
-      //     item_id: 2
-      //   }
-      // ])
     } catch (error: any) {
       toast.error("Erro ao buscar tarefas", {autoClose: 2000})
       console.error("Erro ao buscar tarefas", error)
@@ -83,31 +29,11 @@ function ApontamentoTempo(){
       return
 
     try {
-      const response = await axios.get<Item[]>(`http://localhost:8081/itens/projeto/${projetoId}`)
-      // const itens: Item[] = [
-      //   {
-      //     id: 0,
-      //     nome: "Sem item",
-      //     descricao: "Tarefas não relacionadas a um item"
-      //   },
-      //   {
-      //     id: 1,
-      //     nome: "Frontend",
-      //     descricao: "Tarefas relacionadas à interface do usuário e experiência"
-      //   },
-      //   {
-      //     id: 2,
-      //     nome: "DevOps",
-      //     descricao: "Tarefas de deploy, infraestrutura e integração contínua"
-      //   }
-      // ]
-      // setItens(itens.filter(item =>
-      //   tarefas.some(tarefa => tarefa.item == item.id)
-      // ))
+      const response = await axios.get<Item[]>(`http://192.168.137.104:8089/itens/projeto/${projetoId}/responsavel/${2}`)
       setItens(response.data)
     } catch (error: any) {
       toast.error("Erro ao buscar itens", {autoClose: 2000})
-      console.error("Erro ao buscar itens")
+      console.error("Erro ao buscar itens", error)
     }
   }
 
@@ -128,7 +54,7 @@ function ApontamentoTempo(){
           </div>
           <div className={`grow bg-mist-800 rounded-br-md rounded-tr-md`}>
             {tarefaSelecionada && (
-              <TarefasInfo reloadTarefas={buscarTarefas} tarefa={tarefaSelecionada} item={itens?.find((item) => item.id == tarefaSelecionada.itemId)} setTarefa={setTarefaSelecionada} />
+              <TarefasInfo reloadTarefas={buscarTarefas} tarefa={tarefaSelecionada} item={itens?.find((item) => item.idItem == tarefaSelecionada.itemId)} setTarefa={setTarefaSelecionada} />
             )}
           </div>
         </div>
