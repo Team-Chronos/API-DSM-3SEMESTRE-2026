@@ -5,7 +5,7 @@ import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
 
 const NAV_ITEMS = [
-  { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/projetos", icon: FolderKanban, label: "Projetos" },
   { to: "/profissionais", icon: Users, label: "Profissionais" },
   { to: "/associacoes", icon: Link, label: "Associações" }
@@ -50,7 +50,7 @@ export default function Sidebar() {
 
       <aside
         className={`
-          relative flex flex-col h-screen bg-[#1a1a36] text-white
+          relative flex flex-col h-screen bg-[#1b1b1f] text-white  border-r border-white/5
           transition-all duration-300 ease-in-out shrink-0
           ${expanded ? "w-60" : "w-16"}
         `}

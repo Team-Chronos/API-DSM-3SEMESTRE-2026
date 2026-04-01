@@ -1,2 +1,28 @@
 @import "tailwindcss";
 
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+::-webkit-scrollbar {
+    width: 1px;                
+    height: 12px;               }
+
+::-webkit-scrollbar-track {
+    background: #414040;
+    border-radius: 10px;        
+}
+
+::-webkit-scrollbar-thumb {
+    background:     #8b8b8b;       
+    border-radius: 10px;       
+}
+
+
