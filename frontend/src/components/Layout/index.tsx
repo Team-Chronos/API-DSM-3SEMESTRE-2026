@@ -47,7 +47,6 @@ function Layout() {
 
       </div>
     </div>
-  </div>
   );
 }
 export default Layout;
