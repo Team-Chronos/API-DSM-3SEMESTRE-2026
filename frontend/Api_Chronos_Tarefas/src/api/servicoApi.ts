@@ -8,7 +8,7 @@ export const ApiTarefas = Axios.create({
 });
 
 export const ApiUsuarios = Axios.create({
-  baseURL: "http://localhost:8090", 
+  baseURL: "http://localhost:8089", 
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,5 +20,7 @@ export const ApiResponsaveis = Axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+
 
 export default ApiTarefas;

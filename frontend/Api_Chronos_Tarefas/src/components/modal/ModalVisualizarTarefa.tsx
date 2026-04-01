@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ApiTarefas } from '../../api/servicoApi';
 import itemService, { Item } from "../../api/itemService";
+import projetoService from '../../api/projetoService';
 
 interface Props {
   tarefa: any | null;
@@ -9,18 +10,30 @@ interface Props {
   onAtualizar?: () => void;
 }
 
+interface ResponsavelProjeto {
+  id: number;
+  nome: string;
+}
+
 export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtualizar }: Props) {
   const [itens, setItens] = useState<Item[]>([]);
   const [carregando, setCarregando] = useState(false);
   const [editandoResponsavel, setEditandoResponsavel] = useState(false);
   const [responsavelSelecionado, setResponsavelSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
+  const [nomeProjeto, setNomeProjeto] = useState<string>("");
+  const [responsaveis, setResponsaveis] = useState<ResponsavelProjeto[]>([]);
+  const [carregandoResponsaveis, setCarregandoResponsaveis] = useState(false);
 
   useEffect(() => {
     if (isOpen && tarefa?.id) {
       carregarItens();
+      carregarResponsaveis();
       if (tarefa.responsavelId) {
         setResponsavelSelecionado(String(tarefa.responsavelId));
+      }
+      if (tarefa.projetoId) {
+        carregarNomeProjeto(tarefa.projetoId);
       }
     }
   }, [isOpen, tarefa]);
@@ -38,6 +51,31 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
     }
   };
 
+  const carregarResponsaveis = async () => {
+    setCarregandoResponsaveis(true);
+    try {
+      const response = await ApiTarefas.get('/api/projeto/responsaveis');
+      if (response.data && Array.isArray(response.data)) {
+        setResponsaveis(response.data);
+      }
+    } catch (err) {
+      console.error("Erro ao carregar responsáveis:", err);
+      setResponsaveis([]);
+    } finally {
+      setCarregandoResponsaveis(false);
+    }
+  };
+
+  const carregarNomeProjeto = async (projetoId: number) => {
+    try {
+      const projeto = await projetoService.buscarPorId(projetoId);
+      setNomeProjeto(projeto?.nome || `Projeto ${projetoId}`);
+    } catch (err) {
+      console.error("Erro ao carregar projeto:", err);
+      setNomeProjeto(`Projeto ${projetoId}`);
+    }
+  };
+
   const handleSalvarResponsavel = async () => {
     if (!tarefa || !responsavelSelecionado) return;
     
@@ -50,7 +88,8 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
         tempoMaximoMinutos: tarefa.tempoMaximoMinutos,
         status: tarefa.status,
         tipoTarefaId: tarefa.tipoTarefaId,
-        projetoId: tarefa.projetoId
+        projetoId: tarefa.projetoId,
+        itemId: tarefa.itemId
       };
       
       await ApiTarefas.put(`/tarefas/${tarefa.id}`, tarefaAtualizada);
@@ -64,6 +103,12 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
     } finally {
       setSalvando(false);
     }
+  };
+
+  const getNomeResponsavel = (id: number | null): string => {
+    if (!id) return 'Não atribuído';
+    const responsavel = responsaveis.find(r => r.id === id);
+    return responsavel ? responsavel.nome : `ID: ${id}`;
   };
 
   const formatarData = (data: string | number | null) => {
@@ -131,7 +176,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="text-white">
-                    {tarefa.responsavelId ? `ID: ${tarefa.responsavelId}` : 'Não atribuído'}
+                    {getNomeResponsavel(tarefa.responsavelId)}
                   </span>
                 </div>
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,14 +185,22 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
               </div>
             ) : (
               <div className="space-y-2">
-                <input
-                  type="number"
+                <select
                   value={responsavelSelecionado}
                   onChange={(e) => setResponsavelSelecionado(e.target.value)}
-                  placeholder="ID do Responsável"
                   className="w-full p-2 rounded text-white bg-[#1f1f1f] border border-[#3e3e3e]"
-                  disabled={salvando}
-                />
+                  disabled={salvando || carregandoResponsaveis}
+                >
+                  <option value="">Selecione um responsável</option>
+                  {responsaveis.map((responsavel) => (
+                    <option key={responsavel.id} value={responsavel.id}>
+                      {responsavel.nome}
+                    </option>
+                  ))}
+                </select>
+                {carregandoResponsaveis && (
+                  <p className="text-xs text-gray-400">Carregando responsáveis...</p>
+                )}
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={() => setEditandoResponsavel(false)}
@@ -189,7 +242,12 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Projeto</label>
-              <p className="text-white mt-1">ID: {tarefa.projetoId}</p>
+              <p className="text-white mt-1 flex items-center gap-2">
+                <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                {nomeProjeto}
+              </p>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Tipo Tarefa</label>

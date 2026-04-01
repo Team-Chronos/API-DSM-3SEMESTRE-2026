@@ -1,5 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
 import { ApiTarefas } from "../../api/servicoApi";
+import projetoService, { Projeto, ResponsavelProjeto } from "../../api/projetoService";
 
 interface Props {
   isOpen: boolean;
@@ -23,24 +24,57 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [tiposTarefa, setTiposTarefa] = useState<TipoTarefa[]>([]);
+  const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [responsaveis, setResponsaveis] = useState<ResponsavelProjeto[]>([]);
+  const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
   const [carregandoDados, setCarregandoDados] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
-      carregarTiposTarefa();
+      carregarDadosIniciais();
     }
   }, [isOpen]);
 
-  const carregarTiposTarefa = async () => {
+  const carregarDadosIniciais = async () => {
     setCarregandoDados(true);
     try {
       const tiposRes = await ApiTarefas.get('/tipoTarefa');
       setTiposTarefa(tiposRes.data);
+      
+      const projetosLista = await projetoService.listarTodos();
+      setProjetos(projetosLista);
+      
+      const responsaveisLista = await projetoService.listarResponsaveis();
+      setResponsaveis(responsaveisLista);
+      
     } catch (err) {
-      console.error("Erro ao carregar tipos de tarefa:", err);
-      setErro("Erro ao carregar tipos de tarefa");
+      console.error("Erro ao carregar dados:", err);
+      setErro("Erro ao carregar dados necessários");
     } finally {
       setCarregandoDados(false);
+    }
+  };
+
+  const handleProjetoChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const id = e.target.value;
+    setProjetoId(id);
+    
+    if (id) {
+      try {
+        const projeto = await projetoService.buscarPorId(Number(id));
+        setProjetoSelecionado(projeto || null);
+        
+        if (projeto?.responsavelId) {
+          setResponsavelId(String(projeto.responsavelId));
+        } else {
+          setResponsavelId("");
+        }
+      } catch (err) {
+        console.error("Erro ao buscar detalhes do projeto:", err);
+      }
+    } else {
+      setProjetoSelecionado(null);
+      setResponsavelId("");
     }
   };
 
@@ -64,7 +98,14 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
     }
 
     if (!prazo) {
-      setErro("Prazo é obrigatório");
+      setErro("Prazo (minutos) é obrigatório");
+      setCarregando(false);
+      return;
+    }
+
+    const minutos = Number(prazo);
+    if (isNaN(minutos) || minutos <= 0) {
+      setErro("Prazo deve ser um número válido em minutos (ex: 30, 60, 120)");
       setCarregando(false);
       return;
     }
@@ -76,18 +117,16 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
     }
 
     if (!projetoId) {
-      setErro("Selecione um projeto (digite o ID)");
+      setErro("Selecione um projeto");
       setCarregando(false);
       return;
     }
-
-    const dataTimestamp = new Date(prazo).getTime();
 
     const novaTarefa = {
       titulo: titulo.trim(),
       descricao: descricao.trim(),
       responsavelId: responsavelId ? Number(responsavelId) : null,
-      tempoMaximoMinutos: dataTimestamp,
+      tempoMaximoMinutos: minutos,
       status: status,
       tipoTarefaId: Number(tipoId),
       projetoId: Number(projetoId)
@@ -103,6 +142,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
       setStatus("PENDENTE");
       setTipoId("");
       setProjetoId("");
+      setProjetoSelecionado(null);
       
       onFechar();
       if (onSucesso) onSucesso();
@@ -122,7 +162,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
         <div className="relative p-6 rounded shadow-lg w-full max-w-lg z-10 bg-[#252525] border border-[#3e3e3e]">
           <div className="flex justify-center items-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-            <p className="text-white ml-2">Carregando tipos de tarefa...</p>
+            <p className="text-white ml-2">Carregando dados...</p>
           </div>
         </div>
       </div>
@@ -164,22 +204,44 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
             required
           />
           
-          <input
-            type="number"
-            placeholder="ID do Responsável (opcional)"
+          <select
+            value={projetoId}
+            onChange={handleProjetoChange}
+            className="border p-2 rounded text-white"
+            style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
+            required
+          >
+            <option value="">Selecione o Projeto *</option>
+            {projetos.map((projeto) => (
+              <option key={projeto.id} value={projeto.id}>
+                {projeto.nome} {projeto.codigo ? `(${projeto.codigo})` : ''}
+              </option>
+            ))}
+          </select>
+          
+          <select
             value={responsavelId}
             onChange={(e) => setResponsavelId(e.target.value)}
             className="border p-2 rounded text-white"
             style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
-          />
+          >
+            <option value="">Selecione o Responsável (opcional)</option>
+            {responsaveis.map((responsavel) => (
+              <option key={responsavel.id} value={responsavel.id}>
+                {responsavel.nome}
+              </option>
+            ))}
+          </select>
           
           <input
-            type="date"
-            placeholder="Prazo *"
+            type="number"
+            placeholder="Prazo em minutos * (ex: 30, 60, 120)"
             value={prazo}
             onChange={(e) => setPrazo(e.target.value)}
             className="border p-2 rounded text-white"
             style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
+            min="1"
+            step="1"
             required
           />
           
@@ -194,16 +256,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
             <option value="EM_ANDAMENTO">Em andamento</option>
             <option value="CONCLUIDA">Concluída</option>
           </select>
-          
-          <input
-            type="number"
-            placeholder="ID do Projeto *"
-            value={projetoId}
-            onChange={(e) => setProjetoId(e.target.value)}
-            className="border p-2 rounded text-white"
-            style={{ backgroundColor: '#1f1f1f', borderColor: '#3e3e3e' }}
-            required
-          />
           
           <select
             value={tipoId}
