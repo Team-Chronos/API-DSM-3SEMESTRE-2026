@@ -85,11 +85,13 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ## Manual de Instalação <a id="instalacao"></a>
 
+🚧 Pendente – Atualizando
 
 ---
 
 ## 🚀 Estratégia de Branch <a id="branch"></a>
 
+**:link: Clique no link para visualizar a Estratégia de Branch:** 
 [Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.tizfg2z79z37)
 
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
