@@ -10,7 +10,7 @@ const AppRoutes = createBrowserRouter([
         element: <Layout />,
         children: [
             {
-                path: "apontamento/tempo/",
+                path: "projetos/:projetoId/apontamento/",
                 element: <ApontamentoTempo />
             }
         ]

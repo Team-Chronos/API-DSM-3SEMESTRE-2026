@@ -1,6 +1,6 @@
 import type { Tarefa } from "../../../types/tarefa"
 import type { Item } from "../../../types/item"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 interface ApontamentoListaTarefasProps {
   tarefas?: Tarefa[],
@@ -10,10 +10,16 @@ interface ApontamentoListaTarefasProps {
 
 function ApontamentoListaTarefas({ tarefas, itens, setTarefa }: ApontamentoListaTarefasProps){
   const [aberto, setAberto] = useState<number | null>(null)
-
-  function toggleItem(id: number) {
-    setAberto(prev => prev === id ? null : id)
+  const [ tarefasSemItem, setTarefasSemItem ] = useState<Tarefa[]>()
+  
+  function toggleItem(id: number | string) {
+    const numId = Number(id)
+    setAberto(prev => prev === numId ? null : numId)
   }
+  
+  useEffect(() => {
+    setTarefasSemItem(tarefas?.filter((tarefa) => tarefa.itemId == null))
+  }, [tarefas, itens])
 
   return(
     <>
@@ -28,14 +34,17 @@ function ApontamentoListaTarefas({ tarefas, itens, setTarefa }: ApontamentoLista
           {itens?.map((item) => (
             <li key={item.id} className={`flex flex-col gap-y-2`}>
               <button
-                onClick={() => toggleItem(item.id)}                
+                onClick={() => {
+                  toggleItem(item.id)
+                  console.log(item)
+                }}                
               >
                 <h3 className="font-medium text-left hover:text-white cursor-pointer">{item.nome}</h3>
               </button>
-              {aberto === item.id && (
-                <ul className={`flex flex-col gap-y-1 pl-3`}>
+              {(aberto === Number(item.id)) && (
+                <ul key={item.id*-1} className={`flex flex-col gap-y-1 pl-3`}>
                 {tarefas
-                  ?.filter((tarefa) => tarefa.item_id === item.id)
+                  ?.filter((tarefa) => tarefa.itemId === item.id)
                   .map((tarefa) => (
                     <li key={tarefa.id}>
                       <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>
@@ -47,6 +56,21 @@ function ApontamentoListaTarefas({ tarefas, itens, setTarefa }: ApontamentoLista
               )}
             </li>
           ))}
+          {tarefasSemItem && (
+            <li className={`flex flex-col gap-y-2`}>
+              <h3 className="font-medium text-left">Sem item</h3>
+              <ul className={`flex flex-col gap-y-1 pl-3`}>
+                {tarefasSemItem
+                  ?.map((tarefa) => (
+                    <li key={tarefa.id}>
+                      <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>
+                        <h4 className={`text-sm`}>{tarefa.titulo}</h4>
+                      </button>
+                    </li>
+                ))}
+              </ul>
+            </li>
+          )}
         </ul>
       </div>
     </>
