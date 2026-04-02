@@ -1,6 +1,6 @@
 export type User = {
   id: number
   nome: string
-  email: string
+  sub: string
   cargo_id: number
 }
