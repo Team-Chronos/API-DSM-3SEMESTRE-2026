@@ -1,6 +1,7 @@
-import { useState, FormEvent, useEffect } from "react";
-import { ApiTarefas } from "../../api/servicoApi";
-import projetoService, { Projeto, ResponsavelProjeto } from "../../api/projetoService";
+import { useState, useEffect } from "react";
+import { ApiTarefas } from "../../service/servicoApi";
+import projetoService from "../../types/projetoService";
+import type { Projeto, ResponsavelProjeto } from "../../types/projetoService";
 
 interface Props {
   isOpen: boolean;
@@ -80,7 +81,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso }: Pro
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErro(null);
     setCarregando(true);

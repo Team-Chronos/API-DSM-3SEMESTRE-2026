@@ -1,6 +1,6 @@
-import { useState, FormEvent } from "react";
-import itemService from "../../api/itemService";
-import { ApiTarefas } from "../../api/servicoApi";
+import { useState,  } from "react";
+import itemService from "../../types/itemService";
+import { ApiTarefas } from "../../service/servicoApi";
 
 interface Props {
   tarefaId: number;
@@ -17,7 +17,7 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
 
   if (!isOpen) return null;
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErro(null);
     setCarregando(true);
@@ -35,34 +35,21 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
     }
 
     try {
-      console.log("=== CRIANDO ITEM ===");
-      console.log("Tarefa ID:", tarefaId);
-      console.log("Nome:", nome);
-      console.log("Descrição:", descricao);
       
       const novoItem = await itemService.criarItem(nome.trim(), descricao.trim(), tarefaId);
       
-      console.log("Item criado com sucesso:", novoItem);
-      
-      // VERIFICAR se o item foi vinculado à tarefa
       const tarefaResponse = await ApiTarefas.get(`/tarefas/${tarefaId}`);
       console.log("Tarefa após criar item:", tarefaResponse.data);
       console.log("itemId na tarefa:", tarefaResponse.data.itemId);
       
       if (tarefaResponse.data.itemId === novoItem.id) {
-        console.log("✅ Item vinculado com sucesso!");
       } else {
-        console.warn("⚠️ Item NÃO foi vinculado automaticamente. Tentando vincular manualmente...");
         const idCorreto = novoItem.id;
-        console.log(`Tentando vincular item ${idCorreto} à tarefa ${tarefaId}`);
         
         const vinculado = await itemService.vincularItemATarefa(tarefaId, idCorreto);
         
         if (vinculado) {
-          console.log("✅ Item vinculado manualmente com sucesso!");
         } else {
-          console.error("❌ Falha ao vincular item manualmente");
-          setErro("Item criado mas não foi possível vincular à tarefa. Tente novamente.");
           setCarregando(false);
           return;
         }

@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { ApiTarefas } from '../../api/servicoApi';
-import tarefaItemAdapter, { TarefaComItem } from '../../api/tarefaItemAdapter';
-import projetoService from '../../api/projetoService';
+import { useEffect, useState } from 'react';
+import { ApiTarefas } from '../../service/servicoApi';
+import projetoService from '../../types/projetoService';
+import tarefaItemAdapter from '../../types/tarefaItemAdapter';
+import type { TarefaComItem } from '../../types/tarefaItemAdapter';
+
 
 interface Props {
   tarefa: any | null;
