@@ -1,18 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  DndContext, 
-  DragEndEvent, 
-  closestCenter, 
-  PointerSensor, 
-  useSensor, 
-  useSensors 
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors
 } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
 
 import { Droppable } from './colunas';
 import { Draggable } from './cardTarefa';
 import Api from '../service/servicoApi';
 import ModalVisualizarTarefa from './modal/ModalVisualizarTarefa';
-import itemService from '../types/itemService';
 
 interface Tarefa {
   id: number;
@@ -43,7 +42,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
     { id: 'em_andamento', titulo: 'Em Andamento', status: 'EM_ANDAMENTO', tarefas: [] },
     { id: 'concluida', titulo: 'Concluída', status: 'CONCLUIDA', tarefas: [] },
   ]);
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null);
@@ -66,14 +65,14 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await Api.get('/tarefas');
       let tarefasData = response.data;
-      
+
       if (!Array.isArray(tarefasData)) {
         tarefasData = [];
       }
-      
+
       const tarefas = tarefasData.map((t: any) => ({
         id: t.id,
         titulo: t.titulo,
@@ -84,14 +83,14 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
         tipoTarefaId: t.tipoTarefaId,
         tempoMaximoMinutos: t.tempoMaximoMinutos
       }));
-      
+
       console.log('Tarefas carregadas:', tarefas.length);
-      
+
       setColunas(prev => prev.map(col => ({
         ...col,
         tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status)
       })));
-      
+
     } catch (err: any) {
       console.error("Erro ao carregar tarefas:", err);
       setError("Não foi possível carregar as tarefas do servidor.");
@@ -109,7 +108,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
 
     let tarefaParaMover: Tarefa | undefined;
     let colOrigemIdx = -1;
-    let colDestinoIdx = colunas.findIndex(c => c.id === overId);
+    const colDestinoIdx = colunas.findIndex(c => c.id === overId);
 
     colunas.forEach((col, idx) => {
       const t = col.tarefas.find(task => task && task.id && task.id.toString() === activeId);
@@ -124,7 +123,9 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
     const novoStatus = colunas[colDestinoIdx].status;
 
     const novasColunas = [...colunas];
-    novasColunas[colOrigemIdx].tarefas = novasColunas[colOrigemIdx].tarefas.filter(t => t && t.id && t.id.toString() !== activeId);
+    novasColunas[colOrigemIdx].tarefas = novasColunas[colOrigemIdx].tarefas.filter(
+      t => t && t.id && t.id.toString() !== activeId
+    );
     novasColunas[colDestinoIdx].tarefas.push({ ...tarefaParaMover, status: novoStatus });
     setColunas(novasColunas);
 
@@ -200,7 +201,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
                         console.warn('Tarefa inválida:', tarefa);
                         return null;
                       }
-                      
+
                       let prazoValue: number | null = null;
                       if (tarefa.tempoMaximoMinutos) {
                         if (typeof tarefa.tempoMaximoMinutos === 'number') {
@@ -210,14 +211,14 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
                           prazoValue = isNaN(parsed) ? null : parsed;
                         }
                       }
-                      
+
                       return (
-                        <div 
-                          key={tarefa.id} 
+                        <div
+                          key={tarefa.id}
                           onClick={() => handleAbrirVisualizar(tarefa)}
                           className="cursor-pointer"
                         >
-                          <Draggable 
+                          <Draggable
                             id={String(tarefa.id)}
                             tarefa={{
                               id: tarefa.id,
@@ -240,7 +241,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
         </DndContext>
       </div>
 
-      <ModalVisualizarTarefa 
+      <ModalVisualizarTarefa
         tarefa={tarefaSelecionada}
         isOpen={modalVisualizarAberto}
         onFechar={() => setModalVisualizarAberto(false)}
