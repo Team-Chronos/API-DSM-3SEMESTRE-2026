@@ -3,6 +3,7 @@ import { NavLink } from "react-router-dom";
 import { LayoutDashboard, FolderKanban, Users, ChevronLeft, Link, LogOut,ClipboardList } from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
+import { useAuth } from "../../contexts/AuthContext";
 
 const NAV_ITEMS = [
   { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard" },
@@ -13,6 +14,8 @@ const NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
+  const { user, logout } = useAuth()
+
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
@@ -113,10 +116,10 @@ export default function Sidebar() {
                 <div className="min-w-0 flex-1 text-left">
                   {/* TODO: trocar "Lucas" e o email pelos dados reais do usuário logado
                       Isso vai vir do contexto de autenticação (ex: useAuth()) */}
-                  <p className="text-sm font-medium truncate">Lucas</p>
-                  <p className="text-xs text-white/50 truncate">lucas@email.com</p>
+                  <p className="text-sm font-medium truncate">{user?.nome}</p>
+                  <p className="text-xs text-white/50 truncate">{user?.sub}</p>
                 </div>
-                <button onClick={() => setConfirmLogout(true)} aria-label="Sair">
+                <button onClick={logout} aria-label="Sair">
                   <LogOut size={16} className="text-white/40 hover:text-red-400 transition-colors" />
                 </button>
               </>

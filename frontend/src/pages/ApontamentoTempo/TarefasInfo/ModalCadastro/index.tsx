@@ -1,8 +1,8 @@
 import type React from "react"
 import Modal from "../../../../components/Modal"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { toast } from "react-toastify"
+import apiApontamento from "../../../../services/apiApontamento"
 
 interface ModalCadastroProps {
   tempoMaximoMinutos: number
@@ -71,7 +71,7 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
     }
     onClose()
     try {
-      await toast.promise(axios.post("http://localhost:8082/registros", data),
+      await toast.promise(apiApontamento.post("/registros", data),
         {
           pending: "Esperando resposta",
           success: "Registrado com sucesso!",

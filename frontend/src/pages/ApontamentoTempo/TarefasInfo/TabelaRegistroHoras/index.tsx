@@ -19,6 +19,16 @@ function TabelaRegistroHoras({ registroHorasTarefa }: TabelaRegistroHorasProps){
     })
   }
 
+  function formatarHora(data: string | Date | undefined){
+    if (!data) return
+
+    const date = new Date(data)
+    return date.toLocaleString("pt-br", {
+      hour: "2-digit",
+      minute: "2-digit"
+    })
+  }
+
   return(
     <>
       {registroHorasTarefa?.registros?.length !== 0 ? (
@@ -27,20 +37,22 @@ function TabelaRegistroHoras({ registroHorasTarefa }: TabelaRegistroHorasProps){
             <tr>
               <th>Data início</th>
               <th>Data fim</th>
-              <th>Tempo (min)</th>
+              <th>Tempo</th>
+              <th>Duração (min)</th>
             </tr>
           </thead>
           <tbody>
             {registroHorasTarefa?.registros
-              .slice().sort((a, b) => 
+              .sort((a, b) => 
                 new Date(b.data_inicio).getTime() - new Date(a.data_inicio).getTime()
               )
               .map(registro => (
                 <tr key={registro.id}
                   className={`text-center`}
                 >
-                  <td className={`px-3 py-1`}>{formatarData(registro.data_inicio)}</td>
-                  <td className={`px-3 py-1`}>{formatarData(registro.data_fim) || "Pendente"}</td>
+                  <td className={`px-3 py-1 text-sm`}>{formatarData(registro.data_inicio)}</td>
+                  <td className={`px-3 py-1 text-sm`}>{formatarData(registro.data_fim) || "Pendente"}</td>
+                  <td className={`px-3 py-1 text-nowrap`}>{formatarHora(registro.data_inicio) + " - " + formatarHora(registro.data_fim)}</td>
                   <td className={`px-3 py-1`}>{registro.tempoMinutos || "Pendente"}</td>
                 </tr>
               ))
