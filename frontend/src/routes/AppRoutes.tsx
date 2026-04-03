@@ -3,7 +3,6 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import CadastroProfissional from "../pages/cadastroProfissionail";
 import AssociacaoProfissionalProjeto from "../pages/associacaoProfissionalProjeto";
 import GestaoProfissionais from "../pages/gestaoDeProfissionais";
-import TelaTarefas from "../pages/GerenciarTarefas/gerenciarItensTarefas";
 import Login from "../pages/login";
 import ApontamentoTempo from "../pages/ApontamentoTempo";
 import Projetos from "../pages/Projetos";
@@ -47,10 +46,6 @@ const AppRoutes = createBrowserRouter([
                 )
             },
             {
-                path: "GerenciarTarefas",
-                element: <TelaTarefas />
-            },
-            {
                 path: "projetos/:projetoId/apontamento/",
                 element: (
                     <Suspense fallback={<div>Loading...</div>}>
@@ -58,7 +53,6 @@ const AppRoutes = createBrowserRouter([
                     </Suspense>
                 )
             },
-            
         ]
     },
     {

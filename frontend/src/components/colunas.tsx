@@ -1,6 +1,8 @@
-import React, { ReactNode } from 'react';
+import React from 'react';
+import type { ReactNode } from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import type { UniqueIdentifier } from '@dnd-kit/core';
+
 
 type DroppableProps = {
   id: UniqueIdentifier;
