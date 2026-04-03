@@ -3,11 +3,10 @@ import { Navigate, createBrowserRouter } from "react-router-dom";
 import CadastroProfissional from "../pages/cadastroProfissionail";
 import AssociacaoProfissionalProjeto from "../pages/associacaoProfissionalProjeto";
 import GestaoProfissionais from "../pages/gestaoDeProfissionais";
-import Login from "../pages/login";
 import ApontamentoTempo from "../pages/ApontamentoTempo";
-import TelaTarefas from "../pages/GerenciarTarefas/gerenciarItensTarefas";
-import Projetos from "../pages/Projetos";
-
+import TarefasPorProjeto from "../pages/GerenciarTarefas/TarefasPorProjeto";
+import TelaProjetos from "../pages/GerenciarTarefas/Projetos";
+import Login from "../pages/login";
 
 const Layout = lazy(() => import("../components/Layout"))
 const DashboardPage = lazy(() => (import("../pages/Financeiro/FinanceiroPage")))
@@ -54,14 +53,22 @@ const AppRoutes = createBrowserRouter([
                     </Suspense>
                 )
             },
-             {
-                path: "gerenciar-tarefas",
+                {
+                path: "projetos/:projetoId/tarefas", 
                 element: (
                     <Suspense fallback={<div>Loading...</div>}>
-                        <TelaTarefas />
+                        <TarefasPorProjeto />
                     </Suspense>
                 )
             },
+            {
+                path: "projetos",
+                element: (
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <TelaProjetos />
+                    </Suspense>
+                )
+            }
         ]
     },
     {

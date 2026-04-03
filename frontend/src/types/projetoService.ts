@@ -4,13 +4,10 @@ export interface Projeto {
   id: number;
   nome: string;
   codigo?: string;
-  tipoProjeto?: string;
-  valorHoraBase?: number;
-  horasContratadas?: number;
-  valorTotal?: number;
-  dataInicio?: string;
-  dataFim?: string;
+  descricao?: string;
+  status?: string;
   responsavelId?: number;
+  dataCriacao: string;
 }
 
 export interface ResponsavelProjeto {
