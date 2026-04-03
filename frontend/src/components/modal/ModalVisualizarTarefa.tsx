@@ -1,20 +1,16 @@
 import { useEffect, useState } from 'react';
 import { ApiTarefas } from '../../service/servicoApi';
 import projetoService from '../../types/projetoService';
+import profissionalService from '../../types/profissionalService';
+import type { Profissional } from '../../types/profissionalService';
 import tarefaItemAdapter from '../../types/tarefaItemAdapter';
 import type { TarefaComItem } from '../../types/tarefaItemAdapter';
-
 
 interface Props {
   tarefa: any | null;
   isOpen: boolean;
   onFechar: () => void;
   onAtualizar?: () => void;
-}
-
-interface ResponsavelProjeto {
-  id: number;
-  nome: string;
 }
 
 export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtualizar }: Props) {
@@ -24,21 +20,34 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
   const [responsavelSelecionado, setResponsavelSelecionado] = useState<string>("");
   const [salvando, setSalvando] = useState(false);
   const [nomeProjeto, setNomeProjeto] = useState<string>("");
-  const [responsaveis, setResponsaveis] = useState<ResponsavelProjeto[]>([]);
+  const [responsaveis, setResponsaveis] = useState<Profissional[]>([]);
   const [carregandoResponsaveis, setCarregandoResponsaveis] = useState(false);
+  const [nomeResponsavelAtual, setNomeResponsavelAtual] = useState<string>("Carregando...");
 
   useEffect(() => {
     if (isOpen && tarefa?.id) {
       carregarTarefaComItem();
       carregarResponsaveis();
-      if (tarefa.responsavelId) {
-        setResponsavelSelecionado(String(tarefa.responsavelId));
-      }
       if (tarefa.projetoId) {
         carregarNomeProjeto(tarefa.projetoId);
       }
     }
   }, [isOpen, tarefa]);
+
+  useEffect(() => {
+    if (responsaveis.length > 0 && tarefa?.responsavelId) {
+      const responsavel = responsaveis.find(r => r.id === tarefa.responsavelId);
+      if (responsavel) {
+        setNomeResponsavelAtual(responsavel.nome);
+      } else {
+        setNomeResponsavelAtual(`ID: ${tarefa.responsavelId}`);
+      }
+    } else if (tarefa?.responsavelId && responsaveis.length === 0) {
+      setNomeResponsavelAtual(`ID: ${tarefa.responsavelId}`);
+    } else if (!tarefa?.responsavelId) {
+      setNomeResponsavelAtual("Não atribuído");
+    }
+  }, [responsaveis, tarefa]);
 
   const carregarTarefaComItem = async () => {
     setCarregando(true);
@@ -56,9 +65,14 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
   const carregarResponsaveis = async () => {
     setCarregandoResponsaveis(true);
     try {
-      const response = await ApiTarefas.get('/api/projeto/responsaveis');
-      if (response.data && Array.isArray(response.data)) {
-        setResponsaveis(response.data);
+      const responsaveisLista = await profissionalService.listarTodos();
+      console.log("Responsáveis carregados:", responsaveisLista);
+      setResponsaveis(responsaveisLista);
+      
+      if (tarefa?.responsavelId) {
+        setResponsavelSelecionado(String(tarefa.responsavelId));
+      } else {
+        setResponsavelSelecionado("");
       }
     } catch (err) {
       console.error("Erro ao carregar responsáveis:", err);
@@ -96,7 +110,15 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
       
       await ApiTarefas.put(`/tarefas/${tarefa.id}`, tarefaAtualizada);
       
+      const novoResponsavel = responsaveis.find(r => r.id === Number(responsavelSelecionado));
+      if (novoResponsavel) {
+        setNomeResponsavelAtual(novoResponsavel.nome);
+      }
+      
       setEditandoResponsavel(false);
+      
+      await carregarTarefaComItem();
+      
       if (onAtualizar) onAtualizar();
       
     } catch (err) {
@@ -107,10 +129,16 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
     }
   };
 
-  const getNomeResponsavel = (id: number | null): string => {
-    if (!id) return 'Não atribuído';
-    const responsavel = responsaveis.find(r => r.id === id);
-    return responsavel ? responsavel.nome : `ID: ${id}`;
+  const handleAbrirEdicao = () => {
+    setResponsavelSelecionado(tarefa?.responsavelId ? String(tarefa.responsavelId) : "");
+    setEditandoResponsavel(true);
+  };
+
+  const getNomeResponsavel = (): string => {
+    if (carregandoResponsaveis && responsaveis.length === 0) {
+      return "Carregando...";
+    }
+    return nomeResponsavelAtual;
   };
 
   const formatarData = (data: string | number | null) => {
@@ -171,14 +199,14 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
             {!editandoResponsavel ? (
               <div 
                 className="flex items-center justify-between bg-[#1f1f1f] p-3 rounded border border-[#3e3e3e] cursor-pointer hover:border-blue-500 transition-colors"
-                onClick={() => setEditandoResponsavel(true)}
+                onClick={handleAbrirEdicao}
               >
                 <div className="flex items-center gap-2">
                   <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                   <span className="text-white">
-                    {getNomeResponsavel(tarefa.responsavelId)}
+                    {getNomeResponsavel()}
                   </span>
                 </div>
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,8 +242,9 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
                   <button
                     onClick={handleSalvarResponsavel}
                     className="px-3 py-1 rounded text-sm bg-blue-500 text-white hover:bg-blue-600 transition-colors"
+                    disabled={salvando || !responsavelSelecionado}
                   >
-                    salvar
+                    {salvando ? "Salvando..." : "Salvar"}
                   </button>
                 </div>
               </div>
@@ -225,7 +254,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Prazo</label>
-              <p className="text-white mt-1">{formatarData(tarefa.tempoMaximoMinutos)}</p>
+              <p className="text-white mt-1">{tarefa.tempoMaximoMinutos} minutos</p>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Status</label>
@@ -252,7 +281,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase">Tipo Tarefa</label>
-              <p className="text-white mt-1">ID: {tarefa.tipoTarefaId}</p>
+              <p className="text-white mt-1">{tarefa.tipoTarefaId}</p>
             </div>
           </div>
 

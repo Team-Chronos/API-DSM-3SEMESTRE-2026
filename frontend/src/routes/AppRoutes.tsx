@@ -5,6 +5,7 @@ import AssociacaoProfissionalProjeto from "../pages/associacaoProfissionalProjet
 import GestaoProfissionais from "../pages/gestaoDeProfissionais";
 import Login from "../pages/login";
 import ApontamentoTempo from "../pages/ApontamentoTempo";
+import TelaTarefas from "../pages/GerenciarTarefas/gerenciarItensTarefas";
 import Projetos from "../pages/Projetos";
 
 
@@ -50,6 +51,14 @@ const AppRoutes = createBrowserRouter([
                 element: (
                     <Suspense fallback={<div>Loading...</div>}>
                         <ApontamentoTempo />
+                    </Suspense>
+                )
+            },
+             {
+                path: "gerenciar-tarefas",
+                element: (
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <TelaTarefas />
                     </Suspense>
                 )
             },
