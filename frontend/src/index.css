@@ -26,3 +26,13 @@
 }
 
 
+:root {
+  --primary: #1E40AF;
+  --background: #363f52;
+  --backgroundCards: #363f52;
+  --texto: #ffffff;
+  --color-primary: var(--primary);
+  --color-background: var(--background);
+  --color-backgroundCards: var(--backgroundCards);
+  --color-texto: var(--texto);
+}   

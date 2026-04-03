@@ -17,3 +17,7 @@
 	path = services/gestao-tarefas
 	url = https://github.com/gabsact4/API3-servico-gestao-de-tarefas.git
 	branch = main
+
+[submodule "services-financeiro"]
+	path = services/gestao-financeiro
+	url = https://github.com/Team-Chronos/API3-servico-financeiro.git

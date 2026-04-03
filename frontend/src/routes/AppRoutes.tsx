@@ -5,6 +5,8 @@ import AssociacaoProfissionalProjeto from "../pages/associacaoProfissionalProjet
 import GestaoProfissionais from "../pages/gestaoDeProfissionais";
 import Login from "../pages/login";
 import ApontamentoTempo from "../pages/ApontamentoTempo";
+import Projetos from "../pages/Projetos";
+
 
 const Layout = lazy(() => import("../components/Layout"))
 const DashboardPage = lazy(() => (import("../pages/Financeiro/FinanceiroPage")))
