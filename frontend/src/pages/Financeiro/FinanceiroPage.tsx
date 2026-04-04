@@ -9,9 +9,7 @@ function valorValido(valor: number): boolean {
 }
 
 function formatarMoeda(valor: number): string {
-  if (!valorValido(valor)) {
-    return "--";
-  }
+  if (!valorValido(valor)) return "--";
 
   return new Intl.NumberFormat("pt-BR", {
     style: "currency",
@@ -22,9 +20,7 @@ function formatarMoeda(valor: number): string {
 }
 
 function formatarInteiro(valor: number): string {
-  if (!valorValido(valor)) {
-    return "--";
-  }
+  if (!valorValido(valor)) return "--";
 
   return new Intl.NumberFormat("pt-BR").format(valor);
 }
@@ -41,18 +37,18 @@ export default function FinanceiroPage() {
             {Array.from({ length: 4 }).map((_, index) => (
               <div
                 key={index}
-                className="h-44 animate-pulse rounded-[15px] bg-[#232329]"
+                className="h-44 animate-pulse rounded-2xl bg-[#232329]"
               />
             ))}
           </div>
 
           <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="grid gap-5 md:grid-cols-2">
-              <div className="h-[620px] animate-pulse rounded-[15px] bg-[#232329]" />
-              <div className="h-[620px] animate-pulse rounded-[15px] bg-[#232329]" />
+              <div className="h-[620px] animate-pulse rounded-2xl bg-[#232329]" />
+              <div className="h-[620px] animate-pulse rounded-2xl bg-[#232329]" />
             </div>
 
-            <div className="h-[681px] animate-pulse rounded-[15px] bg-[#5b21b6]" />
+            <div className="h-[681px] animate-pulse rounded-2xl bg-[#232329]" />
           </div>
         </div>
       </section>
@@ -67,11 +63,23 @@ export default function FinanceiroPage() {
             title="Erro ao carregar financeiro"
             description={error ?? "Não foi possível carregar os dados."}
           />
+
           <div className="mt-6">
             <button
               type="button"
               onClick={() => void recarregar()}
-              className="rounded-2xl bg-violet-600 px-5 py-3 font-medium text-white transition hover:bg-violet-500"
+              className="
+                rounded-xl
+                bg-gradient-to-r
+                from-[#6627cc]
+                to-[#4a1898]
+                px-5
+                py-3
+                font-medium
+                text-white
+                transition
+                hover:brightness-110
+              "
             >
               Tentar novamente
             </button>
@@ -83,8 +91,19 @@ export default function FinanceiroPage() {
 
   return (
     <section className="min-h-screen bg-[#1b1b1f] text-white">
-      <div className="mx-auto w-full max-w-7xl px-6 py-10">
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
+      <div className="mx-auto w-full max-w-7xl px-6 py-10 space-y-6">
+        
+        <div>
+          <h1 className="text-2xl font-semibold">
+            Financeiro
+          </h1>
+          <p className="text-sm text-gray-400">
+            Visão geral dos custos e desempenho dos projetos
+          </p>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+          
           <div className="space-y-5">
             <IndicadoresGrid dashboard={dashboard} />
 
@@ -94,31 +113,52 @@ export default function FinanceiroPage() {
             </section>
           </div>
 
-          <aside className="h-[450px] w-[250px] rounded-[15px] bg-gradient-to-b from-[#6627cc] to-[#4a1898] px-8 py-9 shadow-[0_20px_60px_rgba(76,29,149,0.35)]">
-            <div className="flex h-full flex-col justify-start gap-16">
-              <div>
-                <p className="text-[15px] font-medium text-white/85">
+          <aside
+            className="
+            relative
+            overflow-hidden
+            rounded-2xl
+            bg-gradient-to-b
+            from-[#6627cc]
+            to-[#4a1898]
+            p-6
+            shadow-[0_20px_60px_rgba(76,29,149,0.35)]
+          "
+          >
+            <div className="absolute -top-20 -right-20 h-56 w-56 bg-white/10 rounded-full blur-3xl" />
+
+            <div className="relative flex h-full flex-col">
+              
+              <div className="space-y-2">
+                <p className="text-sm text-white/80">
                   Desenvolvedores
                 </p>
-                <p className="mt-4 text-3xl font-semibold leading-none">
+
+                <p className="text-3xl font-semibold">
                   {formatarInteiro(dashboard.totalDesenvolvedores)}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[15px] font-medium text-white/85">
+              <div className="my-6 h-px bg-white/20" />
+
+              <div className="space-y-2">
+                <p className="text-sm text-white/80">
                   Custo Total Projetos
                 </p>
-                <p className="mt-4 text-3xl font-semibold leading-tight">
+
+                <p className="text-3xl font-semibold">
                   {formatarMoeda(dashboard.custoTotal)}
                 </p>
               </div>
 
-              <div>
-                <p className="text-[15px] font-medium text-white/85">
+              <div className="my-6 h-px bg-white/20" />
+
+              <div className="space-y-2">
+                <p className="text-sm text-white/80">
                   Projetos Concluídos
                 </p>
-                <p className="mt-4 text-3xl font-semibold leading-none">
+
+                <p className="text-3xl font-semibold">
                   {formatarInteiro(dashboard.projetosConcluidos)}
                 </p>
               </div>

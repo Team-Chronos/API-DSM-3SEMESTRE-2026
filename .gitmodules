@@ -10,14 +10,18 @@
 
 [submodule "services-gestao-profissionais"]
 	path = services/gestao-profissionais
-	url = https://github.com/EnricoGermano/API3-servico-profissionais.git
+	url = https://github.com/Team-Chronos/API3-servico-profissionais.git
 	branch = main
 
 [submodule "services-gestao-tarefas"]
 	path = services/gestao-tarefas
-	url = https://github.com/gabsact4/API3-servico-gestao-de-tarefas.git
+	url = https://github.com/Team-Chronos/API3-servico-tarefas.git
 	branch = main
 
 [submodule "services-financeiro"]
 	path = services/gestao-financeiro
 	url = https://github.com/Team-Chronos/API3-servico-financeiro.git
+
+[submodule "services-login"]
+	path = services/login
+	url = https://github.com/Team-Chronos/API3-servico-login.git
