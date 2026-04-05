@@ -59,7 +59,7 @@ const AppRoutes = createBrowserRouter([
                 )
             },
              {
-                path: "gerenciar-tarefas",
+                path: "gerenciar/tarefas",
                 element: (
                     <Suspense fallback={<div>Loading...</div>}>
                         <TelaTarefas />
