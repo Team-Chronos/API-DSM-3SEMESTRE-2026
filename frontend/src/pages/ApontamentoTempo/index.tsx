@@ -11,7 +11,7 @@ import type { TipoTarefa } from "../../types/tipoTarefa"
 
 export function getNomeTipoTarefa(id: number | null | undefined, tiposTarefa: TipoTarefa[] | null | undefined){
   if (!tiposTarefa || !id) return
-  const tipoTarefa = tiposTarefa.find((tipo) => tipo.id = id)
+  const tipoTarefa = tiposTarefa.find((tipo) => tipo.id === id)
   if (tipoTarefa) return tipoTarefa.nome
   return null
 }
@@ -36,8 +36,6 @@ function ApontamentoTempo(){
   }
 
   async function buscarTarefas() {
-    setLoading(true)
-
     try {
       const response = await apiTarefas.get<Tarefa[]>(`/tarefas/projeto/${projetoId}/responsavel/${user?.id}`)
       setTarefas(response.data)
@@ -45,14 +43,9 @@ function ApontamentoTempo(){
       toast.error("Erro ao buscar tarefas", {autoClose: 2000})
       console.error("Erro ao buscar tarefas", error)
     }
-    
-    setLoading(false)
   }
 
   async function buscarItens() {
-    if (!tarefas)
-      return
-    
     setLoading(true)
 
     try {
@@ -69,11 +62,8 @@ function ApontamentoTempo(){
   useEffect(() => {
     buscarTiposTarefa()
     buscarTarefas()
-  }, [])
-
-  useEffect(() => {
     buscarItens()
-  }, [tarefas])
+  }, [])
   
   return(
     <>

@@ -32,11 +32,12 @@ interface Coluna {
 }
 
 interface DragDropTarefasProps {
+  projetoId: number;
   onAbrirModalItem?: (tarefaId: number) => void;
   refreshKey?: number;
 }
 
-export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDropTarefasProps) {
+export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKey }: DragDropTarefasProps) {
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: 'pendente', titulo: 'Pendente', status: 'PENDENTE', tarefas: [] },
     { id: 'em_andamento', titulo: 'Em Andamento', status: 'EM_ANDAMENTO', tarefas: [] },
@@ -53,8 +54,10 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
   );
 
   useEffect(() => {
-    carregarTarefas();
-  }, [refreshKey]);
+    if (projetoId) {
+      carregarTarefas();
+    }
+  }, [projetoId, refreshKey]);
 
   const getNomeResponsavel = (responsavelId: number | null): string => {
     if (!responsavelId) return 'Não atribuído';
@@ -66,7 +69,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
       setLoading(true);
       setError(null);
 
-      const response = await Api.get('/tarefas');
+      const response = await Api.get(`/tarefas/projeto/${projetoId}`);
       let tarefasData = response.data;
 
       if (!Array.isArray(tarefasData)) {
@@ -84,7 +87,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
         tempoMaximoMinutos: t.tempoMaximoMinutos
       }));
 
-      console.log('Tarefas carregadas:', tarefas.length);
+      console.log(`Tarefas carregadas para projeto ${projetoId}:`, tarefas.length);
 
       setColunas(prev => prev.map(col => ({
         ...col,
@@ -161,7 +164,7 @@ export default function DragDropTarefas({ onAbrirModalItem, refreshKey }: DragDr
       <div className="flex justify-center items-center h-64">
         <div className="text-white text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p>Carregando tarefas do servidor...</p>
+          <p>Carregando tarefas do projeto...</p>
         </div>
       </div>
     );

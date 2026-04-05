@@ -4,13 +4,10 @@ export interface Projeto {
   id: number;
   nome: string;
   codigo?: string;
-  tipoProjeto?: string;
-  valorHoraBase?: number;
-  horasContratadas?: number;
-  valorTotal?: number;
-  dataInicio?: string;
-  dataFim?: string;
+  descricao?: string;
+  status?: string;
   responsavelId?: number;
+  dataCriacao: string;
 }
 
 export interface ResponsavelProjeto {
@@ -25,6 +22,7 @@ class ProjetoService {
       if (response.data && Array.isArray(response.data)) {
         return response.data;
       }
+      
       return [];
     } catch (error) {
       console.warn("Erro ao buscar projetos:", error);
