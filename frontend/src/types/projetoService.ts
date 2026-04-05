@@ -22,6 +22,7 @@ class ProjetoService {
       if (response.data && Array.isArray(response.data)) {
         return response.data;
       }
+      
       return [];
     } catch (error) {
       console.warn("Erro ao buscar projetos:", error);
