@@ -28,11 +28,15 @@ function ApontamentoListaTarefas({ tarefas, itens, loading, tiposTarefa, setTare
     setTarefasSemItem(tarefas?.filter((tarefa) => tarefa.itemId == null))
   }, [tarefas, itens])
 
+  console.log(tarefas)
+
   return(
     <>
       <div className={`flex flex-col p-4 gap-y-6`}>
         <div className={`flex items-center gap-4`}>
-          <img className={`bg-mist-100 w-10 h-10 rounded-full`} />
+          <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold shrink-0">
+            {user?.nome.slice(0, 1).toUpperCase() || "💩"}
+          </div>
           <div>
             <h2>{user?.nome}</h2>
           </div>
@@ -61,7 +65,7 @@ function ApontamentoListaTarefas({ tarefas, itens, loading, tiposTarefa, setTare
                   .map((tarefa) => (
                     <li key={tarefa.id}>
                       <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>
-                        <h4 className={`text-sm`}>{`[${getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa)?.slice(0, 3)}]`} {tarefa.titulo}</h4>
+                        <h4 className={`text-sm`}><span className={`font-bold text-indigo-500`} title={getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa) || ""}>{`[${getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa)?.slice(0, 3).toUpperCase()}]`}</span> {tarefa.titulo}</h4>
                       </button>
                     </li>
                 ))}
@@ -69,7 +73,7 @@ function ApontamentoListaTarefas({ tarefas, itens, loading, tiposTarefa, setTare
               )}
             </li>
           ))}
-          {tarefasSemItem && (
+          {(tarefasSemItem && tarefasSemItem.length > 0) && (
             <li className={`flex flex-col gap-y-2`}>
               <h3 className="font-medium text-left">Sem item</h3>
               <ul className={`flex flex-col gap-y-1 pl-3`}>
@@ -77,7 +81,7 @@ function ApontamentoListaTarefas({ tarefas, itens, loading, tiposTarefa, setTare
                   ?.map((tarefa) => (
                     <li key={tarefa.id}>
                       <button className={`cursor-pointer hover:text-white`} onClick={() => setTarefa(tarefa)}>
-                        <h4 className={`text-sm`}>{`[${getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa)?.slice(0, 3)}]`} {tarefa.titulo}</h4>
+                        <h4 className={`text-sm`}><span className={`font-bold text-indigo-500`} title={getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa) || ""}>{`[${getNomeTipoTarefa(tarefa.tipoTarefaId, tiposTarefa)?.slice(0, 3).toUpperCase()}]`}</span> {tarefa.titulo}</h4>
                       </button>
                     </li>
                 ))}

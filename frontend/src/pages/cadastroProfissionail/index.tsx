@@ -6,6 +6,8 @@ import {
   type ProjetoVinculoPayload,
 } from "../../services/profissionaisApi";
 
+import { ChevronDown, Eye, EyeOff, Search } from "lucide-react";
+
 const CARGOS = [
   { id: 1, nome: "Desenvolvedor" },
   { id: 2, nome: "Gerente" },
@@ -16,6 +18,7 @@ function CadastroProfissional() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senhaHash, setSenhaHash] = useState("");
+  const [mostrarSenha, setMostrarSenha] = useState(false);
   const [cargoId, setCargoId] = useState("");
   const [ativo, setAtivo] = useState(true);
 
@@ -29,14 +32,13 @@ function CadastroProfissional() {
   useEffect(() => {
     const carregarProjetos = async () => {
       setCarregandoProjetos(true);
-      setMensagem("");
 
       try {
         const projetos = await listarProjetos();
         setProjetosDisponiveis(projetos);
       } catch (error) {
         const mensagemErro =
-          error instanceof Error ? error.message : "Nao foi possivel carregar os projetos.";
+          error instanceof Error ? error.message : "Erro ao carregar projetos.";
         setMensagem(mensagemErro);
       } finally {
         setCarregandoProjetos(false);
@@ -87,193 +89,232 @@ function CadastroProfissional() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMensagem("");
 
     if (!nome || !email || !senhaHash || !cargoId) {
-      setMensagem("Preencha os campos obrigatorios.");
+      setMensagem("Preencha os campos obrigatórios.");
       return;
     }
 
-    const cargoIdNumero = Number(cargoId);
-    if (!Number.isInteger(cargoIdNumero) || cargoIdNumero <= 0) {
-      setMensagem("Informe um cargo valido.");
-      return;
-    }
-
-    const projetosPayload: ProjetoVinculoPayload[] = Object.entries(projetosSelecionados).map(
-      ([projetoId, valorHora]) => ({
-        projetoId: Number(projetoId),
-        valorHora: Number(valorHora),
-      })
-    );
-
-    const projetoComValorInvalido = projetosPayload.find(
-      (projeto) => Number.isNaN(projeto.valorHora) || projeto.valorHora < 0
-    );
-
-    if (projetoComValorInvalido) {
-      setMensagem("Valor hora invalido em um dos projetos selecionados.");
-      return;
-    }
-
-    const payload = {
-      nome,
-      email,
-      senhaHash,
-      ativo,
-      cargoId: cargoIdNumero,
-      projetos: projetosPayload,
-    };
+    const projetosPayload: ProjetoVinculoPayload[] = Object.entries(
+      projetosSelecionados
+    ).map(([projetoId, valorHora]) => ({
+      projetoId: Number(projetoId),
+      valorHora: Number(valorHora),
+    }));
 
     try {
       setSalvando(true);
-      const resposta = await cadastrarProfissional(payload);
-      const quantidadeProjetos = resposta.projetos?.length ?? 0;
-      setMensagem(`Profissional cadastrado com sucesso. Projetos vinculados: ${quantidadeProjetos}.`);
+
+      const resposta = await cadastrarProfissional({
+        nome,
+        email,
+        senhaHash,
+        ativo,
+        cargoId: Number(cargoId),
+        projetos: projetosPayload,
+      });
+
+      const quantidade = resposta.projetos?.length ?? 0;
+
+      setMensagem(`Profissional cadastrado. Projetos vinculados: ${quantidade}`);
       limparFormulario();
     } catch (error) {
-      const mensagemErro =
-        error instanceof Error ? error.message : "Erro ao cadastrar profissional.";
-      setMensagem(mensagemErro);
+      setMensagem("Erro ao cadastrar profissional.");
     } finally {
       setSalvando(false);
     }
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <div className="min-h-screen text-white p-6">
 
-      <h1 className="text-3xl font-bold mb-8 text-center text-white">
-        Cadastro de Profissional
-      </h1>
+      <div className="max-w-3xl mx-auto space-y-6">
 
-      <div className="bg-[#252525] p-8 rounded-xl shadow-md">
+        <div>
+          <h1 className="text-2xl font-semibold">
+            Cadastro de Profissional
+          </h1>
+          <p className="text-sm text-gray-400">
+            Cadastre um profissional e vincule projetos
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+        <div className="bg-[#18181c] border border-white/5 p-8 rounded-2xl shadow-2xl">
 
           {mensagem && (
-            <div className="rounded-lg bg-gray-700 border border-gray-600 p-3 text-sm">
+            <div className="mb-6 p-4 rounded-xl bg-purple-500/10 border border-purple-500/20 text-sm">
               {mensagem}
             </div>
           )}
 
-          <div>
-            <label className="text-sm text-gray-300">Nome *</label>
-            <input
-              type="text"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              className="w-full mt-2 p-4 rounded-lg bg-[#3e3e3e] border border-[#3e3e3e] outline-none text-white"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className="text-sm text-gray-400">Nome</label>
+              <input
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                className="w-full mt-2 px-4 py-3 rounded-xl bg-[#111116] border border-white/5 outline-none focus:border-purple-500 transition"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-300">Email *</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full mt-2 p-4 rounded-lg bg-[#3e3e3e] border border-[#3e3e3e] outline-none text-white"
-            />
-          </div>
+            <div>
+              <label className="text-sm text-gray-400">Email</label>
+              <input
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full mt-2 px-4 py-3 rounded-xl bg-[#111116] border border-white/5 outline-none focus:border-purple-500"
+              />
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-300">Senha *</label>
-            <input
-              type="password"
-              value={senhaHash}
-              onChange={(e) => setSenhaHash(e.target.value)}
-              className="w-full mt-2 p-4 rounded-lg bg-gray-700 border border-gray-600 outline-none"
-            />
-          </div>
+            <div>
+              <label className="text-sm text-gray-400">Senha</label>
 
-          <div>
-            <label className="text-sm text-gray-300">Cargo *</label>
-            <select
-              value={cargoId}
-              onChange={(e) => setCargoId(e.target.value)}
-              className="w-full mt-2 p-4 rounded-lg bg-gray-700 border border-gray-600 outline-none"
-            >
-              <option value="">Selecione um cargo</option>
-              {CARGOS.map((cargo) => (
-                <option key={cargo.id} value={cargo.id}>
-                  {cargo.nome}
-                </option>
-              ))}
-            </select>
-          </div>
+              <div className="relative">
+                <input
+                  type={mostrarSenha ? "text" : "password"}
+                  value={senhaHash}
+                  onChange={(e) => setSenhaHash(e.target.value)}
+                  className="w-full mt-2 px-4 py-3 pr-12 rounded-xl bg-[#111116] border border-white/5 outline-none focus:border-purple-500"
+                />
 
-          <label className="flex items-center gap-3 text-sm text-gray-300">
-            <input
-              type="checkbox"
-              checked={ativo}
-              onChange={(e) => setAtivo(e.target.checked)}
-            />
-            Profissional ativo
-          </label>
+                <button
+                  type="button"
+                  onClick={() => setMostrarSenha(!mostrarSenha)}
+                  className="absolute right-3 top-[60%] -translate-y-1/2 text-gray-400 hover:text-white"
+                >
+                  {mostrarSenha ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
 
-          <div>
-            <label className="text-sm text-gray-300">
-              Projetos vinculados (opcional)
+            <div>
+              <label className="text-sm text-gray-400">Cargo</label>
+
+              <div className="relative">
+                <select
+                  value={cargoId}
+                  onChange={(e) => setCargoId(e.target.value)}
+                  className="w-full mt-2 px-4 py-3 pr-10 rounded-xl bg-[#111116] border border-white/5 outline-none appearance-none focus:border-purple-500"
+                >
+                  <option value="">Selecione um cargo</option>
+
+                  {CARGOS.map((cargo) => (
+                    <option key={cargo.id} value={cargo.id}>
+                      {cargo.nome}
+                    </option>
+                  ))}
+                </select>
+
+                <ChevronDown
+                  size={18}
+                  className="pointer-events-none absolute right-3 top-[60%] -translate-y-1/2 text-gray-500"
+                />
+              </div>
+            </div>
+
+            <label className="flex items-center gap-3 text-sm text-gray-400">
+              <input
+                type="checkbox"
+                checked={ativo}
+                onChange={(e) => setAtivo(e.target.checked)}
+              />
+              Profissional ativo
             </label>
 
-            <input
-              type="text"
-              placeholder="Buscar projeto..."
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              className="w-full mt-2 p-3 rounded-lg bg-[#3e3e3e] border border-[#3e3e3e] outline-none text-white"
-            />
+            <div>
+              <label className="text-sm text-gray-400">
+                Projetos vinculados
+              </label>
 
-            <div className="max-h-40 overflow-y-auto flex flex-col gap-2">
-              {carregandoProjetos && (
-                <p className="text-sm text-gray-300">Carregando projetos...</p>
-              )}
+              <div className="relative mt-2">
+                <Search
+                  size={16}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
+                />
 
-              {!carregandoProjetos && projetosFiltrados.length === 0 && (
-                <p className="text-sm text-gray-300">Nenhum projeto encontrado.</p>
-              )}
+                <input
+                  placeholder="Buscar projeto..."
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  className="w-full pl-9 pr-3 py-3 rounded-xl bg-[#111116] border border-white/5 outline-none focus:border-purple-500"
+                />
+              </div>
 
-              {projetosFiltrados.map((projeto) => {
-                const selecionado = projetosSelecionados[projeto.id] !== undefined;
+              <div className="max-h-72 overflow-y-auto mt-3 space-y-2">
 
-                return (
-                  <div key={projeto.id} className="bg-gray-700 p-2 rounded-lg">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selecionado}
-                        onChange={() => toggleProjeto(projeto.id)}
-                      />
-                      <span>{projeto.nome} ({projeto.codigo})</span>
-                    </label>
+                {projetosFiltrados.map((projeto) => {
+                  const selecionado =
+                    projetosSelecionados[projeto.id] !== undefined;
 
-                    {selecionado && (
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="0"
-                        value={projetosSelecionados[projeto.id]}
-                        onChange={(e) => atualizarValorHoraProjeto(projeto.id, e.target.value)}
-                        className="w-full mt-2 p-2 rounded-lg bg-gray-800 border border-gray-600 outline-none"
-                        placeholder="Valor/hora"
-                      />
-                    )}
-                  </div>
-                );
-              })}
+                  return (
+                    <div
+                      key={projeto.id}
+                      className="bg-[#111116] border border-white/5 p-3 rounded-xl hover:border-purple-500/30 transition"
+                    >
+                      <label className="flex items-center gap-3 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selecionado}
+                          onChange={() => toggleProjeto(projeto.id)}
+                        />
+
+                        <div>
+                          <p className="text-sm">
+                            {projeto.nome}
+                          </p>
+
+                          <p className="text-xs text-gray-500">
+                            {projeto.codigo}
+                          </p>
+                        </div>
+                      </label>
+
+                      {selecionado && (
+                        <>
+                          <p className={`mt-2`}>Valor da hora:</p>
+                          <input
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            value={projetosSelecionados[projeto.id]}
+                            onChange={(e) =>
+                              atualizarValorHoraProjeto(
+                                projeto.id,
+                                e.target.value
+                              )
+                            }
+                            className="w-full mt-1 px-3 py-2 rounded-lg bg-black/30 border border-white/5 outline-none focus:border-purple-500 text-sm"
+                            placeholder="Valor por hora"
+                          />
+                      </>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
 
-          <button
-            className="bg-purple-600 hover:bg-purple-700 p-4 rounded-lg font-semibold disabled:opacity-60"
-            disabled={salvando}
-          >
-            {salvando ? "Salvando..." : "Cadastrar"}
-          </button>
+            <button
+              disabled={salvando}
+              className="
+                w-full
+                h-12
+                rounded-xl
+                bg-gradient-to-b
+                from-[#6627cc]
+                to-[#4a1898]
+                font-medium
+                shadow-lg
+                hover:brightness-110
+                transition
+                disabled:opacity-50
+              "
+            >
+              {salvando ? "Salvando..." : "Cadastrar profissional"}
+            </button>
 
-        </form>
-
+          </form>
+        </div>
       </div>
     </div>
   );

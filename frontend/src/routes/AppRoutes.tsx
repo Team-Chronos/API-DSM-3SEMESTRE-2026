@@ -47,6 +47,10 @@ const AppRoutes = createBrowserRouter([
                 )
             },
             {
+                path: "projetos",
+                element: <Projetos />
+            },
+            {
                 path: "projetos/:projetoId/apontamento/",
                 element: (
                     <Suspense fallback={<div>Loading...</div>}>
