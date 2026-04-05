@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, Users, ChevronLeft, Link, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Users,
+  ChevronLeft,
+  Link,
+  LogOut,
+  ClipboardList
+} from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
 import { useAuth } from "../../contexts/AuthContext";
@@ -9,11 +17,12 @@ const NAV_ITEMS = [
   { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard" },
   { to: "/projetos", icon: FolderKanban, label: "Projetos" },
   { to: "/profissionais", icon: Users, label: "Profissionais" },
-  { to: "/associacoes", icon: Link, label: "Associações" }
+  { to: "/associacoes", icon: Link, label: "Associações" },
+  { to: "/projetos-antigo", icon: ClipboardList, label: "Tarefas" }
 ];
 
 export default function Sidebar() {
-  const { user, logout } = useAuth()
+  const { user, logout } = useAuth();
 
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState<boolean>(false);
@@ -21,7 +30,7 @@ export default function Sidebar() {
   function handleLogout() {
     console.log("Logout");
     setConfirmLogout(false);
-    logout()
+    logout();
   }
 
   return (
@@ -30,7 +39,9 @@ export default function Sidebar() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-[#1b1b1f] border border-white/10 rounded-2xl shadow-2xl p-6 w-80 text-white">
             <h2 className="text-base font-semibold mb-1">Sair da conta</h2>
-            <p className="text-sm text-white/50 mb-6">Tem certeza que deseja sair?</p>
+            <p className="text-sm text-white/50 mb-6">
+              Tem certeza que deseja sair?
+            </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setConfirmLogout(false)}
@@ -51,7 +62,7 @@ export default function Sidebar() {
 
       <aside
         className={`
-          relative flex flex-col h-screen bg-[#151519] text-white  border-r border-white/5
+          relative flex flex-col h-screen bg-[#151519] text-white border-r border-white/5
           transition-all duration-300 ease-in-out shrink-0
           ${expanded ? "w-60" : "w-16"}
         `}
@@ -91,9 +102,11 @@ export default function Sidebar() {
               className={({ isActive }) => `
                 flex items-center gap-3 px-2 py-2.5 rounded-lg
                 transition-colors duration-150
-                ${isActive
-                  ? "bg-white/15 text-white font-medium"
-                  : "text-white/60 hover:bg-white/10 hover:text-white"}
+                ${
+                  isActive
+                    ? "bg-white/15 text-white font-medium"
+                    : "text-white/60 hover:bg-white/10 hover:text-white"
+                }
               `}
             >
               <Icon size={20} className="shrink-0" />
@@ -105,8 +118,9 @@ export default function Sidebar() {
         <div className="px-2 py-3 border-t border-white/10">
           <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors">
             <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold shrink-0">
-              {user?.nome.slice(0, 1).toUpperCase() || "💩"}
+              {user?.nome?.slice(0, 1).toUpperCase() || "U"}
             </div>
+
             {expanded && (
               <>
                 <div className="min-w-0 flex-1 text-left">
@@ -114,7 +128,10 @@ export default function Sidebar() {
                   <p className="text-xs text-white/50 truncate">{user?.sub}</p>
                 </div>
                 <button onClick={() => setConfirmLogout(true)} aria-label="Sair">
-                  <LogOut size={16} className="text-white/40 hover:text-red-400 transition-colors" />
+                  <LogOut
+                    size={16}
+                    className="text-white/40 hover:text-red-400 transition-colors"
+                  />
                 </button>
               </>
             )}
