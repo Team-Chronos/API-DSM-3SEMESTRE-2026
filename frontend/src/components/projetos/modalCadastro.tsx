@@ -47,7 +47,7 @@ export default function ModalCadastro({
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8080/projetos", {
+      const response = await fetch("http://localhost:8084/projetos", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

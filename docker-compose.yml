@@ -1,0 +1,131 @@
+services:
+  ms-profissionais:
+    build:
+      context: ./API3-servico-profissionais/profissionais
+      dockerfile: Dockerfile
+    container_name: ms-profissionais-api
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_APPLICATION_NAME: ms-profissionais
+      SERVER_PORT: 8081
+      DB_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_USERNAME: chronosapi
+      DB_PASSWORD: "Bolsonaro#22"
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
+      JPA_DDL_AUTO: update
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+      SPRING_JPA_SHOW_SQL: "true"
+      JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
+      JWT_EXPIRATION_MS: 86400000
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,https://*.app.github.dev
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  controle-horas:
+    build:
+      context: ./API3-servico-controle-de-horas/controle-horas
+      dockerfile: Dockerfile
+    container_name: controle-horas-api
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_APPLICATION_NAME: controle-horas
+      SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8082
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  projeto:
+    build:
+      context: ./API3-servico-gestao-projetos/projeto
+      dockerfile: Dockerfile
+    container_name: projeto-api
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_APPLICATION_NAME: projeto
+      SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8084
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  financeiro:
+    build:
+      context: ./API3-servico-financeiro
+      dockerfile: Dockerfile
+    container_name: financeiro-api
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_APPLICATION_NAME: financeiro
+      SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SERVER_PORT: 8085
+      SPRING_DATASOURCE_HIKARI_READ_ONLY: "true"
+      SPRING_SQL_INIT_MODE: never
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC_CORE: DEBUG
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  tarefas-api:
+    build:
+      context: ./API3-servico-tarefas/criarTarefas/criarTarefas
+      dockerfile: Dockerfile
+    container_name: tarefas-api
+    ports:
+      - "8089:8089"
+    environment:
+      SPRING_APPLICATION_NAME: criarTarefas
+      SERVER_PORT: 8089
+      PROJETO_API_URL: http://projeto-api:8084/projetos
+      SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+    restart: unless-stopped
+    networks:
+      - app-network
+    depends_on:
+      - projeto  # ⬅️ ADICIONE ISSO TAMBÉM - garante que projeto inicie primeiro
+
+  login-api:
+    build:
+      context: ./API3-servico-login
+      dockerfile: Dockerfile
+    container_name: login-api
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_APPLICATION_NAME: login
+      SERVER_PORT: 8083
+      SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

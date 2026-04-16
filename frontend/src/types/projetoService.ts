@@ -1,4 +1,4 @@
-import { ApiTarefas } from '../service/servicoApi';
+import { ApiTarefas } from '../service/servicoApi'; 
 
 export interface Projeto {
   id: number;
@@ -18,6 +18,7 @@ export interface ResponsavelProjeto {
 class ProjetoService {
   async listarTodos(): Promise<Projeto[]> {
     try {
+      // Agora vai para http://localhost:8089/api/projeto/todos
       const response = await ApiTarefas.get('/api/projeto/todos');
       if (response.data && Array.isArray(response.data)) {
         return response.data;
