@@ -119,11 +119,11 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
 
-| Sprint          |    Período    | Documentação                                     |
-| --------------- | :-----------: | ------------------------------------------------ |
-| 🔖 **SPRINT 1** | 16/03 - 05/04  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
-| 🔖 **SPRINT 2** | 13/04 - 03/05  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
-| 🔖 **SPRINT 3** | 11/05 - 31/05  | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
+| Sprint          |    Período    | Vídeo do projeto | Documentação                                     |
+| --------------- | :-----------: | ---------------- | ------------------------------------------------ |
+| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/4c6249vc36k) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
+| 🔖 **SPRINT 2** | 13/04 - 03/05 | [Vídeo Sprint 2]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
+| 🔖 **SPRINT 3** | 11/05 - 31/05 | [Vídeo Sprint 3]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
 
 ## 💻 Tecnologias <a id="tecnologias"></a>
 
