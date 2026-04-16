@@ -23,7 +23,7 @@
 >
 > Documentação: [Documentação das Sprints](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
 > 
-> Video do Projeto: Indisponível 📽️
+> Video do Projeto: <a href ="sprint">Vídeos</a>
 
 ## 😢 Dor do Cliente <a id="dor"></a>
 
