@@ -137,6 +137,17 @@ services:
     networks:
       - app-network
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
