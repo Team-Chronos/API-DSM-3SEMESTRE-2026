@@ -46,7 +46,7 @@ export default function TelaProjetos() {
 
   const handleProjetoClick = (projetoId: number) => {
     console.log(`Projeto selecionado: ${projetoId}`);
-    navigate(`/projetos/${projetoId}/tarefas`);
+    navigate(`/tarefas/projeto/${projetoId}`);
   };
 
   const getStatusColor = (status?: string) => {

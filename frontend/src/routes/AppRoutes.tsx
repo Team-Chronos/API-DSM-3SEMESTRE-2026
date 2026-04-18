@@ -50,7 +50,7 @@ const AppRoutes = createBrowserRouter([
         element: <Projetos />
       },
       {
-        path: "projetos-antigo",
+        path: "tarefas",
         element: <TelaProjetos />
       },
       {
@@ -62,7 +62,7 @@ const AppRoutes = createBrowserRouter([
         )
       },
       {
-        path: "projetos/:projetoId/tarefas",
+        path: "tarefas/projeto/:projetoId",
         element: (
           <Suspense fallback={<div>Loading...</div>}>
             <TarefasPorProjeto />

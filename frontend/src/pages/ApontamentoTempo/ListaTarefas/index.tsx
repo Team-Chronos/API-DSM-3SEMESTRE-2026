@@ -28,8 +28,6 @@ function ApontamentoListaTarefas({ tarefas, itens, loading, tiposTarefa, setTare
     setTarefasSemItem(tarefas?.filter((tarefa) => tarefa.itemId == null))
   }, [tarefas, itens])
 
-  console.log(tarefas)
-
   return(
     <>
       <div className={`flex flex-col p-4 gap-y-6`}>

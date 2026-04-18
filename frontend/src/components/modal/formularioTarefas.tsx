@@ -221,10 +221,10 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50">
+    <div className="fixed inset-0 flex justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50" onClick={handleClose}></div>
 
-      <div className="relative p-6 rounded shadow-lg w-full max-w-lg z-10" style={{ backgroundColor: '#252525', border: '1px solid #3e3e3e' }}>
+      <div className="relative p-6 rounded overflow-y-auto shadow-lg w-full max-w-lg z-10" style={{ backgroundColor: '#252525', border: '1px solid #3e3e3e' }}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-white">Cadastrar Tarefa</h2>
           <button
