@@ -1,7 +1,7 @@
 services:
   ms-profissionais:
     build:
-      context: ./API3-servico-profissionais/profissionais
+      context: ./services/gestao-profissionais/profissionais
       dockerfile: Dockerfile
     container_name: ms-profissionais-api
     ports:
@@ -25,7 +25,7 @@ services:
 
   controle-horas:
     build:
-      context: ./API3-servico-controle-de-horas/controle-horas
+      context: ./services/controle-horas/controle-horas
       dockerfile: Dockerfile
     container_name: controle-horas-api
     ports:
@@ -43,7 +43,7 @@ services:
 
   projeto:
     build:
-      context: ./API3-servico-gestao-projetos/projeto
+      context: ./services/gestao-projetos/projeto
       dockerfile: Dockerfile
     container_name: projeto-api
     ports:
@@ -61,7 +61,7 @@ services:
 
   financeiro:
     build:
-      context: ./API3-servico-financeiro
+      context: ./services/gestao-financeiro
       dockerfile: Dockerfile
     container_name: financeiro-api
     ports:
@@ -82,7 +82,7 @@ services:
 
   tarefas-api:
     build:
-      context: ./API3-servico-tarefas/criarTarefas/criarTarefas
+      context: ./services/gestao-tarefas/criarTarefas/criarTarefas
       dockerfile: Dockerfile
     container_name: tarefas-api
     ports:
@@ -108,7 +108,7 @@ services:
 
   login-api:
     build:
-      context: ./API3-servico-login
+      context: ./services/login
       dockerfile: Dockerfile
     container_name: login-api
     ports:
@@ -122,6 +122,17 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  gateway:
+    build:
+      context: ./services/gateway/gateway
+      dockerfile: Dockerfile
+    container_name: gateway
+    ports:
+      - "8080:8080"
     restart: unless-stopped
     networks:
       - app-network

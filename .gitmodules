@@ -13,11 +13,6 @@
 	url = https://github.com/Team-Chronos/API3-servico-profissionais.git
 	branch = main
 
-[submodule "services-gestao-tarefas"]
-	path = services/gestao-tarefas
-	url = https://github.com/Team-Chronos/API3-servico-tarefas.git
-	branch = main
-
 [submodule "services-financeiro"]
 	path = services/gestao-financeiro
 	url = https://github.com/Team-Chronos/API3-servico-financeiro.git
@@ -25,3 +20,10 @@
 [submodule "services-login"]
 	path = services/login
 	url = https://github.com/Team-Chronos/API3-servico-login.git
+	
+[submodule "services/gestao-tarefas"]
+	path = services/gestao-tarefas
+	url = https://github.com/Team-Chronos/API3-servico-tarefas.git
+[submodule "services/gateway"]
+	path = services/gateway
+	url = https://github.com/Team-Chronos/API3-servico-gateway.git
