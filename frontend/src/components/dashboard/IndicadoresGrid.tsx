@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { DashboardData } from "../../types/financeiro";
 
 interface IndicadoresGridProps {
@@ -35,7 +36,7 @@ function CardResumo({ titulo, valor }: CardResumoProps) {
   );
 }
 
-export default function IndicadoresGrid({
+function IndicadoresGrid({
   dashboard,
 }: IndicadoresGridProps) {
   return (
@@ -57,3 +58,5 @@ export default function IndicadoresGrid({
     </section>
   );
 }
+
+export default memo(IndicadoresGrid);

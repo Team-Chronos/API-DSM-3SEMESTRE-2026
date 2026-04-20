@@ -141,33 +141,6 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
     return nomeResponsavelAtual;
   };
 
-  const formatarData = (data: string | number | null) => {
-    if (!data) return 'Não definido';
-    
-    try {
-      let timestamp: number;
-      
-      if (typeof data === 'string') {
-        timestamp = parseInt(data, 10);
-        if (isNaN(timestamp)) {
-          return new Date(data).toLocaleDateString('pt-BR');
-        }
-      } else {
-        timestamp = data;
-      }
-      
-      const date = new Date(timestamp);
-      
-      if (isNaN(date.getTime())) {
-        return 'Data inválida';
-      }
-      
-      return date.toLocaleDateString('pt-BR');
-    } catch {
-      return 'Data inválida';
-    }
-  };
-
   if (!isOpen || !tarefa) return null;
 
   return (
