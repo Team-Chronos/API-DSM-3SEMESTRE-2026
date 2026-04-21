@@ -1,4 +1,4 @@
-import { ApiTarefas } from '../service/servicoApi';
+import { ApiTarefas } from '../services/api/servicoApi';
 
 export interface Projeto {
   id: number;

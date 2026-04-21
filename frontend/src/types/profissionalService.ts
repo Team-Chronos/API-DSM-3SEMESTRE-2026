@@ -1,4 +1,4 @@
-import { ApiResponsaveis } from "../service/servicoApi";
+import { ApiResponsaveis } from "../services/api/servicoApi";
 
 export interface Profissional {
   id: number;

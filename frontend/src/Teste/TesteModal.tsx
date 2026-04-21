@@ -1,5 +1,5 @@
 import { useState } from "react";
-import ModalDetalheProjeto from "../components/modais/ModalDetalheProjeto";
+import ModalDetalheProjeto from "../features/projetos/modals/ProjetoDetalheModal";
 import type { ProjetoDetalhe } from "../types/financeiro";
 
 const projetoMock: ProjetoDetalhe = {

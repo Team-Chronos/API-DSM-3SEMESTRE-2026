@@ -1,6 +1,6 @@
 import itemService from './itemService';
 import type { Item } from './itemService';
-import { ApiTarefas } from '../service/servicoApi';
+import { ApiTarefas } from '../services/api/servicoApi';
 
 export interface TarefaComItem {
   id: number;

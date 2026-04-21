@@ -1,14 +1,6 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
-import {
-  LayoutDashboard,
-  FolderKanban,
-  Users,
-  ChevronLeft,
-  Link,
-  LogOut,
-  ClipboardList
-} from "lucide-react";
+import {LayoutDashboard,FolderKanban,Users,ChevronLeft,Link,LogOut,ClipboardList} from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
 import { useAuth } from "../../contexts/AuthContext";
