@@ -11,7 +11,7 @@ import type { DragEndEvent } from '@dnd-kit/core';
 import { Droppable } from './colunas';
 import { Draggable } from './cardTarefa';
 import Api from '../service/servicoApi';
-import ModalVisualizarTarefa from './Modal/ModalVisualizarTarefa';
+import ModalVisualizarTarefa from './modal/ModalVisualizarTarefa';
 
 interface Tarefa {
   id: number;

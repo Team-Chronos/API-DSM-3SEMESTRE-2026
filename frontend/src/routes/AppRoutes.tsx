@@ -9,6 +9,8 @@ import TelaProjetos from "../pages/GerenciarTarefas/Projetos";
 import Projetos from "../pages/Projetos";
 import Login from "../pages/login";
 
+import TelaListaProfissionais from "../pages/listaProfissionais";
+
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
 
@@ -26,7 +28,11 @@ const AppRoutes = createBrowserRouter([
         element: <Navigate to="/projetos" replace />
       },
       {
-        path: "profissionais",
+        path:"profissionais",
+        element: <TelaListaProfissionais/>
+      },
+      {
+        path: "cadastro-profissionais",
         element: <CadastroProfissional />
       },
       {

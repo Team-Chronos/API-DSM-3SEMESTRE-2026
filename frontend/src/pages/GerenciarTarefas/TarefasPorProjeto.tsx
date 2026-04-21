@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DragDropTarefas from "../../components/DragDropTarefas";
-import ModalCadastroItem from "../../components/Modal/formularioItem";
-import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
+//import ModalCadastroItem from "../../components/Modal/formularioItem";
+import ModalCadastroTarefa from "../../components/modal/formularioTarefas";
 import projetoService from "../../types/projetoService";
+import ModalCadastroItem from "../../components/modal/formularioItem";
 
 export default function TarefasPorProjeto() {
   const { projetoId } = useParams<{ projetoId: string }>();
