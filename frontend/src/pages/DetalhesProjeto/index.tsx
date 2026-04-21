@@ -49,7 +49,7 @@ function DetalhesProjeto() {
           </div>
         </div>
         <div className="flex flex-col gap-4 *:rounded-xl *:bg-white/7 *:px-4 *:py-8">
-          {/* separa em um componente depois */}
+          {/* separa em um componente depois se quiser */}
           {tarefas && tarefas.length > 0 ? (
             tarefas
               .filter((tarefa) => {
@@ -75,6 +75,7 @@ function DetalhesProjeto() {
           onChange={setPesquisaProfissional}
         />
         <div className="flex flex-col gap-2">
+          {/* separa em um componente depois se quiser */}
           {profissionais && profissionais.length > 0 ? (
             profissionais
               .filter((profissional) => {
