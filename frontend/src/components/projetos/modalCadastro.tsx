@@ -185,7 +185,7 @@ export default function ModalCadastro({
 
           <button
             type="submit"
-            className="rounded-xl bg-gradient-to-r from-[#6627cc] to-[#4a1898] px-5 py-3 font-medium text-white transition hover:brightness-110"
+            className="rounded-xl bg-linear-to-r from-[#6627cc] to-[#4a1898] px-5 py-3 font-medium text-white transition hover:brightness-110"
           >
             Adicionar
           </button>

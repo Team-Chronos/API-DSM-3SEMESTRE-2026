@@ -9,6 +9,7 @@ export default function TarefasPorProjeto() {
   const { projetoId } = useParams<{ projetoId: string }>();
   const navigate = useNavigate();
   const [projeto, setProjeto] = useState<any>(null);
+  const [nomeResponsavel, setNomeResponsavel] = useState<string>("Não informado");
   const [modalItemAberto, setModalItemAberto] = useState<boolean>(false);
   const [modalTarefaAberto, setModalTarefaAberto] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
@@ -27,6 +28,13 @@ export default function TarefasPorProjeto() {
       setLoading(true);
       const projetoData = await projetoService.buscarPorId(Number(projetoId));
       setProjeto(projetoData);
+      if (projetoData?.responsavelId) {
+        const resposta = await fetch(`http://localhost:8081/api/profissionais/${projetoData.responsavelId}`);
+        if (resposta.ok) {
+          const profissional = await resposta.json();
+          setNomeResponsavel(profissional.nome ?? "Não informado");
+        }
+      }
     } catch (err) {
       console.error("Erro ao carregar projeto:", err);
       setError("Projeto não encontrado");
@@ -94,6 +102,7 @@ export default function TarefasPorProjeto() {
               {projeto.codigo && (
                 <p className="text-gray-500 text-sm mt-1">Código: {projeto.codigo}</p>
               )}
+               <p className="text-gray-500 text-sm mt-1">Responsável: {nomeResponsavel}</p>
             </div>
             
             <button
@@ -111,10 +120,10 @@ export default function TarefasPorProjeto() {
           </div>
         </div>
 
-        <DragDropTarefas 
+        <DragDropTarefas
           key={refreshKey} 
           projetoId={Number(projetoId)}
-          onAbrirModalItem={abrirModalItem} 
+          onAbrirModalItem={abrirModalItem}
         />
 
         <ModalCadastroItem

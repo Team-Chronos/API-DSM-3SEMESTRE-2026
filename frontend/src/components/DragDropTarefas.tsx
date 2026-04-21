@@ -44,6 +44,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
     { id: 'concluida', titulo: 'Concluída', status: 'CONCLUIDA', tarefas: [] },
   ]);
 
+  const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null);
@@ -61,7 +62,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
 
   const getNomeResponsavel = (responsavelId: number | null): string => {
     if (!responsavelId) return 'Não atribuído';
-    return `Responsável ID: ${responsavelId}`;
+    return profissionais.get(responsavelId) ?? 'Não atribuído';
   };
 
   const carregarTarefas = async () => {
@@ -69,12 +70,15 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
       setLoading(true);
       setError(null);
 
-      const response = await Api.get(`/tarefas/projeto/${projetoId}`);
-      let tarefasData = response.data;
+      const [responseTarefas, responseProfissionais] = await Promise.all([
+        Api.get(`/tarefas/projeto/${projetoId}`),
+        fetch('http://localhost:8081/api/profissionais').then(r => r.json()),
+      ]);
 
-      if (!Array.isArray(tarefasData)) {
-        tarefasData = [];
-      }
+      setProfissionais(new Map(responseProfissionais.map((p: { id: number; nome: string }) => [p.id, p.nome])));
+
+      let tarefasData = responseTarefas.data;
+      if (!Array.isArray(tarefasData)) tarefasData = [];
 
       const tarefas = tarefasData.map((t: any) => ({
         id: t.id,
@@ -84,14 +88,12 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         status: t.status,
         projetoId: t.projetoId,
         tipoTarefaId: t.tipoTarefaId,
-        tempoMaximoMinutos: t.tempoMaximoMinutos
+        tempoMaximoMinutos: t.tempoMaximoMinutos,
       }));
-
-      console.log(`Tarefas carregadas para projeto ${projetoId}:`, tarefas.length);
 
       setColunas(prev => prev.map(col => ({
         ...col,
-        tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status)
+        tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status),
       })));
 
     } catch (err: any) {
@@ -134,7 +136,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
 
     try {
       await Api.patch(`/tarefas/${tarefaParaMover.id}/status`, `"${novoStatus}"`, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       });
     } catch (err) {
       console.error("Erro ao atualizar status:", err);
@@ -200,10 +202,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
                     </div>
                   ) : (
                     coluna.tarefas.map((tarefa) => {
-                      if (!tarefa || !tarefa.id) {
-                        console.warn('Tarefa inválida:', tarefa);
-                        return null;
-                      }
+                      if (!tarefa || !tarefa.id) return null;
 
                       let prazoValue: number | null = null;
                       if (tarefa.tempoMaximoMinutos) {
@@ -229,7 +228,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
                               descricao: tarefa.descricao,
                               responsavel: getNomeResponsavel(tarefa.responsavelId),
                               prazo: prazoValue,
-                              status: tarefa.status
+                              status: tarefa.status,
                             }}
                             onAddItem={(e) => handleAbrirModalItem(tarefa.id, e)}
                           />

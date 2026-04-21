@@ -1,0 +1,6 @@
+services/controle-horas
+services/gestao-financeiro
+services/gestao-profissionais
+services/gestao-projetos
+services/gestao-tarefas
+services/login
