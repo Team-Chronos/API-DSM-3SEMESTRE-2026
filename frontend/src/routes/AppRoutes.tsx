@@ -8,6 +8,9 @@ import TarefasPorProjeto from "../pages/GerenciarTarefas/TarefasPorProjeto";
 import TelaProjetos from "../pages/GerenciarTarefas/Projetos";
 import Projetos from "../pages/Projetos";
 import Login from "../pages/login";
+import DetalhesProjeto from "../pages/DetalhesProjeto";
+import { ProjetoProvider } from "../contexts/ProjetoContext";
+import ProjetoLoader from "../components/ProjetosLoader";
 
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
@@ -50,16 +53,30 @@ const AppRoutes = createBrowserRouter([
         element: <Projetos />
       },
       {
-        path: "tarefas",
-        element: <TelaProjetos />
+        path: "projetos/:projetoId/",
+        element: (
+          <ProjetoProvider>
+            <ProjetoLoader />
+          </ProjetoProvider>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DetalhesProjeto />
+          },
+          {
+            path: "apontamento",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <ApontamentoTempo />
+              </Suspense>
+            )
+          },
+        ]
       },
       {
-        path: "projetos/:projetoId/apontamento",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ApontamentoTempo />
-          </Suspense>
-        )
+        path: "tarefas",
+        element: <TelaProjetos />
       },
       {
         path: "tarefas/projeto/:projetoId",

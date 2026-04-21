@@ -14,7 +14,7 @@ export const ApiProjeto = Axios.create({
   },
 });
 
-export const ApiResponsaveis = Axios.create({
+export const ApiProfissionais = Axios.create({
   baseURL: "http://localhost:8081",  
   headers: {
     'Content-Type': 'application/json',
