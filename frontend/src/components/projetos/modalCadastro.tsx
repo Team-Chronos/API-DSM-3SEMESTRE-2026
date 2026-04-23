@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ModalBase from "../modais/ModalBase";
+import { toastPromise, toastError } from "../../utils/toastUtils";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -47,26 +48,31 @@ export default function ModalCadastro({
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8084/projetos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        alert("Erro ao cadastrar. Verifique os dados.");
-        console.log(formData);
-        return;
-      }
-
-      alert("Projeto cadastrado com sucesso!");
+      await toastPromise(
+        fetch("http://localhost:8084/projetos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        }).then(async (response) => {
+          if (!response.ok) {
+            throw new Error("Erro ao cadastrar. Verifique os dados.");
+          }
+          return response.json();
+        }),
+        {
+          pending: "Cadastrando projeto...",
+          success: "Projeto cadastrado com sucesso!",
+          error: "Erro ao cadastrar projeto"
+        }
+      );
       limparForm();
       onProjetoCadastrado?.();
       onFechar();
     } catch (error) {
       console.error("Erro na requisição:", error);
+      toastError("Erro ao cadastrar projeto. Tente novamente.");
     }
   };
 

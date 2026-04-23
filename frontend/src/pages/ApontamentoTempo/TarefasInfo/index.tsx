@@ -7,6 +7,7 @@ import ModalCadastro from "./ModalCadastro"
 import apiApontamento from "../../../services/apiApontamento"
 import type { TipoTarefa } from "../../../types/tipoTarefa"
 import { getNomeTipoTarefa } from ".."
+import { toastError } from "../../../utils/toastUtils"
 
 interface TarefasInfoProps {
     tarefa: Tarefa
@@ -26,7 +27,7 @@ function TarefasInfo({ tarefa, item, tiposTarefa, setTarefa, reloadTarefas }: Ta
             const response = await apiApontamento.get<RegistroHorasTarefa>("/registros/tarefa/" + tarefa.id)
             setRegistroHorasTarefa(response.data)
         } catch (error: any) {
-            console.error("Erro ao buscar registro de horas da tarefa")
+            toastError("Erro ao buscar registro de horas da tarefa")
         }
     }
 

@@ -5,6 +5,7 @@ import profissionalService from '../../types/profissionalService';
 import type { Profissional } from '../../types/profissionalService';
 import tarefaItemAdapter from '../../types/tarefaItemAdapter';
 import type { TarefaComItem } from '../../types/tarefaItemAdapter';
+import { toastSuccess, toastError } from '../../utils/toastUtils';
 
 interface Props {
   tarefa: any | null;
@@ -116,6 +117,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
       }
       
       setEditandoResponsavel(false);
+      toastSuccess("Responsável atualizado com sucesso!");
       
       await carregarTarefaComItem();
       
@@ -123,7 +125,7 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
       
     } catch (err) {
       console.error("Erro ao atualizar responsável:", err);
-      alert("Erro ao atualizar responsável. Tente novamente.");
+      toastError("Erro ao atualizar responsável. Tente novamente.");
     } finally {
       setSalvando(false);
     }

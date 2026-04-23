@@ -14,6 +14,7 @@ import {
   Search,
   UserPlus,
 } from "lucide-react";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 
 const CARGOS = [
   { id: 1, nome: "Desenvolvedor" },
@@ -46,7 +47,7 @@ function CadastroProfissional() {
       } catch (error) {
         const mensagemErro =
           error instanceof Error ? error.message : "Erro ao carregar projetos.";
-        setMensagem(mensagemErro);
+        toastError(mensagemErro);
       } finally {
         setCarregandoProjetos(false);
       }
@@ -100,7 +101,7 @@ function CadastroProfissional() {
     e.preventDefault();
 
     if (!nome || !email || !senhaHash || !cargoId) {
-      setMensagem("Preencha os campos obrigatórios.");
+      toastError("Preencha os campos obrigatórios.");
       return;
     }
 
@@ -125,10 +126,10 @@ function CadastroProfissional() {
 
       const quantidade = resposta.projetos?.length ?? 0;
 
-      setMensagem(`Profissional cadastrado. Projetos vinculados: ${quantidade}`);
+      toastSuccess(`Profissional cadastrado! ${quantidade} projeto(s) vinculado(s).`);
       limparFormulario();
     } catch (error) {
-      setMensagem("Erro ao cadastrar profissional.");
+      toastError("Erro ao cadastrar profissional.");
     } finally {
       setSalvando(false);
     }
@@ -190,12 +191,6 @@ function CadastroProfissional() {
           </div>
 
           <div className="px-6 py-6 sm:px-8 sm:py-8">
-            {mensagem && (
-              <div className="mb-6 rounded-2xl border border-purple-500/20 bg-purple-500/10 px-4 py-4 text-sm text-purple-100">
-                {mensagem}
-              </div>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-12">
                 <div className="flex flex-col gap-4 lg:col-span-7">

@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import projetoService from "../../types/projetoService";
 import type { Projeto } from "../../types/projetoService";
-
 import profissionalService from "../../types/profissionalService";
 import type { Profissional } from "../../types/profissionalService";
+import { toastError } from "../../utils/toastUtils";
 
 export default function TelaProjetos() {
   const navigate = useNavigate();
@@ -37,8 +36,7 @@ export default function TelaProjetos() {
       setResponsaveis(mapaResponsaveis);
 
     } catch (err) {
-      console.error("Erro ao carregar projetos:", err);
-      setError("Não foi possível carregar os projetos.");
+      toastError("Erro ao carregar projetos. Tente novamente.");
     } finally {
       setLoading(false);
     }

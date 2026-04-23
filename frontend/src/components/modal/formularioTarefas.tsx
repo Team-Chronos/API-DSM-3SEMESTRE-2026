@@ -3,6 +3,7 @@ import { ApiTarefas } from "../../service/servicoApi";
 import projetoService from "../../types/projetoService";
 import profissionalService from "../../types/profissionalService";
 import type { Projeto, ResponsavelProjeto } from "../../types/projetoService";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 
 interface Props {
   isOpen: boolean;
@@ -69,14 +70,15 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
           if (projeto?.responsavelId) {
             setResponsavelId(String(projeto.responsavelId));
           }
-        } catch (err) {
-          console.error("Erro ao buscar detalhes do projeto padrão:", err);
-        }
+    } catch (err) {
+      console.error("Erro ao buscar detalhes do projeto padrão:", err);
+      toastError("Erro ao carregar dados do projeto.");
+    }
       }
 
     } catch (err) {
       console.error("Erro ao carregar dados:", err);
-      setErro("Erro ao carregar dados necessários. Tente novamente.");
+      toastError("Erro ao carregar dados. Tente novamente.");
     } finally {
       setCarregandoDados(false);
     }
@@ -98,6 +100,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
         }
       } catch (err) {
         console.error("Erro ao buscar detalhes do projeto:", err);
+        toastError("Erro ao carregar projeto.");
         setProjetoSelecionado(null);
         setResponsavelId("");
       }
@@ -135,38 +138,38 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
 
     // Validações
     if (!titulo.trim()) {
-      setErro("Título é obrigatório");
+      toastError("Título é obrigatório");
       setCarregando(false);
       return;
     }
     
     if (!descricao.trim()) {
-      setErro("Descrição é obrigatória");
+      toastError("Descrição é obrigatória");
       setCarregando(false);
       return;
     }
     
     if (!prazo) {
-      setErro("Prazo (minutos) é obrigatório");
+      toastError("Prazo (minutos) é obrigatório");
       setCarregando(false);
       return;
     }
     
     const minutos = Number(prazo);
     if (isNaN(minutos) || minutos <= 0) {
-      setErro("Prazo deve ser um número válido em minutos (ex: 30, 60, 120)");
+      toastError("Prazo deve ser um número válido em minutos (ex: 30, 60, 120)");
       setCarregando(false);
       return;
     }
     
     if (!tipoId) {
-      setErro("Selecione um tipo de tarefa");
+      toastError("Selecione um tipo de tarefa");
       setCarregando(false);
       return;
     }
     
     if (!projetoId) {
-      setErro("Selecione um projeto");
+      toastError("Selecione um projeto");
       setCarregando(false);
       return;
     }
@@ -184,6 +187,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
     try {
       await ApiTarefas.post("/tarefas", novaTarefa);
       
+      toastSuccess("Tarefa criada com sucesso!");
       resetForm();
       onFechar();
       if (onSucesso) onSucesso();
@@ -200,7 +204,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
         mensagemErro = err.message;
       }
       
-      setErro(mensagemErro);
+      toastError(mensagemErro);
     } finally {
       setCarregando(false);
     }
@@ -235,13 +239,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
             &times;
           </button>
         </div>
-
-        {erro && (
-          <div className="mb-4 p-3 bg-red-500 text-white rounded whitespace-pre-wrap">
-            <strong>Erro:</strong><br />
-            {erro}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {/* Título */}

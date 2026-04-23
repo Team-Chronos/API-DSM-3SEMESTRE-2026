@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { User } from "../types/usuario";
 import { jwtDecode } from "jwt-decode";
+import { toastError } from "../utils/toastUtils";
 
 type AuthContextType = {
   user?: User
@@ -81,6 +82,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData?.message || "Email ou senha inválidos";
+        toastError(errorMessage);
         return false
       }
 
@@ -92,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return true
     } catch (error: any) {
       console.log("Erro no login", error)
+      toastError("Erro ao conectar com o servidor. Tente novamente.");
       return false
     }
   }

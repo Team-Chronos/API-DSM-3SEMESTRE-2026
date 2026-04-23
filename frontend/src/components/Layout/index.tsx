@@ -5,9 +5,9 @@ import { Navigate, Outlet } from "react-router-dom";
 export default function AppLayout() {
   const { user } = useAuth()
 
-  if (!user){
-    return <Navigate to={"/login"} replace/>
-  }
+  /*if (!user){
+    return <Navigate to={"/projetos"} replace/>
+  }*/
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0f1020]">

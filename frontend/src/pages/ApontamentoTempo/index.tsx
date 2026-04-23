@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom"
 import apiTarefas from "../../services/apiTarefas"
 import { useAuth } from "../../contexts/AuthContext"
 import type { TipoTarefa } from "../../types/tipoTarefa"
+import { toastError } from "../../utils/toastUtils"
 
 export function getNomeTipoTarefa(id: number | null | undefined, tiposTarefa: TipoTarefa[] | null | undefined){
   if (!tiposTarefa || !id) return
@@ -31,7 +32,7 @@ function ApontamentoTempo(){
       const response = await apiTarefas.get("/tipoTarefa")
       setTiposTarefa(response.data)
     } catch (error: any) {
-      console.error("Erro ao buscar tipos de tarefa")
+      toastError("Erro ao buscar tipos de tarefa")
     }
   }
 

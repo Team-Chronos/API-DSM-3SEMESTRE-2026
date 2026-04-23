@@ -60,7 +60,7 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
     }
     
     if (!tarefaId){
-      console.error("Não foi passado tarefaId")
+      toast.error("Erro interno: tarefa não identificada")
       return
     }
     
@@ -81,8 +81,10 @@ function ModalCadastro({tempoMaximoMinutos, tempoRegistradoMinutos, tarefaId, op
       await reloadTarefas()
       await reloadRegistros()
     } catch (error: any) {
-      console.error("Erro ao enviar formulário", error)
-    }
+  toast.error(
+    error?.response?.data?.message || "Erro ao enviar formulário"
+  )
+}
   }
 
   function calcularDuracao(data_inicio: string | Date, data_fim: string | Date){

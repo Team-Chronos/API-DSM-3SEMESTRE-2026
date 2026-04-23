@@ -12,6 +12,7 @@ import { Droppable } from './colunas';
 import { Draggable } from './cardTarefa';
 import Api from '../service/servicoApi';
 import ModalVisualizarTarefa from './Modal/ModalVisualizarTarefa';
+import { toastError } from '../utils/toastUtils';
 
 interface Tarefa {
   id: number;
@@ -95,7 +96,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
       })));
 
     } catch (err: any) {
-      console.error("Erro ao carregar tarefas:", err);
+      toastError("Erro ao carregar tarefas. Tente novamente.");
       setError("Não foi possível carregar as tarefas do servidor.");
     } finally {
       setLoading(false);
@@ -137,7 +138,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         headers: { 'Content-Type': 'application/json' }
       });
     } catch (err) {
-      console.error("Erro ao atualizar status:", err);
+      toastError("Erro ao atualizar status da tarefa. Tente novamente.");
       await carregarTarefas();
     }
   };

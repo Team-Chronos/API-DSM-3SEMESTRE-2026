@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ModalCadastro from "../../components/projetos/modalCadastro";
 import { useNavigate } from "react-router-dom";
+import { toastError } from "../../utils/toastUtils";
 
 interface Projeto {
   id: number;
@@ -26,10 +27,13 @@ function Projetos() {
     try {
       setLoading(true);
       const resposta = await fetch("http://localhost:8084/projetos");
+      if (!resposta.ok) {
+        throw new Error("Erro ao buscar projetos");
+      }
       const dados = await resposta.json();
       setProjetos(dados);
     } catch (erro) {
-      console.error("Erro ao buscar projeto ", erro);
+      toastError("Erro ao carregar projetos. Tente novamente.");
     } finally {
       setLoading(false);
     }

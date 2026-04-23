@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import logoGSW from "../../assets/inteiro.png"
 import { Eye, EyeOff } from "lucide-react";
+import { toastError } from "../../utils/toastUtils";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -13,21 +14,11 @@ function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
 
-  const [mensagem, setMensagem] = useState<{
-    tipo: "erro";
-    texto: string;
-  } | null>(null);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!email || !senha) {
-      setMensagem({
-        tipo: "erro",
-        texto: "Preencha todos os campos",
-      });
-
-      setTimeout(() => setMensagem(null), 3000);
+      toastError("Preencha todos os campos");
       return;
     }
 
@@ -40,12 +31,7 @@ function Login() {
       return;
     }
 
-    setMensagem({
-      tipo: "erro",
-      texto: "Email ou senha inválidos",
-    });
-
-    setTimeout(() => setMensagem(null), 3000);
+    toastError("Email ou senha inválidos");
   };
 
   return (
@@ -80,19 +66,7 @@ function Login() {
               </p>
             </div>
 
-            {mensagem && (
-              <div className="
-                mb-6
-                rounded-lg
-                border border-red-500/40
-                bg-red-500/10
-                p-3
-                text-sm
-                text-red-400
-              ">
-                {mensagem.texto}
-              </div>
-            )}
+
 
             <form onSubmit={handleLogin} className="flex flex-col gap-5">
               

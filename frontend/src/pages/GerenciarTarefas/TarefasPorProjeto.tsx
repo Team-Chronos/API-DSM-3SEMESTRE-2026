@@ -4,6 +4,7 @@ import DragDropTarefas from "../../components/DragDropTarefas";
 import ModalCadastroItem from "../../components/Modal/formularioItem";
 import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
 import projetoService from "../../types/projetoService";
+import { toastError } from "../../utils/toastUtils";
 
 export default function TarefasPorProjeto() {
   const { projetoId } = useParams<{ projetoId: string }>();
@@ -28,7 +29,7 @@ export default function TarefasPorProjeto() {
       const projetoData = await projetoService.buscarPorId(Number(projetoId));
       setProjeto(projetoData);
     } catch (err) {
-      console.error("Erro ao carregar projeto:", err);
+      toastError("Erro ao carregar projeto. Projeto não encontrado.");
       setError("Projeto não encontrado");
     } finally {
       setLoading(false);
