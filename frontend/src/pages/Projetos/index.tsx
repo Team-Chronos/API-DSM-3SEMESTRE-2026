@@ -104,7 +104,7 @@ function Projetos() {
           projetosFiltrados.map((projeto) => (
             <div
               key={projeto.id}
-              onClick={() => navigate(`/projetos/${projeto.id}/apontamento`)}
+              onClick={() => navigate(`/projetos/${projeto.id}`)}
               className="
                 cursor-pointer
                 rounded-2xl
