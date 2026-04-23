@@ -8,6 +8,9 @@ import TarefasPorProjeto from "../pages/GerenciarTarefas/TarefasPorProjeto";
 import TelaProjetos from "../pages/GerenciarTarefas/Projetos";
 import Projetos from "../pages/Projetos";
 import Login from "../pages/login";
+import DetalhesProjeto from "../pages/DetalhesProjeto";
+import { ProjetoProvider } from "../contexts/ProjetoContext";
+import ProjetoLoader from "../components/ProjetosLoader";
 
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
@@ -23,19 +26,19 @@ const AppRoutes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/projetos" replace />
+        element: <Navigate to="/projetos" replace />,
       },
       {
         path: "profissionais",
-        element: <CadastroProfissional />
+        element: <CadastroProfissional />,
       },
       {
         path: "associacoes",
-        element: <AssociacaoProfissionalProjeto />
+        element: <AssociacaoProfissionalProjeto />,
       },
       {
         path: "gestao-profissionais",
-        element: <GestaoProfissionais />
+        element: <GestaoProfissionais />,
       },
       {
         path: "financeiro",
@@ -43,38 +46,52 @@ const AppRoutes = createBrowserRouter([
           <Suspense fallback={<div>Loading...</div>}>
             <DashboardPage />
           </Suspense>
-        )
+        ),
       },
       {
         path: "projetos",
-        element: <Projetos />
+        element: <Projetos />,
+      },
+      {
+        path: "projetos/:projetoId/",
+        element: (
+          <ProjetoProvider>
+            <ProjetoLoader />
+          </ProjetoProvider>
+        ),
+        children: [
+          {
+            index: true,
+            element: <DetalhesProjeto />,
+          },
+          {
+            path: "apontamento",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <ApontamentoTempo />
+              </Suspense>
+            ),
+          },
+          {
+            path: "tarefas",
+            element: (
+              <Suspense fallback={<div>Loading...</div>}>
+                <TarefasPorProjeto />
+              </Suspense>
+            ),
+          },
+        ],
       },
       {
         path: "tarefas",
-        element: <TelaProjetos />
+        element: <TelaProjetos />,
       },
-      {
-        path: "projetos/:projetoId/apontamento",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <ApontamentoTempo />
-          </Suspense>
-        )
-      },
-      {
-        path: "tarefas/projeto/:projetoId",
-        element: (
-          <Suspense fallback={<div>Loading...</div>}>
-            <TarefasPorProjeto />
-          </Suspense>
-        )
-      }
-    ]
+    ],
   },
   {
     path: "/login",
-    element: <Login />
-  }
+    element: <Login />,
+  },
 ]);
 
 export default AppRoutes;

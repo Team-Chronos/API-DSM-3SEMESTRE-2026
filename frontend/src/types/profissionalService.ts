@@ -1,4 +1,4 @@
-import { ApiResponsaveis } from "../service/servicoApi";
+import { ApiProfissionais } from "../service/servicoApi";
 
 export interface Profissional {
   id: number;
@@ -11,7 +11,7 @@ class ProfissionalService {
   async listarTodos(): Promise<Profissional[]> {
     try {
       // Endpoint que retorna todos os profissionais com id e nome
-      const response = await ApiResponsaveis.get("/api/profissionais");
+      const response = await ApiProfissionais.get("/api/profissionais");
       
       console.log("Resposta do microsserviço:", response.data);
       
@@ -34,7 +34,7 @@ class ProfissionalService {
   // Método específico para buscar apenas nomes (se o endpoint /nomes existir)
   async listarNomes(): Promise<Profissional[]> {
     try {
-      const response = await ApiResponsaveis.get("/api/profissionais/nomes");
+      const response = await ApiProfissionais.get("/api/profissionais/nomes");
       
       if (response.data && Array.isArray(response.data)) {
         return response.data;

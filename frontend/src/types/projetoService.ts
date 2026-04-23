@@ -1,6 +1,6 @@
 import { ApiTarefas } from '../service/servicoApi'; 
 
-export interface Projeto {
+export interface Projeto1 {
   id: number;
   nome: string;
   codigo?: string;
@@ -16,7 +16,7 @@ export interface ResponsavelProjeto {
 }
 
 class ProjetoService {
-  async listarTodos(): Promise<Projeto[]> {
+  async listarTodos(): Promise<Projeto1[]> {
     try {
       // Agora vai para http://localhost:8089/api/projeto/todos
       const response = await ApiTarefas.get('/api/projeto/todos');
@@ -31,7 +31,7 @@ class ProjetoService {
     }
   }
 
-  async buscarPorId(id: number): Promise<Projeto | undefined> {
+  async buscarPorId(id: number): Promise<Projeto1 | undefined> {
     try {
       const response = await ApiTarefas.get(`/api/projeto/${id}`);
       return response.data;
