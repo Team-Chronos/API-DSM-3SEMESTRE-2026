@@ -10,13 +10,11 @@ export interface Profissional {
 class ProfissionalService {
   async listarTodos(): Promise<Profissional[]> {
     try {
-      // Endpoint que retorna todos os profissionais com id e nome
-      const response = await ApiResponsaveis.get("/api/profissionais");
+      const response = await ApiResponsaveis.get("/profissionais");
       
-      console.log("Resposta do microsserviço:", response.data);
+      console.log("Resposta do serviço:", response.data);
       
       if (response.data && Array.isArray(response.data)) {
-        // Mapeia para garantir que só temos id e nome
         return response.data.map((item: any) => ({
           id: item.id,
           nome: item.nome,
@@ -31,10 +29,9 @@ class ProfissionalService {
     }
   }
 
-  // Método específico para buscar apenas nomes (se o endpoint /nomes existir)
   async listarNomes(): Promise<Profissional[]> {
     try {
-      const response = await ApiResponsaveis.get("/api/profissionais/nomes");
+      const response = await ApiResponsaveis.get("/profissionais/nomes");
       
       if (response.data && Array.isArray(response.data)) {
         return response.data;

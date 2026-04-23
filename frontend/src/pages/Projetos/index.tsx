@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ModalCadastro from "../../components/projetos/modalCadastro";
 import { useNavigate } from "react-router-dom";
+import { projetoService } from "../../services/gateway";
 
 interface Projeto {
   id: number;
@@ -21,15 +22,19 @@ function Projetos() {
   const [projetos, setProjetos] = useState<Projeto[]>([]);
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState<string | null>(null);
 
   const carregarProjetos = async () => {
     try {
       setLoading(true);
-      const resposta = await fetch("http://localhost:8084/projetos");
+      setErro(null);
+      const resposta = await projetoService.listar();
       const dados = await resposta.json();
-      setProjetos(dados);
+      setProjetos(Array.isArray(dados) ? dados : []);
     } catch (erro) {
       console.error("Erro ao buscar projeto ", erro);
+      setErro(erro instanceof Error ? erro.message : "Erro ao carregar projetos");
+      setProjetos([]); 
     } finally {
       setLoading(false);
     }
@@ -39,7 +44,7 @@ function Projetos() {
     carregarProjetos();
   }, []);
 
-  const projetosFiltrados = projetos.filter((projeto) => {
+  const projetosFiltrados = (projetos || []).filter((projeto) => {
     const termo = busca.toLowerCase();
 
     return (
@@ -73,6 +78,12 @@ function Projetos() {
           </button>
         </div>
       </div>
+
+      {erro && (
+        <div className="mb-4 rounded-lg border border-red-500 bg-red-950 p-4 text-red-200">
+          <strong>Erro:</strong> {erro}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {loading &&

@@ -1,4 +1,4 @@
-import { ApiTarefas } from '../service/servicoApi'; 
+import { ApiProjeto } from '../service/servicoApi';
 
 export interface Projeto {
   id: number;
@@ -18,12 +18,10 @@ export interface ResponsavelProjeto {
 class ProjetoService {
   async listarTodos(): Promise<Projeto[]> {
     try {
-      // Agora vai para http://localhost:8089/api/projeto/todos
-      const response = await ApiTarefas.get('/api/projeto/todos');
+      const response = await ApiProjeto.get('/projetos');
       if (response.data && Array.isArray(response.data)) {
         return response.data;
       }
-      
       return [];
     } catch (error) {
       console.warn("Erro ao buscar projetos:", error);
@@ -33,7 +31,7 @@ class ProjetoService {
 
   async buscarPorId(id: number): Promise<Projeto | undefined> {
     try {
-      const response = await ApiTarefas.get(`/api/projeto/${id}`);
+      const response = await ApiProjeto.get(`/projetos/${id}`);
       return response.data;
     } catch (error) {
       console.warn("Erro ao buscar projeto:", error);
@@ -43,7 +41,7 @@ class ProjetoService {
 
   async listarResponsaveis(): Promise<ResponsavelProjeto[]> {
     try {
-      const response = await ApiTarefas.get('/api/projeto/responsaveis');
+      const response = await ApiProjeto.get('/responsaveis');
       if (response.data && Array.isArray(response.data)) {
         return response.data;
       }
