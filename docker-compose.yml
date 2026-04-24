@@ -1,6 +1,8 @@
 services:
   ms-profissionais:
-    image: api_teste-ms-profissionais:latest
+    build:
+      context: ./services/gestao-profissionais/profissionais
+      dockerfile: Dockerfile
     container_name: ms-profissionais-api
     ports:
       - "8081:8081"
@@ -22,7 +24,9 @@ services:
       - app-network
 
   controle-horas:
-    image: api_teste-controle-horas:latest
+    build:
+      context: ./services/controle-horas/controle-horas
+      dockerfile: Dockerfile
     container_name: controle-horas-api
     ports:
       - "8082:8082"
@@ -38,7 +42,9 @@ services:
       - app-network
 
   projeto:
-    image: api_teste-projeto:latest
+    build:
+      context: ./services/gestao-projetos/projeto
+      dockerfile: Dockerfile
     container_name: projeto-api
     ports:
       - "8084:8084"
@@ -54,7 +60,9 @@ services:
       - app-network
 
   financeiro:
-    image: api_teste-financeiro:latest
+    build:
+      context: ./services/gestao-financeiro
+      dockerfile: Dockerfile
     container_name: financeiro-api
     ports:
       - "8085:8085"
@@ -73,7 +81,9 @@ services:
       - app-network
 
   tarefas-api:
-    image: api_teste-tarefas-api:latest
+    build:
+      context: ./services/gestao-tarefas/criarTarefas/criarTarefas
+      dockerfile: Dockerfile
     container_name: tarefas-api
     ports:
       - "8089:8089"
@@ -97,7 +107,9 @@ services:
       - projeto
 
   login-api:
-    image: api_teste-login-api:latest
+    build:
+      context: ./services/login
+      dockerfile: Dockerfile
     container_name: login-api
     ports:
       - "8083:8083"
@@ -108,32 +120,34 @@ services:
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       SPRING_JPA_SHOW_SQL: "true"
+      APP_CORS_ALLOWED_ORIGINS: http://localhost:*
     restart: unless-stopped
     networks:
       - app-network
 
-  auth-gateway:
+  gateway:
     build:
-      context: ./services/gateway
+      context: ./services/gateway/gateway
       dockerfile: Dockerfile
-    container_name: auth-gateway-api
+    container_name: gateway
     ports:
-      - "8090:8080"
-    environment:
-      SPRING_APPLICATION_NAME: gateway
-      SERVER_PORT: 8080
+      - "8080:8080"
     restart: unless-stopped
     networks:
       - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "80:80"
     depends_on:
-      - ms-profissionais
-      - controle-horas
-      - projeto
-      - financeiro
-      - tarefas-api
-      - login-api
+      - gateway
+    networks:
+      - app-network
 
 networks:
   app-network:

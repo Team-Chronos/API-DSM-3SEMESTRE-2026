@@ -6,25 +6,20 @@ import type {
   ProjetoFinanceiro,
 } from "../types/financeiro";
 
-const GATEWAY_URL = "http://localhost:8080";
+const API_BASE = "/api/financeiro";
 
 const api = axios.create({
-  baseURL: `${GATEWAY_URL}/financeiro`,
-  headers: {
-    "Content-Type": "application/json",
-  },
+  baseURL: API_BASE,
+  headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 api.interceptors.response.use(
   (response) => response,
@@ -39,37 +34,29 @@ api.interceptors.response.use(
 
 export const apiFinanceiro = {
   async buscarDashboard(): Promise<DashboardData> {
-    const response = await api.get<DashboardData>("/dashboard");
+    const response = await api.get<DashboardData>("/financeiro/dashboard");
     return response.data;
   },
 
   async buscarProjetos(): Promise<ProjetoFinanceiro[]> {
-    const response = await api.get<ProjetoFinanceiro[]>("/projetos");
+    const response = await api.get<ProjetoFinanceiro[]>("/financeiro/projetos");
     return response.data;
   },
 
   async buscarProfissionais(): Promise<ProfissionalGanhos[]> {
-    const response = await api.get<ProfissionalGanhos[]>("/profissionais");
+    const response = await api.get<ProfissionalGanhos[]>("/financeiro/profissionais");
     return response.data;
   },
 
-  async buscarProfissionalPorId(
-    usuarioId: number,
-    bonus = 0
-  ): Promise<ProfissionalGanhos> {
-    const response = await api.get<ProfissionalGanhos>(
-      `/profissionais/${usuarioId}`,
-      {
-        params: { bonus },
-      }
-    );
+  async buscarProfissionalPorId(usuarioId: number, bonus = 0): Promise<ProfissionalGanhos> {
+    const response = await api.get<ProfissionalGanhos>(`/financeiro/profissionais/${usuarioId}`, {
+      params: { bonus },
+    });
     return response.data;
   },
 
   async buscarProjetoDetalhe(projetoId: number): Promise<ProjetoDetalhe> {
-    const response = await api.get<ProjetoDetalhe>(
-      `/projetos/${projetoId}/detalhes`
-    );
+    const response = await api.get<ProjetoDetalhe>(`/financeiro/projetos/${projetoId}/detalhes`);
     return response.data;
   },
 };

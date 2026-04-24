@@ -1,11 +1,6 @@
-import Axios from "axios";
+import axios from "axios";
 
-const GATEWAY_URL = "http://localhost:8080";
-
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+const PROXY_BASE = "/api"; 
 
 const setupInterceptors = (client: any) => {
   client.interceptors.request.use(
@@ -29,53 +24,19 @@ const setupInterceptors = (client: any) => {
       return Promise.reject(error);
     }
   );
-
   return client;
 };
 
 export const ApiGateway = setupInterceptors(
-  Axios.create({
-    baseURL: GATEWAY_URL,
-    headers: {
-      "Content-Type": "application/json",
-    },
+  axios.create({
+    baseURL: PROXY_BASE,
+    headers: { "Content-Type": "application/json" },
   })
 );
 
-export const ApiTarefas = setupInterceptors(
-  Axios.create({
-    baseURL: `${GATEWAY_URL}/tarefas`,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-);
-
-export const ApiProjeto = setupInterceptors(
-  Axios.create({
-    baseURL: `${GATEWAY_URL}/projeto`,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-);
-
-export const ApiResponsaveis = setupInterceptors(
-  Axios.create({
-    baseURL: `${GATEWAY_URL}/profissionais`,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-);
-
-export const ApiLogin = setupInterceptors(
-  Axios.create({
-    baseURL: `${GATEWAY_URL}/login`,
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-);
+export const ApiTarefas = ApiGateway;
+export const ApiProjeto = ApiGateway;
+export const ApiLogin = ApiGateway;
+export const ApiProfissionais = ApiGateway;
 
 export default ApiGateway;

@@ -10,8 +10,11 @@ import type { DragEndEvent } from '@dnd-kit/core';
 
 import { Droppable } from './colunas';
 import { Draggable } from './cardTarefa';
-import Api from '../service/servicoApi';
+import { ApiTarefas } from '../service/servicoApi';
+import profissionalService from '../types/profissionalService';
 import ModalVisualizarTarefa from './Modal/ModalVisualizarTarefa';
+import type { Profissional } from '../types/profissionalService';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Tarefa {
   id: number;
@@ -38,12 +41,14 @@ interface DragDropTarefasProps {
 }
 
 export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKey }: DragDropTarefasProps) {
+  const { user } = useAuth();
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: 'pendente', titulo: 'Pendente', status: 'PENDENTE', tarefas: [] },
     { id: 'em_andamento', titulo: 'Em Andamento', status: 'EM_ANDAMENTO', tarefas: [] },
     { id: 'concluida', titulo: 'Concluída', status: 'CONCLUIDA', tarefas: [] },
   ]);
 
+  const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null);
@@ -54,14 +59,14 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
   );
 
   useEffect(() => {
-    if (projetoId) {
+    if (projetoId && user?.id) {
       carregarTarefas();
     }
-  }, [projetoId, refreshKey]);
+  }, [projetoId, user?.id, refreshKey]);
 
   const getNomeResponsavel = (responsavelId: number | null): string => {
     if (!responsavelId) return 'Não atribuído';
-    return `Responsável ID: ${responsavelId}`;
+    return profissionais.get(responsavelId) ?? 'Não atribuído';
   };
 
   const carregarTarefas = async () => {
@@ -69,12 +74,18 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
       setLoading(true);
       setError(null);
 
-      const response = await Api.get(`/tarefas/projeto/${projetoId}`);
-      let tarefasData = response.data;
-
-      if (!Array.isArray(tarefasData)) {
-        tarefasData = [];
+      if (!user?.id) {
+        throw new Error('Usuário não autenticado');
       }
+
+      const response = await ApiTarefas.get(`/tarefas/tarefas/projeto/${projetoId}/responsavel/${user.id}`);
+      let tarefasData = response.data;
+      if (!Array.isArray(tarefasData)) tarefasData = [];
+
+      const profissionaisLista = await profissionalService.listarTodos();
+      const profissionaisMap = new Map<number, string>();
+      profissionaisLista.forEach((p: Profissional) => profissionaisMap.set(p.id, p.nome));
+      setProfissionais(profissionaisMap);
 
       const tarefas = tarefasData.map((t: any) => ({
         id: t.id,
@@ -84,19 +95,18 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         status: t.status,
         projetoId: t.projetoId,
         tipoTarefaId: t.tipoTarefaId,
-        tempoMaximoMinutos: t.tempoMaximoMinutos
+        tempoMaximoMinutos: t.tempoMaximoMinutos,
       }));
 
-      console.log(`Tarefas carregadas para projeto ${projetoId}:`, tarefas.length);
-
-      setColunas(prev => prev.map(col => ({
-        ...col,
-        tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status)
-      })));
-
+      setColunas(prev =>
+        prev.map(col => ({
+          ...col,
+          tarefas: tarefas.filter((t:any) => t && t.status === col.status),
+        }))
+      );
     } catch (err: any) {
-      console.error("Erro ao carregar tarefas:", err);
-      setError("Não foi possível carregar as tarefas do servidor.");
+      console.error('Erro ao carregar tarefas:', err);
+      setError('Não foi possível carregar as tarefas do servidor.');
     } finally {
       setLoading(false);
     }
@@ -114,7 +124,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
     const colDestinoIdx = colunas.findIndex(c => c.id === overId);
 
     colunas.forEach((col, idx) => {
-      const t = col.tarefas.find(task => task && task.id && task.id.toString() === activeId);
+      const t = col.tarefas.find(task => task.id.toString() === activeId);
       if (t) {
         tarefaParaMover = t;
         colOrigemIdx = idx;
@@ -127,23 +137,22 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
 
     const novasColunas = [...colunas];
     novasColunas[colOrigemIdx].tarefas = novasColunas[colOrigemIdx].tarefas.filter(
-      t => t && t.id && t.id.toString() !== activeId
+      t => t.id.toString() !== activeId
     );
     novasColunas[colDestinoIdx].tarefas.push({ ...tarefaParaMover, status: novoStatus });
     setColunas(novasColunas);
 
     try {
-      await Api.patch(`/tarefas/${tarefaParaMover.id}/status`, `"${novoStatus}"`, {
-        headers: { 'Content-Type': 'application/json' }
+      await ApiTarefas.patch(`/tarefas/tarefas/${tarefaParaMover.id}/status`, `"${novoStatus}"`, {
+        headers: { 'Content-Type': 'application/json' },
       });
     } catch (err) {
-      console.error("Erro ao atualizar status:", err);
-      await carregarTarefas();
+      console.error('Erro ao atualizar status:', err);
+      await carregarTarefas(); 
     }
   };
 
   const handleAbrirVisualizar = (tarefa: Tarefa) => {
-    if (!tarefa) return;
     setTarefaSelecionada(tarefa);
     setModalVisualizarAberto(true);
   };
@@ -154,16 +163,14 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
 
   const handleAbrirModalItem = (tarefaId: number, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onAbrirModalItem && tarefaId) {
-      onAbrirModalItem(tarefaId);
-    }
+    onAbrirModalItem?.(tarefaId);
   };
 
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
           <p>Carregando tarefas do projeto...</p>
         </div>
       </div>
@@ -176,10 +183,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
           <strong>Erro:</strong> {error}
         </div>
-        <button
-          onClick={carregarTarefas}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
+        <button onClick={carregarTarefas} className="px-4 py-2 bg-blue-500 text-white rounded">
           Tentar novamente
         </button>
       </div>
@@ -191,7 +195,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
       <div className="p-6">
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {colunas.map((coluna) => (
+            {colunas.map(coluna => (
               <Droppable key={coluna.id} id={coluna.id} titulo={coluna.titulo}>
                 <div className="space-y-2">
                   {coluna.tarefas.length === 0 ? (
@@ -199,43 +203,26 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
                       Nenhuma tarefa
                     </div>
                   ) : (
-                    coluna.tarefas.map((tarefa) => {
-                      if (!tarefa || !tarefa.id) {
-                        console.warn('Tarefa inválida:', tarefa);
-                        return null;
-                      }
-
-                      let prazoValue: number | null = null;
-                      if (tarefa.tempoMaximoMinutos) {
-                        if (typeof tarefa.tempoMaximoMinutos === 'number') {
-                          prazoValue = tarefa.tempoMaximoMinutos;
-                        } else if (typeof tarefa.tempoMaximoMinutos === 'string') {
-                          const parsed = parseInt(tarefa.tempoMaximoMinutos, 10);
-                          prazoValue = isNaN(parsed) ? null : parsed;
-                        }
-                      }
-
-                      return (
-                        <div
-                          key={tarefa.id}
-                          onClick={() => handleAbrirVisualizar(tarefa)}
-                          className="cursor-pointer"
-                        >
-                          <Draggable
-                            id={String(tarefa.id)}
-                            tarefa={{
-                              id: tarefa.id,
-                              titulo: tarefa.titulo,
-                              descricao: tarefa.descricao,
-                              responsavel: getNomeResponsavel(tarefa.responsavelId),
-                              prazo: prazoValue,
-                              status: tarefa.status
-                            }}
-                            onAddItem={(e) => handleAbrirModalItem(tarefa.id, e)}
-                          />
-                        </div>
-                      );
-                    })
+                    coluna.tarefas.map(tarefa => (
+                      <div
+                        key={tarefa.id}
+                        onClick={() => handleAbrirVisualizar(tarefa)}
+                        className="cursor-pointer"
+                      >
+                        <Draggable
+                          id={String(tarefa.id)}
+                          tarefa={{
+                            id: tarefa.id,
+                            titulo: tarefa.titulo,
+                            descricao: tarefa.descricao,
+                            responsavel: getNomeResponsavel(tarefa.responsavelId),
+                            prazo: typeof tarefa.tempoMaximoMinutos === 'number' ? tarefa.tempoMaximoMinutos : null,
+                            status: tarefa.status,
+                          }}
+                          onAddItem={e => handleAbrirModalItem(tarefa.id, e)}
+                        />
+                      </div>
+                    ))
                   )}
                 </div>
               </Droppable>
@@ -243,7 +230,6 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
           </div>
         </DndContext>
       </div>
-
       <ModalVisualizarTarefa
         tarefa={tarefaSelecionada}
         isOpen={modalVisualizarAberto}

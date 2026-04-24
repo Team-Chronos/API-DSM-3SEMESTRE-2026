@@ -1,24 +1,19 @@
 import axios from "axios";
 
-const GATEWAY_URL = "http://localhost:8080"; 
+const API_BASE = "/api/tarefas"; 
 
 const apiTarefas = axios.create({
-  baseURL: `${GATEWAY_URL}/tarefas`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: API_BASE,
+  headers: { "Content-Type": "application/json" },
 });
 
-apiTarefas.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+apiTarefas.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 apiTarefas.interceptors.response.use(
   (response) => response,

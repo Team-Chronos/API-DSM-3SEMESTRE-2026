@@ -5,11 +5,13 @@
 <h2 align="center"> Chronos </h2>
 
 <p align="center">
+  <a href ="#dor">Dor do cliente</a>  |
   <a href ="#desafio">Desafio</a>  |
   <a href ="#solucao">Solução</a>  |   
   <a href ="#backlog">Backlog do Produto</a>  |
   <a href ="#dor">DoR</a>  |
   <a href ="#dod">DoD</a>  |
+  <a href ="#requisitos">Requisitos</a>  |
   <a href ="#instalacao">Manual de Instalação</a> |
   <a href ="#branch">Estratégia de Branch</a>  |
   <a href ="#sprint">Cronograma de Sprints</a>  |
@@ -19,9 +21,13 @@
 
 > Status do Projeto: Em andamento ⏳ 
 >
-> Pasta de Documentação: [Documentação das Sprints](https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026/tree/main/docs)
+> Documentação: [Documentação das Sprints](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
 > 
-> Video do Projeto: Indisponível 📽️
+> Video do Projeto: <a href ="sprint">Vídeos</a>
+
+## 😢 Dor do Cliente <a id="dor"></a>
+
+O principal dor do cliente está na dificuldade de organizar e gerir a equipe de forma eficiente diante do crescente volume de demandas. A falta de um processo centralizado e a lentidão no fluxo de informações geram gargalos operacionais que quebram a dinâmica do trabalho diário. Essa dispersão não apenas prejudica a autonomia dos colaboradores, mas também tira dos gestores a visibilidade clara sobre o esforço e a capacidade da equipe, reduzindo drasticamente a produtividade geral e impedindo o negócio de escalar seus resultados.
 
 ## 🏅 Desafio <a id="desafio"></a>
 
@@ -39,19 +45,23 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 | Rank | Prioridade | User Story                                                                                                                                                                                                      | Estimativa | Sprint | Status |
 | :--: | :--------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------: | :----: | :----: |
-|   1  |    Alta    | Como Gestor, eu quero cadastrar novos projetos definindo seu tipo ("alocação" ou "hora fechada"), para que o sistema aplique as regras corretas de acompanhamento.                                        |       7      |    1   |   🔄   |
-|   2  |    Alta    | Como Desenvolvedor, eu quero apontar o tempo gasto selecionando um projeto, o item e a atividade para que o registro do meu esforço seja centralizado e rápido.                                                                             |       5      |    1   |   🔄   |
-|   3  |    Alta    | Como Gestor, eu quero criar tarefas dentro dos projetos e coloca-los em uma hierarquia de "Itens", para que a equipe saiba exatamente onde o esforço deve ser alocado.                                 |       4      |    1   |   🔄   |
-|   4  |    Alta    | Como Administrador do sistema, eu quero cadastrar os profissionais e vinculá-los aos projetos correspondentes, para garantir que cada pessoa só lance horas onde realmente está atuando.                                         |       6      |    1   |   🔄   |
-|   5  |    Alta    | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou análisada. |             |    3   |      |
-|   6  |    Alta    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |             |    2   |      |
-|   7  |    Alta    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |             |    2   |      |
-|   8  |    Alta   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |             |    2   |      |
-|   9  |    Alta   | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada.                                            |       3      |    1   |   🔄   |
-|  10  |    Média   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |             |    3   |      |
-|  11  |    Média   | Como Gestor, eu quero visualizar um dashboard centralizado com os principais indicadores de esforço e custo, para que eu possa ter uma visão rápida da saúde dos projetos e tomar decisões sem precisar de gerar relatórios complexos. |             |    3   |      |
+|   1  |    Alta    | Como Gestor, eu quero cadastrar novos projetos definindo seu tipo ("alocação" ou "hora fechada"), para que o sistema aplique as regras corretas de acompanhamento.                                        |       7      |    1   |   ✅​   |
+|   2  |    Alta    | Como Desenvolvedor, eu quero apontar o tempo gasto selecionando um projeto, o item e a atividade para que o registro do meu esforço seja centralizado e rápido.                                                                             |       5      |    1   |   ✅​   |
+|   3  |    Alta    | Como Gestor, eu quero criar tarefas dentro dos projetos e coloca-los em uma hierarquia de "Itens", para que a equipe saiba exatamente onde o esforço deve ser alocado.                                 |       4      |    1   |   ✅​   |
+|   4  |    Alta    | Como Administrador do sistema, eu quero cadastrar os profissionais e vinculá-los aos projetos correspondentes, para garantir que cada pessoa só lance horas onde realmente está atuando.                                         |       6      |    1   |   ✅​   |
+|   5  |    Baixa    | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou análisada. |      5      |    3   |   🔁   |
+|   6  |    Média    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |      6       |    2   |   🔁   |
+|   7  |    Média    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |      3       |    2   |   🔁   |
+|   8  |    Baixa   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |      2      |    2   |   🔁   |
+|   9  |    Alta   | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada.                                            |       5      |    1   |   ✅​   |
+|  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |      3       |    3   |   🔁   |
+|  11  |    Baixa   | Como gestor quero gerenciar os projetos cadastrados no sistema (criar, editar e visualizar) para manter as informações atualizadas e acompanhar os detalhes de cada projeto de forma eficiente. |       5       |    3   |   🔁   |
 
 ---
+
+## DoR (Definition of Ready) and DoD (Definition of Done)
+**:link: Clique no link abaixo para visualizar o DoD e o DoR em documentos:** 
+> [Definition of Ready and Done](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.0)
 
 ## 🏃‍ DoR - Definition of Ready <a id="dor"></a>
 
@@ -74,22 +84,46 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ---
 
+## 📝 Requesitos <a id="requisitos"></a>
+**:link: Clique no link abaixo para visualizar os requisitos em documentos:** 
+> [Requisitos](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.lxgjjl15qtax)
+
+## 🎯 Requisitos Funcionais(RF)
+
+* **RF01** - Gestão de Projetos: O sistema deve permitir o cadastro, edição e inativação de projetos, categorizando-os obrigatoriamente como "Alocação" ou "Hora Fechada".
+* **RF02** - Estruturação de Tarefas: O sistema deve permitir a criação de uma hierarquia de "Itens" e "Atividades" dentro de cada projeto.
+* **RF03** - Controle de Acessos e Perfis: O sistema deve permitir o cadastro de usuários com diferentes níveis de permissão (ex: Desenvolvedor, Gestor, Financeiro, Administrador) e vinculá-los aos projetos.
+* **RF04** - Apontamento de Horas: O sistema deve prover uma interface para que os profissionais registrem suas horas trabalhadas informando a data, projeto, item, atividade e uma descrição opcional.
+* **RF05** - Relatórios: O sistema deve gerar relatórios consolidados de horas consumidas e faturamento, permitindo a aplicação de filtros por data, projeto e profissional, com opção de exportação de dados.
+* **RF06** - Dashboard de Gestão: O sistema deve exibir um painel centralizado para gestores contendo indicadores de saúde do projeto, totalizadores financeiros e alertas de capacidade da equipe.
+
+## 🎯 Requisitos Não Funcionais(RNF)
+* **RNF01** - Performance (Tempo de Resposta): O sistema deve processar e carregar as telas de apontamento de horas e dashboards em um tempo máximo de 3 segundos em condições normais de rede, garantindo a fluidez do trabalho diário. (Ataca a dor da lentidão)
+* **RNF02** - Escalabilidade: A arquitetura do sistema deve suportar o crescimento do volume de dados e o acesso simultâneo de múltiplos usuários (ex: 500 conexões simultâneas) sem degradação perceptível da performance. (Ataca a dor de não suportar a demanda)
+* **RNF03** - Usabilidade (Eficiência): A interface de apontamento de horas deve ser intuitiva e otimizada, permitindo que o usuário realize seu registro diário com o menor número de cliques possível (ex: máximo de 3 cliques após o login). (Ataca a dor da falta de autonomia e ferramentas dispersas)
+* **RNF04** - Segurança e Privacidade: Dados sensíveis de custos, valores hora e faturamento devem ser criptografados no banco de dados e visíveis exclusivamente para os perfis de Gestor, Administrador e Financeiro.
+* **RNF05** - Rastreabilidade (Auditoria): O sistema deve registrar logs de todas as alterações críticas, como edição de valores financeiros ou exclusão de horas já apontadas, identificando o usuário e a data da ação.
+
+---
+
 ## Manual de Instalação <a id="instalacao"></a>
 
+🚧 Pendente – Atualizando
 
 ---
 
 ## 🚀 Estratégia de Branch <a id="branch"></a>
 
-[Documentação da Estrátegia de Branch](https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026/blob/main/docs/Documentação%20da%20Estratégia%20de%20Branches%20-%20Equipe%20Chronos.pdf)
+**:link: Clique no link para visualizar a Estratégia de Branch:** 
+[Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.tizfg2z79z37)
 
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
 
-| Sprint          |    Período    | Documentação                                     |
-| --------------- | :-----------: | ------------------------------------------------ |
-| 🔖 **SPRINT 1** | 16/03 - 05/04  | [Sprint 1] |
-| 🔖 **SPRINT 2** | 13/04 - 03/05  | [Sprint 2] |
-| 🔖 **SPRINT 3** | 11/05 - 31/05  | [Sprint 3] |
+| Sprint          |    Período    | Vídeo do projeto | Documentação                                     |
+| --------------- | :-----------: | ---------------- | ------------------------------------------------ |
+| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/4c6249vc36k) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
+| 🔖 **SPRINT 2** | 13/04 - 03/05 | [Vídeo Sprint 2]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
+| 🔖 **SPRINT 3** | 11/05 - 31/05 | [Vídeo Sprint 3]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
 
 ## 💻 Tecnologias <a id="tecnologias"></a>
 
@@ -105,6 +139,8 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
  <a href="https://github.com/"><img src="https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white"/></a>
  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-white?style=for-the-badge&logo=react&logoColor=white&color=%23087ea4"/></a>
   <a href="https://www.java.com/"><img src="https://img.shields.io/badge/Java-white?style=for-the-badge&logo=openjdk&logoColor=white&color=%23ED8B00"/></a>
+  <a href="https://spring.io/projects/spring-boot"><img src="https://img.shields.io/badge/Spring_Boot-white?style=for-the-badge&logo=springboot&logoColor=white&color=%236DB33F"/></a>
+  <a href="https://tailwindcss.com/"><img src="https://img.shields.io/badge/Tailwind_CSS-white?style=for-the-badge&logo=tailwind-css&logoColor=white&color=%2306B6D4"/></a>
 </h4>
 
 ## 🎓 Equipe <a id="equipe"></a>

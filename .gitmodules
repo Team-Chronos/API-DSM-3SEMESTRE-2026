@@ -1,27 +1,21 @@
-[submodule "services-gestao-projetos"]
-	path = services/gestao-projetos
-	url = https://github.com/Team-Chronos/API3-servico-gestao-projetos.git
-	branch = main
-
-[submodule "services-controle-horas"]
-	path = services/controle-horas
-	url = https://github.com/Team-Chronos/API3-servico-controle-de-tempo.git
-	branch = main
-
-[submodule "services-gestao-profissionais"]
-	path = services/gestao-profissionais
-	url = https://github.com/Team-Chronos/API3-servico-profissionais.git
-	branch = main
-
-[submodule "services-gestao-tarefas"]
+[submodule "services/gestao-tarefas"]
 	path = services/gestao-tarefas
 	url = https://github.com/Team-Chronos/API3-servico-tarefas.git
-	branch = main
-
-[submodule "services-financeiro"]
+[submodule "services/gateway"]
+	path = services/gateway
+	url = https://github.com/Team-Chronos/API3-servico-gateway.git
+[submodule "services/gestao-projetos"]
+	path = services/gestao-projetos
+	url = https://github.com/Team-Chronos/API3-servico-gestao-projetos.git
+[submodule "services/controle-horas"]
+	path = services/controle-horas
+	url = https://github.com/Team-Chronos/API3-servico-controle-de-tempo.git
+[submodule "services/gestao-profissionais"]
+	path = services/gestao-profissionais
+	url = https://github.com/Team-Chronos/API3-servico-profissionais.git
+[submodule "services/gestao-financeiro"]
 	path = services/gestao-financeiro
 	url = https://github.com/Team-Chronos/API3-servico-financeiro.git
-
-[submodule "services-login"]
+[submodule "services/login"]
 	path = services/login
 	url = https://github.com/Team-Chronos/API3-servico-login.git

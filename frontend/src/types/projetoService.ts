@@ -1,6 +1,6 @@
-import { ApiProjeto } from '../service/servicoApi';
+import { ApiProjeto } from "../service/servicoApi";
 
-export interface Projeto {
+export interface Projeto1 {
   id: number;
   nome: string;
   codigo?: string;
@@ -10,45 +10,24 @@ export interface Projeto {
   dataCriacao: string;
 }
 
-export interface ResponsavelProjeto {
-  id: number;
-  nome: string;
-}
-
 class ProjetoService {
-  async listarTodos(): Promise<Projeto[]> {
+  async listarTodos(): Promise<Projeto1[]> {
     try {
-      const response = await ApiProjeto.get('/projetos');
-      if (response.data && Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
+      const response = await ApiProjeto.get("/projeto/projetos");
+      return response.data || [];
     } catch (error) {
       console.warn("Erro ao buscar projetos:", error);
       return [];
     }
   }
 
-  async buscarPorId(id: number): Promise<Projeto | undefined> {
+  async buscarPorId(id: number): Promise<Projeto1 | undefined> {
     try {
-      const response = await ApiProjeto.get(`/projetos/${id}`);
+      const response = await ApiProjeto.get(`/projeto/projetos/${id}`);
       return response.data;
     } catch (error) {
       console.warn("Erro ao buscar projeto:", error);
       return undefined;
-    }
-  }
-
-  async listarResponsaveis(): Promise<ResponsavelProjeto[]> {
-    try {
-      const response = await ApiProjeto.get('/responsaveis');
-      if (response.data && Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
-    } catch (error) {
-      console.warn("Erro ao buscar responsáveis dos projetos:", error);
-      return [];
     }
   }
 }

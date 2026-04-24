@@ -40,7 +40,8 @@ export type ProjetoVinculadoResposta = {
   valorHora: number;
 };
 
-const API_BASE = "/api"; 
+const API_BASE = "/api";
+
 type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
 
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
@@ -85,15 +86,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export function listarProjetos(): Promise<ProjetoDisponivel[]> {
-  return request<ProjetoDisponivel[]>("/profissionais/projetos", { method: "GET" });
+  return request<ProjetoDisponivel[]>("/profissionais/api/profissionais/projetos", { method: "GET" });
 }
 
 export function listarProfissionais(): Promise<ProfissionalResposta[]> {
-  return request<ProfissionalResposta[]>("/profissionais/", { method: "GET" });
+  return request<ProfissionalResposta[]>("/profissionais/api/profissionais", { method: "GET" });
+
 }
 
 export function listarProjetosVinculados(profissionalId: number): Promise<ProjetoVinculadoResposta[]> {
-  return request<ProjetoVinculadoResposta[]>(`/profissionais/${profissionalId}/projetos`, { method: "GET" });
+  return request<ProjetoVinculadoResposta[]>(`/profissionais/api/profissionais/${profissionalId}/projetos`, { method: "GET" });
 }
 
 export function vincularProjetoAoProfissional(
@@ -101,14 +103,14 @@ export function vincularProjetoAoProfissional(
   projetoId: number,
   valorHora: number
 ): Promise<void> {
-  return request<void>(`/profissionais/${profissionalId}/projetos/${projetoId}`, {
+  return request<void>(`/profissionais/api/profissionais/${profissionalId}/projetos/${projetoId}`, {
     method: "POST",
     body: { valorHora },
   });
 }
 
 export function cadastrarProfissional(payload: ProfissionalPayload): Promise<ProfissionalResposta> {
-  return request<ProfissionalResposta>("/profissionais/", {
+  return request<ProfissionalResposta>("/profissionais/api/profissionais", {
     method: "POST",
     body: payload,
   });

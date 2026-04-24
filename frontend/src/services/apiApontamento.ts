@@ -1,24 +1,19 @@
 import axios from "axios";
 
-const GATEWAY_URL = "http://localhost:8080"; 
+const API_BASE = "/api/apontamento"; 
 
 const apiApontamento = axios.create({
-  baseURL: `${GATEWAY_URL}/apontamento`,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: API_BASE,
+  headers: { "Content-Type": "application/json" },
 });
 
-apiApontamento.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
+apiApontamento.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 apiApontamento.interceptors.response.use(
   (response) => response,
