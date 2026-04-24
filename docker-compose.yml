@@ -1,11 +1,26 @@
+version: '3.8'
+
 services:
+  redis:
+    image: redis:7-alpine
+    container_name: gateway-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
   ms-profissionais:
     build:
-      context: ./services/gestao-profissionais/profissionais
+      context: ./API3-servico-profissionais/profissionais
       dockerfile: Dockerfile
     container_name: ms-profissionais-api
-    ports:
-      - "8081:8081"
+    
     environment:
       SPRING_APPLICATION_NAME: ms-profissionais
       SERVER_PORT: 8081
@@ -22,14 +37,16 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    depends_on:
+      redis:
+        condition: service_healthy
 
   controle-horas:
     build:
-      context: ./services/controle-horas/controle-horas
+      context: ./API3-servico-controle-de-horas/controle-horas
       dockerfile: Dockerfile
     container_name: controle-horas-api
-    ports:
-      - "8082:8082"
+    
     environment:
       SPRING_APPLICATION_NAME: controle-horas
       SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -43,11 +60,9 @@ services:
 
   projeto:
     build:
-      context: ./services/gestao-projetos/projeto
+      context: ./API3-servico-gestao-projetos/projeto
       dockerfile: Dockerfile
     container_name: projeto-api
-    ports:
-      - "8084:8084"
     environment:
       SPRING_APPLICATION_NAME: projeto
       SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -61,11 +76,9 @@ services:
 
   financeiro:
     build:
-      context: ./services/gestao-financeiro
+      context: ./API3-servico-financeiro
       dockerfile: Dockerfile
     container_name: financeiro-api
-    ports:
-      - "8085:8085"
     environment:
       SPRING_APPLICATION_NAME: financeiro
       SPRING_DATASOURCE_URL: jdbc:mysql://136.117.188.200:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
@@ -82,11 +95,9 @@ services:
 
   tarefas-api:
     build:
-      context: ./services/gestao-tarefas/criarTarefas/criarTarefas
+      context: ./API3-servico-tarefas/criarTarefas/criarTarefas
       dockerfile: Dockerfile
     container_name: tarefas-api
-    ports:
-      - "8089:8089"
     environment:
       SPRING_APPLICATION_NAME: criarTarefas
       SERVER_PORT: 8089
@@ -108,11 +119,9 @@ services:
 
   login-api:
     build:
-      context: ./services/login
+      context: ./API3-servico-login
       dockerfile: Dockerfile
     container_name: login-api
-    ports:
-      - "8083:8083"
     environment:
       SPRING_APPLICATION_NAME: login
       SERVER_PORT: 8083
@@ -120,34 +129,47 @@ services:
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: "Bolsonaro#22"
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
-      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
-      APP_CORS_ALLOWED_ORIGINS: http://localhost:*
     restart: unless-stopped
     networks:
       - app-network
 
-  gateway:
+  auth-gateway:
     build:
-      context: ./services/gateway/gateway
+      context: ./API3-servico-auth-gateway/gateway
       dockerfile: Dockerfile
-    container_name: gateway
+    container_name: auth-gateway-api
     ports:
       - "8080:8080"
+    environment:
+      SPRING_APPLICATION_NAME: auth-gateway
+      SERVER_PORT: 8080
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
     restart: unless-stopped
     networks:
       - app-network
-
-  frontend:
-    build:
-      context: ./frontend
-    container_name: frontend
-    ports:
-      - "80:80"
     depends_on:
-      - gateway
-    networks:
-      - app-network
+      redis:
+        condition: service_healthy
+      ms-profissionais:
+        condition: service_started
+      controle-horas:
+        condition: service_started
+      projeto:
+        condition: service_started
+      financeiro:
+        condition: service_started
+      tarefas-api:
+        condition: service_started
+      login-api:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
 
 networks:
   app-network:
