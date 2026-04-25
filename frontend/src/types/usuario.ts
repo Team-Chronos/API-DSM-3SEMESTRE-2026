@@ -3,4 +3,5 @@ export type User = {
   nome: string;
   sub: string;
   cargo_id: number;
+  roles: string[];
 };

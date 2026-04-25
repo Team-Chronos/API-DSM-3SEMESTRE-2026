@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { User } from '../types/usuario';
 import { jwtDecode } from 'jwt-decode';
+import type { User } from '../types/usuario';
 
 type AuthContextType = {
   user?: User;
@@ -30,6 +30,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const decoded = jwtDecode<User>(token);
       const exp = (decoded as any).exp;
       if (exp && Date.now() >= exp * 1000) throw new Error('expirado');
+      if (!decoded.roles) decoded.roles = [];
       setUser(decoded);
     } catch {
       localStorage.removeItem('token');
@@ -41,9 +42,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem('token');
     const headers = new Headers(options.headers);
     headers.set('Content-Type', 'application/json');
-    if (token) headers.set('Authorization', `Bearer ${token}`);
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`);
+    }
 
-    const response = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+    const response = await fetch(`${API_BASE}${endpoint}`, {
+      ...options,
+      headers,
+    });
+
     if (response.status === 401) {
       localStorage.removeItem('token');
       setUser(undefined);
@@ -55,16 +62,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   async function login(email: string, senha: string): Promise<boolean> {
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const response = await fetch(`${API_BASE}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase(), senha }),
+        body: JSON.stringify({ email: normalizedEmail, senha }),
       });
       if (!response.ok) return false;
+
       const data = (await response.json()) as LoginResponse;
       if (!data.token || typeof data.token !== 'string') return false;
+
       localStorage.setItem('token', data.token);
       const decodedUser = jwtDecode<User>(data.token);
+      if (!decodedUser.roles) decodedUser.roles = [];
       setUser(decodedUser);
       return true;
     } catch (error) {
@@ -79,7 +90,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     window.location.href = '/login';
   }
 
-  function getToken() { return localStorage.getItem('token'); }
+  function getToken() {
+    return localStorage.getItem('token');
+  }
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout, getToken, apiFetch }}>
