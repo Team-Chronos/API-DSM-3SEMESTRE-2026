@@ -1,14 +1,14 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface Projeto {
+export interface Projeto {
   projetoId: number;
   nomeProjeto: string;
   codigoProjeto: string;
   valorHora: number;
 }
 
-interface Profissional {
+export interface Profissional {
   id: number;
   nome: string;
   email: string;
@@ -16,14 +16,15 @@ interface Profissional {
   cargoId: number;
   projetos: Projeto[];
 }
-
+// estilização de acordo com id do cargo
 const CARGO_MAP: Record<number, { label: string; color: string }> = {
   1: { label: "Dev", color: "bg-[#2d1f6e] text-[#a78bfa] border border-[#6627cc]/40" },
   2: { label: "Gerente", color: "bg-[#1a2e1a] text-[#4ade80] border border-[#22c55e]/30" },
   3: { label: "Financeiro", color: "bg-[#1e2a1e] text-[#86efac] border border-[#16a34a]/30" },
 };
 
-function getInitials(nome: string): string {
+// função para Selecionar as inicias do avatar de cada profissional
+export function getInitials(nome: string): string {
   const parts = nome.trim().split(" ");
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -37,6 +38,8 @@ const AVATAR_COLORS = [
   "from-[#6d28d9] to-[#4c1d95]",
 ];
 
+
+//seleção da cor de acordo com o id
 function getAvatarColor(id: number): string {
   return AVATAR_COLORS[id % AVATAR_COLORS.length];
 }
@@ -44,6 +47,7 @@ function getAvatarColor(id: number): string {
 const ITEMS_PER_PAGE = 8;
 
 function TelaListaProfissionais() {
+
   const navigate = useNavigate();
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,6 +72,7 @@ function TelaListaProfissionais() {
       });
   }, []);
 
+  // logica de filtro do pesquisar
   const filtrados = useMemo(() => {
     const termo = busca.toLowerCase().trim();
     if (!termo) return profissionais;
@@ -221,8 +226,8 @@ function TelaListaProfissionais() {
                       {/* Email */}
                       <span className="truncate text-sm text-slate-400">{prof.email}</span>
 
-                      {/* Ação */}
-                      {/*}
+                      {/* Aguardando decisão */}
+                      {}
                       <button
                         onClick={() => navigate(`/profissionais/${prof.id}`)}
                         className="flex items-center gap-1 text-sm font-medium text-[#9d71f5] transition hover:text-white whitespace-nowrap"
@@ -233,7 +238,7 @@ function TelaListaProfissionais() {
                           <polyline points="12 5 19 12 12 19" />
                         </svg>
                       </button>
-                      {*/}
+                      {}
                     </div>
                   );
                 })}

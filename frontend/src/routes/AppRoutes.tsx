@@ -10,6 +10,8 @@ import Projetos from "../pages/Projetos";
 import Login from "../pages/login";
 
 import TelaListaProfissionais from "../pages/listaProfissionais";
+import TelaDetalhesProfissional from "../pages/detalhesProfissionais";
+
 
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
@@ -31,6 +33,11 @@ const AppRoutes = createBrowserRouter([
         path:"profissionais",
         element: <TelaListaProfissionais/>
       },
+      {
+        path:"profissionais/:id",
+        element: <TelaDetalhesProfissional/>
+      },
+       
       {
         path: "cadastro-profissionais",
         element: <CadastroProfissional />
