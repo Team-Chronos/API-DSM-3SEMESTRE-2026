@@ -66,33 +66,54 @@ function Projetos() {
       <div className="mb-6 flex justify-between items-center">
         <h1 className="text-2xl font-semibold text-white">Projetos</h1>
         <div className="flex gap-2">
-          <input type="text" placeholder="Pesquisar..." value={busca} onChange={e => setBusca(e.target.value)}
-                 className="w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white" />
-          <button onClick={() => setModalAberto(true)}
-                  className="rounded-lg bg-linear-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 text-white">
+          <input
+            type="text"
+            placeholder="Pesquisar..."
+            value={busca}
+            onChange={e => setBusca(e.target.value)}
+            className="w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white"
+          />
+          <button
+            onClick={() => setModalAberto(true)}
+            className="rounded-lg bg-linear-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 text-white"
+          >
             + Novo
           </button>
         </div>
       </div>
       {erro && <div className="mb-4 p-4 bg-red-950 text-red-200 rounded">{erro}</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {loading && Array(8).fill(0).map((_, i) => <div key={i} className="bg-[#2a2a2c] p-4 rounded-2xl animate-pulse h-32" />)}
-        {!loading && projetosFiltrados.length === 0 && <div className="col-span-full text-center text-slate-400">Nenhum projeto</div>}
-        {!loading && projetosFiltrados.map(projeto => (
-          <div
-            key={projeto.id}
-            onClick={() => navigate(`/projetos/${projeto.id}/apontamento`)}  // ← navegação corrigida
-            className="cursor-pointer rounded-2xl bg-[#2a2a2c] p-4 text-white transition hover:scale-[1.02] hover:border-purple-500"
-          >
-            <h2 className="text-lg font-semibold">{projeto.nome}</h2>
-            <p>Código: {projeto.codigo}</p>
-            <p>Tipo: {projeto.tipoProjeto}</p>
-            <p>Responsável: {profissionais.get(projeto.responsavelId) ?? 'N/D'}</p>
-          </div>
-        ))}
+        {loading &&
+          Array(8)
+            .fill(0)
+            .map((_, i) => (
+              <div key={i} className="bg-[#2a2a2c] p-4 rounded-2xl animate-pulse h-32" />
+            ))}
+        {!loading && projetosFiltrados.length === 0 && (
+          <div className="col-span-full text-center text-slate-400">Nenhum projeto</div>
+        )}
+        {!loading &&
+          projetosFiltrados.map(projeto => (
+            <div
+              key={projeto.id}
+              onClick={() => navigate(`/projetos/${projeto.id}`)} // ← Redireciona para a rota de detalhes
+              className="cursor-pointer rounded-2xl bg-[#2a2a2c] p-4 text-white transition hover:scale-[1.02] hover:border-purple-500"
+            >
+              <h2 className="text-lg font-semibold">{projeto.nome}</h2>
+              <p>Código: {projeto.codigo}</p>
+              <p>Tipo: {projeto.tipoProjeto}</p>
+              <p>Responsável: {profissionais.get(projeto.responsavelId) ?? 'N/D'}</p>
+            </div>
+          ))}
       </div>
-      <ModalCadastro aberto={modalAberto} onFechar={() => setModalAberto(false)}
-                     onProjetoCadastrado={() => { setModalAberto(false); carregarDados(); }} />
+      <ModalCadastro
+        aberto={modalAberto}
+        onFechar={() => setModalAberto(false)}
+        onProjetoCadastrado={() => {
+          setModalAberto(false);
+          carregarDados();
+        }}
+      />
     </div>
   );
 }

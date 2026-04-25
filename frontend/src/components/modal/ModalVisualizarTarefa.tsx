@@ -6,6 +6,7 @@ import type { Profissional } from '../../types/profissionalService';
 import tarefaItemAdapter from '../../types/tarefaItemAdapter';
 import type { TarefaComItem } from '../../types/tarefaItemAdapter';
 
+
 interface Props {
   tarefa: any | null;
   isOpen: boolean;

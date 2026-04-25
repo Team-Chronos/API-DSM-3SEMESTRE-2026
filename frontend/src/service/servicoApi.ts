@@ -1,19 +1,16 @@
 import axios from "axios";
 
-const PROXY_BASE = "/api"; 
+const PROXY_BASE = "/api";
 
 const setupInterceptors = (client: any) => {
   client.interceptors.request.use(
     (config: any) => {
       const token = localStorage.getItem("token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
+      if (token) config.headers.Authorization = `Bearer ${token}`;
       return config;
     },
     (error: any) => Promise.reject(error)
   );
-
   client.interceptors.response.use(
     (response: any) => response,
     (error: any) => {
@@ -28,10 +25,7 @@ const setupInterceptors = (client: any) => {
 };
 
 export const ApiGateway = setupInterceptors(
-  axios.create({
-    baseURL: PROXY_BASE,
-    headers: { "Content-Type": "application/json" },
-  })
+  axios.create({ baseURL: PROXY_BASE, headers: { "Content-Type": "application/json" } })
 );
 
 export const ApiTarefas = ApiGateway;

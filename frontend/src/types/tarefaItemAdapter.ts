@@ -1,5 +1,5 @@
-import itemService from './itemService';
-import type { Item } from './itemService';
+import itemService from '../types/itemService';
+import type { Item } from '../types/itemService';
 import { ApiTarefas } from '../service/servicoApi';
 
 export interface TarefaComItem {
@@ -17,7 +17,7 @@ export interface TarefaComItem {
 class TarefaItemAdapter {
   async buscarTarefaComItem(tarefaId: number): Promise<TarefaComItem | null> {
     try {
-      const response = await ApiTarefas.get(`/tarefas/${tarefaId}`);
+      const response = await ApiTarefas.get(`/tarefas/tarefas/${tarefaId}`);
       const tarefa = response.data;
 
       const itens = await itemService.getItensPorTarefa(tarefaId);
@@ -35,27 +35,19 @@ class TarefaItemAdapter {
 
   async buscarMultiplasTarefasComItem(tarefasIds: number[]): Promise<Map<number, TarefaComItem>> {
     const resultado = new Map<number, TarefaComItem>();
-
     const promises = tarefasIds.map(id => this.buscarTarefaComItem(id));
     const tarefas = await Promise.all(promises);
-
     tarefas.forEach(tarefa => {
-      if (tarefa) {
-        resultado.set(tarefa.id, tarefa);
-      }
+      if (tarefa) resultado.set(tarefa.id, tarefa);
     });
-
     return resultado;
   }
 
   async buscarTarefasDoProjetoComItens(projetoId: number): Promise<TarefaComItem[]> {
     try {
-      const response = await ApiTarefas.get(`/tarefas/projeto/${projetoId}`);
+      const response = await ApiTarefas.get(`/tarefas/tarefas/projeto/${projetoId}`);
       const tarefas = response.data;
-
-      if (!Array.isArray(tarefas)) {
-        return [];
-      }
+      if (!Array.isArray(tarefas)) return [];
 
       const tarefasComItens = await Promise.all(
         tarefas.map(async (tarefa) => {
@@ -66,7 +58,6 @@ class TarefaItemAdapter {
           };
         })
       );
-
       return tarefasComItens;
     } catch (error) {
       console.error(`Erro ao buscar tarefas do projeto ${projetoId} com itens:`, error);
@@ -90,21 +81,17 @@ class TarefaItemAdapter {
     }
   ): Promise<TarefaComItem | null> {
     try {
-      const novoItem = await itemService.criarItem(
-        itemData.nome,
-        itemData.descricao,
-        0
-      );
-
+      const novoItem = await itemService.criarItem(itemData.nome, itemData.descricao, 0);
+      
       const tarefaParaCriar = {
         ...tarefaData,
-        itemId: novoItem.id
+        itemId: novoItem.idItem
       };
-
-      const response = await ApiTarefas.post("/tarefas", tarefaParaCriar);
+      
+      const response = await ApiTarefas.post("/tarefas/tarefas", tarefaParaCriar);
       const novaTarefa = response.data;
 
-      await ApiTarefas.put(`/itens/${novoItem.id}`, {
+      await ApiTarefas.put(`/tarefas/itens/${novoItem.idItem}`, {
         nome: novoItem.nome,
         descricao: novoItem.descricao,
         tarefaId: novaTarefa.id
@@ -127,8 +114,8 @@ class TarefaItemAdapter {
   ): Promise<Item | null> {
     try {
       const novoItem = await itemService.criarItem(nome, descricao, tarefaId);
-
-      const tarefaResponse = await ApiTarefas.get(`/tarefas/${tarefaId}`);
+      
+      const tarefaResponse = await ApiTarefas.get(`/tarefas/tarefas/${tarefaId}`);
       const tarefa = tarefaResponse.data;
 
       const tarefaAtualizada = {
@@ -139,10 +126,9 @@ class TarefaItemAdapter {
         status: tarefa.status,
         tipoTarefaId: tarefa.tipoTarefaId,
         projetoId: tarefa.projetoId,
-        itemId: novoItem.id
+        itemId: novoItem.idItem
       };
-
-      await ApiTarefas.put(`/tarefas/${tarefaId}`, tarefaAtualizada);
+      await ApiTarefas.put(`/tarefas/tarefas/${tarefaId}`, tarefaAtualizada);
 
       return novoItem;
     } catch (error) {
@@ -153,26 +139,15 @@ class TarefaItemAdapter {
 
   async removerItemDaTarefa(tarefaId: number): Promise<boolean> {
     try {
-      const tarefaResponse = await ApiTarefas.get(`/tarefas/${tarefaId}`);
+      const tarefaResponse = await ApiTarefas.get(`/tarefas/tarefas/${tarefaId}`);
       const tarefa = tarefaResponse.data;
-
-      if (!tarefa.itemId) {
-        return true;
-      }
+      if (!tarefa.itemId) return true;
 
       const tarefaAtualizada = {
-        titulo: tarefa.titulo,
-        descricao: tarefa.descricao,
-        responsavelId: tarefa.responsavelId,
-        tempoMaximoMinutos: tarefa.tempoMaximoMinutos,
-        status: tarefa.status,
-        tipoTarefaId: tarefa.tipoTarefaId,
-        projetoId: tarefa.projetoId,
+        ...tarefa,
         itemId: null
       };
-
-      await ApiTarefas.put(`/tarefas/${tarefaId}`, tarefaAtualizada);
-
+      await ApiTarefas.put(`/tarefas/tarefas/${tarefaId}`, tarefaAtualizada);
       return true;
     } catch (error) {
       console.error("Erro ao remover item da tarefa:", error);
