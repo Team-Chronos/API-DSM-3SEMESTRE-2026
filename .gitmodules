@@ -8,7 +8,7 @@
 	path = services/gestao-projetos
 	url = https://github.com/Team-Chronos/API3-servico-gestao-projetos.git
 [submodule "services/gestao-horas"]
-	path = services/gestao-horas
+	path = services/controle-horas
 	url = https://github.com/Team-Chronos/API3-servico-controle-de-tempo.git
 [submodule "services/gestao-profissionais"]
 	path = services/gestao-profissionais
