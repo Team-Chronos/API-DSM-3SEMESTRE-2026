@@ -4,3 +4,5 @@ services/gestao-profissionais
 services/gestao-projetos
 services/gestao-tarefas
 services/login
+services/gestao-financeiro
+services/login

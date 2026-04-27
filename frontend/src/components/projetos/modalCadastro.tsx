@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
 import { projetoService } from "../../services/gateway";
 
@@ -6,6 +6,11 @@ interface ModalCadastroProps {
   aberto: boolean;
   onFechar: () => void;
   onProjetoCadastrado?: () => void;
+}
+
+interface Profissional {
+  id: number;
+  nome: string;
 }
 
 export default function ModalCadastro({
@@ -24,11 +29,18 @@ export default function ModalCadastro({
     responsavelId: 0,
   });
 
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
+
+  useEffect(() => {
+    if (!aberto) return;
+    fetch("http://localhost:8081/api/profissionais")
+      .then((r) => r.json())
+      .then(setProfissionais)
+      .catch((e) => console.error("Erro ao buscar profissionais", e));
+  }, [aberto]);
+
   const handleChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const limparForm = () => {
@@ -46,16 +58,13 @@ export default function ModalCadastro({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
       const response = await projetoService.criar(formData);
 
       if (!response.ok) {
         alert("Erro ao cadastrar. Verifique os dados.");
-        console.log(formData);
         return;
       }
-
       alert("Projeto cadastrado com sucesso!");
       limparForm();
       onProjetoCadastrado?.();
@@ -75,9 +84,7 @@ export default function ModalCadastro({
     >
       <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="md:col-span-2">
-          <label className="mb-1 block font-semibold text-white">
-            Nome do Projeto
-          </label>
+          <label className="mb-1 block font-semibold text-white">Nome do Projeto</label>
           <input
             type="text"
             value={formData.nome}
@@ -87,9 +94,7 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">
-            Código do Projeto
-          </label>
+          <label className="mb-1 block font-semibold text-white">Código do Projeto</label>
           <input
             type="text"
             value={formData.codigo}
@@ -112,9 +117,7 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">
-            Valor Hora Base
-          </label>
+          <label className="mb-1 block font-semibold text-white">Valor Hora Base</label>
           <input
             type="number"
             value={formData.valorHoraBase}
@@ -124,9 +127,7 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">
-            Horas Contratadas
-          </label>
+          <label className="mb-1 block font-semibold text-white">Horas Contratadas</label>
           <input
             type="number"
             value={formData.horasContratadas}
@@ -136,9 +137,7 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">
-            Data de Início
-          </label>
+          <label className="mb-1 block font-semibold text-white">Data de Início</label>
           <input
             type="date"
             value={formData.dataInicio}
@@ -158,15 +157,19 @@ export default function ModalCadastro({
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block font-semibold text-white">
-            Responsável ID
-          </label>
-          <input
-            type="number"
+          <label className="mb-1 block font-semibold text-white">Responsável</label>
+          <select
             value={formData.responsavelId}
             onChange={(e) => handleChange("responsavelId", Number(e.target.value))}
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
-          />
+          >
+            <option value={0}>Selecione</option>
+            {profissionais.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nome}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="md:col-span-2 flex justify-end gap-3 pt-2">
