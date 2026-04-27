@@ -24,7 +24,7 @@ function Login() {
     const autenticado = await login(email, senha);
     setCarregando(false);
     if (autenticado) {
-      navigate("/profissionais");
+      navigate("/projetos");
       return;
     }
     setMensagem({ tipo: "erro", texto: "Email ou senha inválidos" });

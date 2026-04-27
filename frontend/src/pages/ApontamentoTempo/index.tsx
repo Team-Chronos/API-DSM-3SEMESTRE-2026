@@ -1,4 +1,3 @@
-// src/pages/ApontamentoTempo/index.tsx
 import { useEffect, useState } from "react";
 import ApontamentoListaTarefas from "./ListaTarefas";
 import type { Tarefa } from "../../types/tarefa";

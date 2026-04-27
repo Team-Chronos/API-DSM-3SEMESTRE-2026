@@ -1,3 +1,4 @@
+// src/services/gateway.ts
 const API_BASE = '/api';
 
 export async function apiFetch(endpoint: string, options: RequestInit = {}) {
@@ -25,6 +26,7 @@ export async function apiFetch(endpoint: string, options: RequestInit = {}) {
 }
 
 export const profissionaisService = {
+  // 🔥 CORRIGIDO: endpoint correto para listar profissionais (após StripPrefix=1)
   listar: () => apiFetch('/profissionais/api/profissionais'),
   buscar: (id: number) => apiFetch(`/profissionais/api/profissionais/${id}`),
   criar: (data: unknown) => apiFetch('/profissionais/api/profissionais', {
@@ -68,9 +70,10 @@ export const apontamentoService = {
   }),
 };
 
+// 🔥 CORRIGIDO: rota de projetos agora usa /projeto/projetos
 export const projetoService = {
   listar: () => apiFetch('/projeto/projetos'),
-  buscarPorId: (id: number) => apiFetch(`/projeto/projetos/${id}`), 
+  buscarPorId: (id: number) => apiFetch(`/projeto/projetos/${id}`),
   criar: (data: unknown) => apiFetch('/projeto/projetos', {
     method: 'POST',
     body: JSON.stringify(data),
