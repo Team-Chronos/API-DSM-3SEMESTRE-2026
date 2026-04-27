@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { ApiTarefas } from "../../service/servicoApi";
 import projetoService from "../../types/projetoService";
 import profissionalService from "../../types/profissionalService";
-import type { Projeto, ResponsavelProjeto } from "../../types/projetoService";
+import type { Projeto1, ResponsavelProjeto } from "../../types/projetoService";
 
 interface Props {
   isOpen: boolean;
@@ -27,9 +27,9 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
   const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [tiposTarefa, setTiposTarefa] = useState<TipoTarefa[]>([]);
-  const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [projetos, setProjetos] = useState<Projeto1[]>([]);
   const [responsaveis, setResponsaveis] = useState<ResponsavelProjeto[]>([]);
-  const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto | null>(null);
+  const [projetoSelecionado, setProjetoSelecionado] = useState<Projeto1 | null>(null);
   const [carregandoDados, setCarregandoDados] = useState(true);
 
   useEffect(() => {

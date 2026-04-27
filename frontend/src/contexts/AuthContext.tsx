@@ -14,9 +14,6 @@ type LoginResponse = {
 }
 
 function getDefaultApiUrl(): string {
-  if (import.meta.env.DEV) {
-    return "/api"
-  }
 
   const host = window.location.hostname
 
@@ -31,15 +28,7 @@ const RAW_API_URL = import.meta.env.VITE_LOGIN_API_URL ?? getDefaultApiUrl()
 const API_URL = RAW_API_URL.trim().replace(/\/+$/, "")
 
 function getLoginUrl(apiUrl: string): string {
-  if (apiUrl.endsWith("/api/auth")) {
-    return `${apiUrl}/login`
-  }
-
-  if (apiUrl.endsWith("/api")) {
-    return `${apiUrl}/auth/login`
-  }
-
-  return `${apiUrl}/api/auth/login`
+  return `${apiUrl}/login`
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)

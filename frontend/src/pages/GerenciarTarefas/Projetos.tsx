@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import projetoService from "../../types/projetoService";
-import type { Projeto } from "../../types/projetoService";
+import type { Projeto1 } from "../../types/projetoService";
 
 import profissionalService from "../../types/profissionalService";
 import type { Profissional } from "../../types/profissionalService";
 
 export default function TelaProjetos() {
   const navigate = useNavigate();
-  const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [projetos, setProjetos] = useState<Projeto1[]>([]);
   const [responsaveis, setResponsaveis] = useState<Map<number, string>>(new Map());
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -14,39 +14,48 @@ interface Projeto {
   responsavelId: number;
 }
 
+interface Profissional {
+  id: number;
+  nome: string;
+}
+
 function Projetos() {
   const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
   const [projetos, setProjetos] = useState<Projeto[]>([]);
+  const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
   const [busca, setBusca] = useState("");
   const [loading, setLoading] = useState(true);
 
-  const carregarProjetos = async () => {
+  const carregarDados = async () => {
     try {
       setLoading(true);
-      const resposta = await fetch("http://localhost:8084/projetos");
-      const dados = await resposta.json();
+      const [respostaProjetos, respostaProfissionais] = await Promise.all([
+        fetch("http://localhost:8084/projetos"),
+        fetch("http://localhost:8081/api/profissionais"),
+      ]);
+      const dados = await respostaProjetos.json();
+      const profissionaisData: Profissional[] = await respostaProfissionais.json();
       setProjetos(dados);
+      setProfissionais(new Map(profissionaisData.map((p) => [p.id, p.nome])));
     } catch (erro) {
-      console.error("Erro ao buscar projeto ", erro);
-    } finally {
+      console.error("Erro ao carregar dados", erro);    } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    carregarProjetos();
-  }, []);
+    carregarDados();  }, []);
 
   const projetosFiltrados = projetos.filter((projeto) => {
     const termo = busca.toLowerCase();
+    const nomeResponsavel = profissionais.get(projeto.responsavelId) ?? "";
 
     return (
       projeto.nome?.toLowerCase().includes(termo) ||
       projeto.codigo?.toLowerCase().includes(termo) ||
-      projeto.responsavelId?.toString().includes(termo)
-    );
+      nomeResponsavel.toLowerCase().includes(termo)    );
   });
 
   return (
@@ -67,7 +76,7 @@ function Projetos() {
 
           <button
             onClick={() => setModalAberto(true)}
-            className="cursor-pointer rounded-lg bg-gradient-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 font-medium text-white shadow-lg transition hover:scale-[1.03] hover:brightness-110"
+            className="cursor-pointer rounded-lg bg-linear-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 font-medium text-white shadow-lg transition hover:scale-[1.03] hover:brightness-110"
           >
             + Novo
           </button>
@@ -95,7 +104,7 @@ function Projetos() {
           projetosFiltrados.map((projeto) => (
             <div
               key={projeto.id}
-              onClick={() => navigate(`/projetos/${projeto.id}/apontamento`)}
+              onClick={() => navigate(`/projetos/${projeto.id}`)}
               className="
                 cursor-pointer
                 rounded-2xl
@@ -107,7 +116,7 @@ function Projetos() {
                 transition
                 hover:scale-[1.03]
                 hover:border-[#6627cc]
-                hover:bg-gradient-to-b
+                hover:bg-linear-to-b
                 hover:from-[#6627cc]
                 hover:to-[#4a1898]
                 hover:shadow-xl
@@ -131,8 +140,7 @@ function Projetos() {
 
                 <p>
                   <span className="text-slate-400">Responsável:</span>{" "}
-                  {projeto.responsavelId}
-                </p>
+                  {profissionais.get(projeto.responsavelId) ?? "Não informado"}                </p>
               </div>
             </div>
           ))}
@@ -143,8 +151,7 @@ function Projetos() {
         onFechar={() => setModalAberto(false)}
         onProjetoCadastrado={() => {
           setModalAberto(false);
-          carregarProjetos();
-        }}
+          carregarDados();        }}
       />
     </div>
   );
