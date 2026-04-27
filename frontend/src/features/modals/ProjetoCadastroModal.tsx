@@ -23,6 +23,18 @@ export default function ModalCadastro({
     responsavelId: 0,
   });
 
+  const [erros, setErros] = useState({
+    nome: "",
+    codigo: "",
+    tipoProjeto: "",
+    valorHoraBase: "",
+    horasContratadas: "",
+    dataInicio: "",
+    dataFim: "",
+    responsavelId: "",
+  });
+  
+
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({
       ...prev,
@@ -43,8 +55,69 @@ export default function ModalCadastro({
     });
   };
 
+  const validarFormulario = () => {
+    const novosErros = {
+      nome: "",
+      codigo: "",
+      tipoProjeto: "",
+      valorHoraBase: "",
+      horasContratadas: "",
+      dataInicio: "",
+      dataFim: "",
+      responsavelId: "",
+    };
+
+    if (!formData.nome.trim()) {
+      novosErros.nome = "Nome do projeto é obrigatório";
+    } else if (formData.nome.trim().length < 3) {
+      novosErros.nome = "Nome deve ter no mínimo 3 caracteres";
+    }
+
+    if (!formData.codigo.trim()) {
+      novosErros.codigo = "Código é obrigatório";
+    }
+
+    if (!formData.tipoProjeto) {
+      novosErros.tipoProjeto = "Selecione o tipo do projeto";
+    }
+
+    if (formData.valorHoraBase <= 0) {
+      novosErros.valorHoraBase = "Valor hora deve ser maior que zero";
+    }
+
+    if (formData.horasContratadas <= 0) {
+      novosErros.horasContratadas = "Horas contratadas deve ser maior que zero";
+    }
+
+    if (!formData.dataInicio) {
+      novosErros.dataInicio = "Data de início é obrigatória";
+    }
+
+    if (!formData.dataFim) {
+      novosErros.dataFim = "Data final é obrigatória";
+    } else if (
+      formData.dataInicio &&
+      formData.dataFim < formData.dataInicio
+    ) {
+      novosErros.dataFim =
+        "Data final deve ser maior que a data inicial";
+    }
+
+    if (formData.responsavelId <= 0) {
+      novosErros.responsavelId = "Responsável deve ser válido";
+    }
+
+    setErros(novosErros);
+
+    return !Object.values(novosErros).some(Boolean);
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!validarFormulario()) {
+      return;
+    }
 
     try {
       const response = await fetch("http://localhost:8084/projetos", {
@@ -83,28 +156,45 @@ export default function ModalCadastro({
           <label className="mb-1 block font-semibold text-white">
             Nome do Projeto
           </label>
+
           <input
             type="text"
             value={formData.nome}
             onChange={(e) => handleChange("nome", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.nome && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.nome}
+            </p>
+          )}
         </div>
 
         <div>
           <label className="mb-1 block font-semibold text-white">
             Código do Projeto
           </label>
+
           <input
             type="text"
             value={formData.codigo}
             onChange={(e) => handleChange("codigo", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.codigo && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.codigo}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Tipo</label>
+          <label className="mb-1 block font-semibold text-white">
+            Tipo
+          </label>
+
           <select
             value={formData.tipoProjeto}
             onChange={(e) => handleChange("tipoProjeto", e.target.value)}
@@ -114,64 +204,113 @@ export default function ModalCadastro({
             <option value="HORA_FECHADA">Hora Fechada</option>
             <option value="ALOCACAO">Alocação</option>
           </select>
+
+          {erros.tipoProjeto && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.tipoProjeto}
+            </p>
+          )}
         </div>
 
         <div>
           <label className="mb-1 block font-semibold text-white">
             Valor Hora Base
           </label>
+
           <input
             type="number"
             value={formData.valorHoraBase}
-            onChange={(e) => handleChange("valorHoraBase", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("valorHoraBase", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.valorHoraBase && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.valorHoraBase}
+            </p>
+          )}
         </div>
 
         <div>
           <label className="mb-1 block font-semibold text-white">
             Horas Contratadas
           </label>
+
           <input
             type="number"
             value={formData.horasContratadas}
-            onChange={(e) => handleChange("horasContratadas", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("horasContratadas", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.horasContratadas && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.horasContratadas}
+            </p>
+          )}
         </div>
 
         <div>
           <label className="mb-1 block font-semibold text-white">
             Data de Início
           </label>
+
           <input
             type="date"
             value={formData.dataInicio}
             onChange={(e) => handleChange("dataInicio", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.dataInicio && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.dataInicio}
+            </p>
+          )}
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Data Fim</label>
+          <label className="mb-1 block font-semibold text-white">
+            Data Fim
+          </label>
+
           <input
             type="date"
             value={formData.dataFim}
             onChange={(e) => handleChange("dataFim", e.target.value)}
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.dataFim && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.dataFim}
+            </p>
+          )}
         </div>
 
         <div className="md:col-span-2">
           <label className="mb-1 block font-semibold text-white">
             Responsável ID
           </label>
+
           <input
             type="number"
             value={formData.responsavelId}
-            onChange={(e) => handleChange("responsavelId", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("responsavelId", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
+
+          {erros.responsavelId && (
+            <p className="mt-1 text-sm text-red-400">
+              {erros.responsavelId}
+            </p>
+          )}
         </div>
 
         <div className="md:col-span-2 flex justify-end gap-3 pt-2">

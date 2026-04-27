@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import {cadastrarProfissional,listarProjetos,type ProjetoDisponivel,type ProjetoVinculoPayload,} from "../../../services/profissionais/profissionaisApi";
+import { cadastrarProfissional, listarProjetos, type ProjetoDisponivel, type ProjetoVinculoPayload, } from "../../../services/profissionais/profissionaisApi";
 
-import {BriefcaseBusiness,ChevronDown,Eye,EyeOff,Search,UserPlus,} from "lucide-react";
+import { BriefcaseBusiness, ChevronDown, Eye, EyeOff, Search, UserPlus, } from "lucide-react";
 
 const CARGOS = [
   { id: 1, nome: "Desenvolvedor" },
@@ -23,6 +23,13 @@ function CadastroProfissional() {
   const [carregandoProjetos, setCarregandoProjetos] = useState(false);
   const [salvando, setSalvando] = useState(false);
   const [mensagem, setMensagem] = useState("");
+
+  const [erros, setErros] = useState({
+    nome: "",
+    email: "",
+    senhaHash: "",
+    cargoId: "",
+  });
 
   useEffect(() => {
     const carregarProjetos = async () => {
@@ -84,11 +91,45 @@ function CadastroProfissional() {
     setProjetosSelecionados({});
   };
 
+  const validarFormulario = () => {
+    const novosErros = {
+      nome: "",
+      email: "",
+      senhaHash: "",
+      cargoId: "",
+    };
+
+    if (!nome.trim()) {
+      novosErros.nome = "Nome é obrigatório";
+    } else if (nome.trim().length < 3) {
+      novosErros.nome = "Nome deve ter no mínimo 3 caracteres";
+    }
+
+    if (!email.trim()) {
+      novosErros.email = "Email é obrigatório";
+    } else if (!email.includes("@")) {
+      novosErros.email = "Email inválido";
+    }
+
+    if (!senhaHash.trim()) {
+      novosErros.senhaHash = "Senha é obrigatória";
+    } else if (senhaHash.length < 6) {
+      novosErros.senhaHash = "Senha deve ter no mínimo 6 caracteres";
+    }
+
+    if (!cargoId) {
+      novosErros.cargoId = "Selecione um cargo";
+    }
+
+    setErros(novosErros);
+
+    return !Object.values(novosErros).some(Boolean);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!nome || !email || !senhaHash || !cargoId) {
-      setMensagem("Preencha os campos obrigatórios.");
+    if (!validarFormulario()) {
       return;
     }
 
@@ -211,6 +252,11 @@ function CadastroProfissional() {
                           className="w-full rounded-xl border border-white/10 bg-[#3d3d40] px-4 py-3 text-white outline-none transition placeholder:text-white/50 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
                           placeholder="Digite o nome do profissional"
                         />
+                        {erros.nome && (
+                          <p className="mt-1 text-sm text-red-400">
+                            {erros.nome}
+                          </p>
+                        )}
                       </div>
 
                       <div className="md:col-span-2">
@@ -223,6 +269,11 @@ function CadastroProfissional() {
                           className="w-full rounded-xl border border-white/10 bg-[#3d3d40] px-4 py-3 text-white outline-none transition placeholder:text-white/50 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
                           placeholder="nome@empresa.com"
                         />
+                        {erros.email && (
+                          <p className="mt-1 text-sm text-red-400">
+                            {erros.email}
+                          </p>
+                        )}
                       </div>
 
                       <div>
@@ -367,11 +418,10 @@ function CadastroProfissional() {
                         return (
                           <div
                             key={projeto.id}
-                            className={`rounded-2xl border p-4 transition ${
-                              selecionado
-                                ? "border-purple-500/35 bg-purple-500/10 shadow-[0_0_0_1px_rgba(147,51,234,0.08)]"
-                                : "border-white/8 bg-[#1b1b1f] hover:border-white/15"
-                            }`}
+                            className={`rounded-2xl border p-4 transition ${selecionado
+                              ? "border-purple-500/35 bg-purple-500/10 shadow-[0_0_0_1px_rgba(147,51,234,0.08)]"
+                              : "border-white/8 bg-[#1b1b1f] hover:border-white/15"
+                              }`}
                           >
                             <label className="flex cursor-pointer items-start gap-3">
                               <input
