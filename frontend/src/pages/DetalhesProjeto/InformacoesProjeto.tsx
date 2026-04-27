@@ -38,10 +38,13 @@ function InformacoesProjeto() {
 
   useEffect(() => {
     async function load() {
-      setResponsavel(await carregarPorfissionalPorId(projeto!.responsavelId))
+      if (projeto?.responsavelId) {
+        const resp = await carregarProfissionalPorId(projeto.responsavelId);
+        setResponsavel(resp);
+      }
     }
-    load()
-  }, [projeto!.id])
+    load();
+  }, [projeto?.id]);
 
   useEffect(() => {
     async function loadHoras() {
@@ -385,8 +388,13 @@ function InformacoesProjeto() {
           </>
         )}
       </div>
-    </>
-  )
+      <div>coisa1</div>
+      <div>coisa2</div>
+      <div>coisa3</div>
+      <div>coisa4</div>
+      <div>coisa5</div>
+    </div>
+  );
 }
 
-export default InformacoesProjeto
+export default InformacoesProjeto;

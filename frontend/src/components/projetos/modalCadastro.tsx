@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
+import { projetoService } from "../../services/gateway";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -58,11 +59,8 @@ export default function ModalCadastro({
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:8084/projetos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
+      const response = await projetoService.criar(formData);
+
       if (!response.ok) {
         alert("Erro ao cadastrar. Verifique os dados.");
         return;

@@ -3,108 +3,57 @@ import { useNavigate } from "react-router-dom";
 import DragDropTarefas from "../../components/DragDropTarefas";
 import ModalCadastroItem from "../../components/Modal/formularioItem";
 import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
-// import projetoService from "../../types/projetoService";
 import { useProjetoContext } from "../../contexts/ProjetoContext";
+import profissionalService from "../../types/profissionalService";
 
 export default function TarefasPorProjeto() {
-  const { projeto } = useProjetoContext();
+  const { projeto, isLoading } = useProjetoContext();
   const navigate = useNavigate();
-  // const [projeto, setProjeto] = useState<any>(null);
   const [nomeResponsavel, setNomeResponsavel] = useState<string>("Não informado");
   const [modalItemAberto, setModalItemAberto] = useState<boolean>(false);
   const [modalTarefaAberto, setModalTarefaAberto] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [tarefaSelecionadaId, setTarefaSelecionadaId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
-  if (!projeto) return;
-
-  // useEffect(() => {
-  //   if (projetoId) {
-  //     carregarProjeto();
-  //   }
-  // }, [projetoId]);
-
-  // const carregarProjeto = async () => {
-  //   try {
-  //     setLoading(true);
-  //     const projetoData = await projetoService.buscarPorId(Number(projetoId));
-  //     setProjeto(projetoData);
-  //     if (projetoData?.responsavelId) {
-  //       const resposta = await fetch(`http://localhost:8081/api/profissionais/${projetoData.responsavelId}`);
-  //       if (resposta.ok) {
-  //         const profissional = await resposta.json();
-  //         setNomeResponsavel(profissional.nome ?? "Não informado");
-  //       }
-  //     }
-  //   } catch (err) {
-  //     console.error("Erro ao carregar projeto:", err);
-  //     setError("Projeto não encontrado");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-  const carregarProjeto = async () => {
-    try {
-      setLoading(true);
-
-      if (projeto.responsavelId) {
-        const resposta = await fetch(
-          `http://localhost:8081/api/profissionais/${projeto.responsavelId}`,
-        );
-        if (resposta.ok) {
-          const profissional = await resposta.json();
-          setNomeResponsavel(profissional.nome ?? "Não informado");
-        }
-      }
-    } catch (err) {
-      console.error("Erro ao carregar responsável:", err);
-      setError("responsável não encontrado");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (projeto?.responsavelId) {
+      profissionalService
+        .listarTodos()
+        .then((profissionais) => {
+          const responsavel = profissionais.find((p) => p.id === projeto.responsavelId);
+          setNomeResponsavel(responsavel?.nome || "Não informado");
+        })
+        .catch(() => setNomeResponsavel("Erro ao carregar"));
+    } else {
+      setNomeResponsavel("Não informado");
     }
-  };
+  }, [projeto]);
 
-  const handleSucesso = () => {
-    setRefreshKey((prev) => prev + 1);
-  };
-
+  const handleSucesso = () => setRefreshKey((prev) => prev + 1);
   const abrirModalItem = (tarefaId: number) => {
     setTarefaSelecionadaId(tarefaId);
     setModalItemAberto(true);
   };
 
-  useEffect(() => {
-    carregarProjeto();
-  }, [projeto.id]);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <div
-        className="min-h-screen flex items-center justify-center"
-        style={{ backgroundColor: "#1f1f1f" }}
-      >
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#1f1f1f" }}>
         <div className="text-white text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4" />
           <p>Carregando projeto...</p>
         </div>
       </div>
     );
   }
 
-  if (error || !projeto) {
+  if (!projeto) {
     return (
       <div className="min-h-screen p-6" style={{ backgroundColor: "#1f1f1f" }}>
         <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
-          <strong>Erro:</strong> {error || "Projeto não encontrado"}
+          <strong>Erro:</strong> Projeto não encontrado
         </div>
-        <button
-          onClick={() => navigate(`/projetos/${projeto.id}`)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Voltar
+        <button onClick={() => navigate("/projetos")} className="px-4 py-2 bg-blue-500 text-white rounded">
+          Voltar para projetos
         </button>
       </div>
     );
@@ -115,44 +64,27 @@ export default function TarefasPorProjeto() {
       <div className="p-6">
         <div className="mb-6">
           <button
-            onClick={() => navigate(`/projetos/${projeto.id}`)}
+            onClick={() => navigate("/projetos")}
             className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Voltar
           </button>
-
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-white">{projeto.nome}</h1>
-              {/* {projeto.descricao && <p className="text-gray-400 mt-1">{projeto.descricao}</p>} */}
-              {projeto.codigo && (
-                <p className="text-gray-500 text-sm mt-1">Código: {projeto.codigo}</p>
-              )}
+              {projeto.codigo && <p className="text-gray-500 text-sm mt-1">Código: {projeto.codigo}</p>}
               <p className="text-gray-500 text-sm mt-1">Responsável: {nomeResponsavel}</p>
             </div>
-
             <button
               onClick={() => setModalTarefaAberto(true)}
               className="text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
               style={{ backgroundColor: "#3e3e3e" }}
-              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "#4e4e4e")}
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "#3e3e3e")}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 4v16m8-8H4"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
               Nova Tarefa
             </button>

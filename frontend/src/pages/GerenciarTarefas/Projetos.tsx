@@ -1,9 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import projetoService from "../../types/projetoService";
 import type { Projeto1 } from "../../types/projetoService";
-
 import profissionalService from "../../types/profissionalService";
 import type { Profissional } from "../../types/profissionalService";
 
@@ -25,7 +23,7 @@ export default function TelaProjetos() {
 
       const [projetosLista, responsaveisLista] = await Promise.all([
         projetoService.listarTodos(),
-        profissionalService.listarTodos()
+        profissionalService.listarTodos(),
       ]);
 
       setProjetos(projetosLista);
@@ -35,7 +33,6 @@ export default function TelaProjetos() {
         mapaResponsaveis.set(resp.id, resp.nome);
       });
       setResponsaveis(mapaResponsaveis);
-
     } catch (err) {
       console.error("Erro ao carregar projetos:", err);
       setError("Não foi possível carregar os projetos.");
@@ -45,8 +42,7 @@ export default function TelaProjetos() {
   };
 
   const handleProjetoClick = (projetoId: number) => {
-    console.log(`Projeto selecionado: ${projetoId}`);
-    navigate(`/tarefas/projeto/${projetoId}`);
+    navigate(`/projetos/${projetoId}/tarefas`);
   };
 
   const getStatusColor = (status?: string) => {
@@ -117,15 +113,13 @@ export default function TelaProjetos() {
                 style={{
                   backgroundColor: "#252525",
                   border: "1px solid #3e3e3e",
-                  cursor: "pointer"
+                  cursor: "pointer",
                 }}
               >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <h3 className="text-white font-semibold text-lg">{projeto.nome}</h3>
-                    {projeto.codigo && (
-                      <p className="text-gray-500 text-sm">Código: {projeto.codigo}</p>
-                    )}
+                    {projeto.codigo && <p className="text-gray-500 text-sm">Código: {projeto.codigo}</p>}
                   </div>
                   <div className={`w-3 h-3 rounded-full ${getStatusColor(projeto.status)}`}></div>
                 </div>
@@ -137,7 +131,12 @@ export default function TelaProjetos() {
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center text-gray-500">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
                     <span>
                       {projeto.responsavelId
@@ -147,7 +146,12 @@ export default function TelaProjetos() {
                   </div>
                   <div className="flex items-center text-gray-500">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
                     </svg>
                     <span>
                       {projeto.dataCriacao

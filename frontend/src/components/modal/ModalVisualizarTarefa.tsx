@@ -6,6 +6,7 @@ import type { Profissional } from '../../types/profissionalService';
 import tarefaItemAdapter from '../../types/tarefaItemAdapter';
 import type { TarefaComItem } from '../../types/tarefaItemAdapter';
 
+
 interface Props {
   tarefa: any | null;
   isOpen: boolean;
@@ -141,33 +142,6 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
     return nomeResponsavelAtual;
   };
 
-  // const formatarData = (data: string | number | null) => {
-  //   if (!data) return 'Não definido';
-    
-  //   try {
-  //     let timestamp: number;
-      
-  //     if (typeof data === 'string') {
-  //       timestamp = parseInt(data, 10);
-  //       if (isNaN(timestamp)) {
-  //         return new Date(data).toLocaleDateString('pt-BR');
-  //       }
-  //     } else {
-  //       timestamp = data;
-  //     }
-      
-  //     const date = new Date(timestamp);
-      
-  //     if (isNaN(date.getTime())) {
-  //       return 'Data inválida';
-  //     }
-      
-  //     return date.toLocaleDateString('pt-BR');
-  //   } catch {
-  //     return 'Data inválida';
-  //   }
-  // };
-
   if (!isOpen || !tarefa) return null;
 
   return (
@@ -296,11 +270,6 @@ export default function ModalVisualizarTarefa({ tarefa, isOpen, onFechar, onAtua
                 <div className="p-3 rounded bg-[#2a2a2a] border-l-4 border-blue-500 shadow-sm">
                   <div className="text-white text-sm font-semibold">{tarefaComItem.item.nome}</div>
                   <div className="text-gray-400 text-xs">{tarefaComItem.item.descricao}</div>
-                  {tarefaComItem.item.createdAt && (
-                    <div className="text-gray-500 text-[10px] mt-1">
-                      Criado em: {new Date(tarefaComItem.item.createdAt).toLocaleDateString('pt-BR')}
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center py-4 bg-[#1f1f1f] rounded">
