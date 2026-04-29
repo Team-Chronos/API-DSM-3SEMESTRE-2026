@@ -164,7 +164,7 @@ services:
 
   auth-gateway:
     build:
-      context: ./services/gateway
+      context: ./services/gateway/gateway
       dockerfile: Dockerfile
     container_name: auth-gateway-api
     ports:
