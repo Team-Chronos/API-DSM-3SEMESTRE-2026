@@ -36,6 +36,78 @@ function InformacoesProjeto() {
   const [responsaveisDisponiveis, setResponsaveisDisponiveis] = useState<Profissional[]>([])
   const [formProjeto, setFormProjeto] = useState<FormProjeto | null>(null)
 
+  const [erros, setErros] = useState({
+    nome: "",
+    codigo: "",
+    tipoProjeto: "",
+    valorHoraBase: "",
+    horasContratadas: "",
+    dataInicio: "",
+    dataFim: "",
+    responsavelId: "",
+
+  })
+
+  const validarFormulario = () => {
+    if (!formProjeto) return false
+
+    const novosErros = {
+      nome: "",
+      codigo: "",
+      tipoProjeto: "",
+      valorHoraBase: "",
+      horasContratadas: "",
+      dataInicio: "",
+      dataFim: "",
+      responsavelId: "",
+    }
+
+    if (!formProjeto.nome.trim()) {
+      novosErros.nome = "Nome do projeto é obrigatório"
+    } else if (formProjeto.nome.trim().length < 3) {
+      novosErros.nome = "Nome deve ter no mínimo 3 caracteres"
+    }
+
+    if (!formProjeto.tipoProjeto) {
+      novosErros.tipoProjeto = "Selecione o tipo do projeto"
+    }
+
+    if (formProjeto.valorHoraBase <= 0) {
+      novosErros.valorHoraBase = "Valor hora deve ser maior que zero"
+    }
+
+    if (
+      formProjeto.tipoProjeto === "HORA_FECHADA" &&
+      formProjeto.horasContratadas <= 0
+    ) {
+      novosErros.horasContratadas =
+        "Horas contratadas deve ser maior que zero"
+    }
+
+    if (!formProjeto.dataInicio) {
+      novosErros.dataInicio = "Data de início é obrigatória"
+    }
+
+    if (!formProjeto.dataFim) {
+      novosErros.dataFim = "Data final é obrigatória"
+    } else if (
+      formProjeto.dataInicio &&
+      formProjeto.dataFim < formProjeto.dataInicio
+    ) {
+      novosErros.dataFim =
+        "Data final deve ser maior que a data inicial"
+    }
+
+    if (formProjeto.responsavelId <= 0) {
+      novosErros.responsavelId =
+        "Selecione um responsável válido"
+    }
+
+    setErros(novosErros)
+
+    return !Object.values(novosErros).some(Boolean)
+  }
+
   useEffect(() => {
     async function load() {
       setResponsavel(await carregarPorfissionalPorId(projeto!.responsavelId))
@@ -60,9 +132,9 @@ function InformacoesProjeto() {
       }
     }
     loadHoras()
-  }, [projeto!.id])
+  }, [projeto?.id])
 
-  if (!projeto) return
+  if (!projeto) return null
 
   const iniciarEdicao = async () => {
     setErroEdicao(null)
@@ -93,24 +165,7 @@ function InformacoesProjeto() {
     e.preventDefault()
     if (!formProjeto) return
 
-    if (
-      !formProjeto.nome.trim() ||
-      !formProjeto.codigo.trim() ||
-      !formProjeto.dataInicio ||
-      !formProjeto.dataFim ||
-      !formProjeto.responsavelId
-    ) {
-      setErroEdicao("Preencha todos os campos obrigatórios.")
-      return
-    }
-
-    if (formProjeto.tipoProjeto === "HORA_FECHADA" && formProjeto.horasContratadas <= 0) {
-      setErroEdicao("Para projeto de hora fechada, informe horas contratadas maiores que zero.")
-      return
-    }
-
-    if (formProjeto.valorHoraBase <= 0) {
-      setErroEdicao("Informe um valor hora base maior que zero.")
+    if (!validarFormulario()) {
       return
     }
 
@@ -182,6 +237,12 @@ function InformacoesProjeto() {
                   onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, nome: e.target.value } : prev))}
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none"
                 />
+
+                {erros.nome && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.nome}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -202,6 +263,8 @@ function InformacoesProjeto() {
                   onChange={(e) =>
                     setFormProjeto((prev) =>
                       prev ? { ...prev, tipoProjeto: e.target.value as "HORA_FECHADA" | "ALOCACAO" } : prev
+
+
                     )
                   }
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none"
@@ -209,6 +272,12 @@ function InformacoesProjeto() {
                   <option value="HORA_FECHADA">Hora Fechada</option>
                   <option value="ALOCACAO">Alocação</option>
                 </select>
+
+                {erros.tipoProjeto && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.tipoProjeto}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -219,6 +288,11 @@ function InformacoesProjeto() {
                   onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, dataInicio: e.target.value } : prev))}
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none"
                 />
+                {erros.dataInicio && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.dataInicio}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -229,6 +303,11 @@ function InformacoesProjeto() {
                   onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, dataFim: e.target.value } : prev))}
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none"
                 />
+                {erros.dataFim && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.dataFim}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -245,6 +324,11 @@ function InformacoesProjeto() {
                   }
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none"
                 />
+                {erros.valorHoraBase && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.valorHoraBase}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -261,6 +345,13 @@ function InformacoesProjeto() {
                   disabled={formProjeto.tipoProjeto !== "HORA_FECHADA"}
                   className="w-full rounded-md bg-black/25 px-3 py-2 outline-none disabled:opacity-50"
                 />
+
+                {erros.horasContratadas && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.horasContratadas}
+                  </p>
+                )}
+
               </div>
 
               <div className="col-span-2">
@@ -281,6 +372,13 @@ function InformacoesProjeto() {
                     </option>
                   ))}
                 </select>
+
+                {erros.responsavelId && (
+                  <p className="mt-1 text-sm text-red-400">
+                    {erros.responsavelId}
+                  </p>
+                )}
+
               </div>
 
               {erroEdicao ? <p className="col-span-2 text-sm text-red-300">{erroEdicao}</p> : null}
