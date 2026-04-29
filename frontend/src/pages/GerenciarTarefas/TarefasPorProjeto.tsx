@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DragDropTarefas from "../../components/DragDropTarefas";
-import ModalCadastroItem from "../../components/Modal/formularioItem";
-import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
+import ModalCadastroItem from "../../components/modal/formularioItem";
+import ModalCadastroTarefa from "../../components/modal/formularioTarefas";
 import { useProjetoContext } from "../../contexts/ProjetoContext";
 import profissionalService from "../../types/profissionalService";
 

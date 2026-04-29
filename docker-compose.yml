@@ -82,6 +82,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
       JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
+      APP_CORS_ALLOWED_ORIGINS: http://localhost,http://localhost:5173,https://*.app.github.dev
     depends_on:
       redis:
         condition: service_healthy

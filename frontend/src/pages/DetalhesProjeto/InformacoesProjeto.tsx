@@ -121,7 +121,7 @@ function InformacoesProjeto() {
       setSalvando(true)
       setErroEdicao(null)
 
-      await ApiProjeto.put(`/projetos/${projeto.id}`, {
+      await ApiProjeto.put(`/projeto/projetos/${projeto.id}`, {
         nome: formProjeto.nome,
         codigo: projeto.codigo,
         tipoProjeto: formProjeto.tipoProjeto,

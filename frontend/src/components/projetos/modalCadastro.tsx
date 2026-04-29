@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
-import { projetoService } from "../../services/gateway";
+import { projetoService, profissionaisService } from "../../services/gateway";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -32,12 +32,14 @@ export default function ModalCadastro({
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
 
   useEffect(() => {
-    if (!aberto) return;
-    fetch("http://localhost:8081/api/profissionais")
+    if (!aberto) return
+
+    profissionaisService
+      .listar()
       .then((r) => r.json())
       .then(setProfissionais)
-      .catch((e) => console.error("Erro ao buscar profissionais", e));
-  }, [aberto]);
+      .catch((e) => console.error("Erro ao buscar profissionais", e))
+  }, [aberto])
 
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
