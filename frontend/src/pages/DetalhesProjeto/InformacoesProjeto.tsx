@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useProjetoContext } from "../../contexts/ProjetoContext"
-import { carregarPorfissionalPorId } from "../../service/servicoProfissionais"
+import { carregarProfissionalPorId } from "../../service/servicoProfissionais"
 import { carregarTarefasPorProjeto } from "../../service/servicoTarefas"
 import type { Profissional } from "../../types/profissionalService"
 import apiApontamento from "../../services/apiApontamento"
@@ -393,7 +393,7 @@ function InformacoesProjeto() {
       <div>coisa3</div>
       <div>coisa4</div>
       <div>coisa5</div>
-    </div>
+    </>
   );
 }
 
