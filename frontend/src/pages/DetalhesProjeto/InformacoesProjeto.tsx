@@ -7,6 +7,7 @@ import apiApontamento from "../../services/apiApontamento"
 import { Clock, AlertTriangle, AlertCircle } from "lucide-react"
 import profissionalService from "../../types/profissionalService"
 import { ApiProjeto } from "../../service/servicoApi"
+import { toast } from "react-toastify"
 
 type FormProjeto = {
   nome: string
@@ -31,8 +32,6 @@ function InformacoesProjeto() {
   const [totalMinutos, setTotalMinutos] = useState<number>(0)
   const [isEditando, setIsEditando] = useState(false)
   const [salvando, setSalvando] = useState(false)
-  const [erroEdicao, setErroEdicao] = useState<string | null>(null)
-  const [sucessoEdicao, setSucessoEdicao] = useState<string | null>(null)
   const [responsaveisDisponiveis, setResponsaveisDisponiveis] = useState<Profissional[]>([])
   const [formProjeto, setFormProjeto] = useState<FormProjeto | null>(null)
 
@@ -137,8 +136,7 @@ function InformacoesProjeto() {
   if (!projeto) return null
 
   const iniciarEdicao = async () => {
-    setErroEdicao(null)
-    setSucessoEdicao(null)
+    
     setFormProjeto({
       nome: projeto.nome,
       codigo: projeto.codigo,
@@ -158,7 +156,7 @@ function InformacoesProjeto() {
   const cancelarEdicao = () => {
     setIsEditando(false)
     setFormProjeto(null)
-    setErroEdicao(null)
+
   }
 
   const salvarEdicao = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -166,33 +164,38 @@ function InformacoesProjeto() {
     if (!formProjeto) return
 
     if (!validarFormulario()) {
-      return
-    }
+    toast.warning("Preencha corretamente os campos obrigatórios")
+    return
+  }
 
     try {
       setSalvando(true)
-      setErroEdicao(null)
 
-      await ApiProjeto.put(`/projetos/${projeto.id}`, {
-        nome: formProjeto.nome,
-        codigo: projeto.codigo,
-        tipoProjeto: formProjeto.tipoProjeto,
-        valorHoraBase: Number(formProjeto.valorHoraBase),
-        horasContratadas:
-          formProjeto.tipoProjeto === "HORA_FECHADA"
-            ? Number(formProjeto.horasContratadas)
-            : null,
-        dataInicio: formProjeto.dataInicio,
-        dataFim: formProjeto.dataFim,
-        responsavelId: Number(formProjeto.responsavelId),
-      })
+      await toast.promise(
+        ApiProjeto.put(`/projetos/${projeto.id}`, {
+          nome: formProjeto.nome,
+          codigo: formProjeto.codigo,
+          tipoProjeto: formProjeto.tipoProjeto,
+          valorHoraBase: Number(formProjeto.valorHoraBase),
+          horasContratadas:
+            formProjeto.tipoProjeto === "HORA_FECHADA"
+              ? Number(formProjeto.horasContratadas)
+              : null,
+          dataInicio: formProjeto.dataInicio,
+          dataFim: formProjeto.dataFim,
+          responsavelId: Number(formProjeto.responsavelId),
+        }),
+        {
+          pending: "Salvando alterações...",
+          success: "Projeto atualizado com sucesso!",
+          error: "Não foi possível atualizar o projeto.",
+        }
+      )
 
       await refetch()
       setIsEditando(false)
-      setSucessoEdicao("Projeto atualizado com sucesso.")
     } catch (error) {
       console.error(error)
-      setErroEdicao("Não foi possível atualizar o projeto. Verifique a rota PUT no backend.")
     } finally {
       setSalvando(false)
     }
@@ -381,7 +384,7 @@ function InformacoesProjeto() {
 
               </div>
 
-              {erroEdicao ? <p className="col-span-2 text-sm text-red-300">{erroEdicao}</p> : null}
+             
 
               <div className="col-span-2 flex justify-end gap-2">
                 <button
@@ -402,7 +405,6 @@ function InformacoesProjeto() {
             </form>
           ) : null}
 
-          {sucessoEdicao ? <p className="mb-3 text-sm text-green-300">{sucessoEdicao}</p> : null}
 
           <div className="grid grid-cols-3 gap-4">
             <div>
