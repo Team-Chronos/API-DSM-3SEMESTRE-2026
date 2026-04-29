@@ -16,3 +16,7 @@
 [submodule "services/login"]
 	path = services/login
 	url = https://github.com/Team-Chronos/API3-servico-login.git
+[submodule "services/gestao-tarefas"]
+	path = services/gestao-tarefas
+	url = https://github.com/Team-Chronos/API3-servico-gestao-tarefas.git
+	branch = main
