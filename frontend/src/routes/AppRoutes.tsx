@@ -26,7 +26,7 @@ const AppRoutes = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <Navigate to="/projetos" replace />,
+        element: <Navigate to="/login" replace />
       },
       {
         path: "profissionais",
