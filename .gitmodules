@@ -1,6 +1,6 @@
 [submodule "services/gateway"]
 	path = services/gateway
-	url = https://github.com/Team-Chronos/API3-servico-gateway.git
+	url = https://github.com/Team-Chronos/API3-servico-auth-gateway
 	branch = main
 
 [submodule "services/gestao-projetos"]

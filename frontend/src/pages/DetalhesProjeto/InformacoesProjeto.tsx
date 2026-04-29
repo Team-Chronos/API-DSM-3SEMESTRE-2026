@@ -27,7 +27,7 @@ function formatarDataInput(valor: string) {
 function InformacoesProjeto() {
   const { projeto, refetch } = useProjetoContext()
 
-  const [responsavel, setResponsavel] = useState<Profissional>()
+  const [responsavel, setResponsavel] = useState<Profissional | null>(null)
   const [totalMinutos, setTotalMinutos] = useState<number>(0)
   const [isEditando, setIsEditando] = useState(false)
   const [salvando, setSalvando] = useState(false)

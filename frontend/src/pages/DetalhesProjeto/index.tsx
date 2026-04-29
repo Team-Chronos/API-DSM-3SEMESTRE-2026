@@ -42,15 +42,20 @@ function DetalhesProjeto() {
   }, []);
 
   useEffect(() => {
-    if (!projeto) return;
-    async function load() {
+    const projetoId = projeto?.id;
+
+    if (projetoId === undefined || projetoId === null) return;
+
+    async function load(id: number) {
       setLoadingItens(true);
+
       try {
         const [tarefasData, profissionaisData, itensData] = await Promise.all([
-          carregarTarefasPorProjeto(projeto.id),
-          carregarProfissionaisPorProjeto(projeto.id),
-          carregarItensPorProjeto(projeto.id),
+          carregarTarefasPorProjeto(id),
+          carregarProfissionaisPorProjeto(id),
+          carregarItensPorProjeto(id),
         ]);
+
         setTarefas(tarefasData);
         setProfissionais(profissionaisData);
         setItens(itensData);
@@ -60,7 +65,8 @@ function DetalhesProjeto() {
         setLoadingItens(false);
       }
     }
-    load();
+
+    load(projetoId);
   }, [projeto?.id]);
 
   if (projetoLoading) {

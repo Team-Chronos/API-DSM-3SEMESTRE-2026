@@ -30,14 +30,15 @@ services:
       SPRING_JPA_SHOW_SQL: "true"
       JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
       JWT_EXPIRATION_MS: 86400000
-      APP_CORS_ALLOWED_ORIGINS: http://localhost:5173,https://*.app.github.dev
+      APP_CORS_ALLOWED_ORIGINS: http://localhost,http://localhost:5173,https://*.app.github.dev
       SPRING_DATA_REDIS_HOST: redis-cache
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_CACHE_TYPE: redis
       SERVER_COMPRESSION_ENABLED: "true"
       SERVER_COMPRESSION_MIME_TYPES: application/json
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - app-network
@@ -60,86 +61,8 @@ services:
       SERVER_COMPRESSION_ENABLED: "true"
       SERVER_COMPRESSION_MIME_TYPES: application/json
     depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  projeto:
-    build:
-      context: ./services/gestao-projetos/projeto
-      dockerfile: Dockerfile
-    container_name: projeto-api
-    environment:
-      SPRING_APPLICATION_NAME: projeto
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: chronosapi
-      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: 8084
-      SPRING_DATA_REDIS_HOST: redis-cache
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_CACHE_TYPE: redis
-      SERVER_COMPRESSION_ENABLED: "true"
-      SERVER_COMPRESSION_MIME_TYPES: application/json
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  financeiro:
-    build:
-      context: ./services/gestao-financeiro
-      dockerfile: Dockerfile
-    container_name: financeiro-api
-    environment:
-      SPRING_APPLICATION_NAME: financeiro
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: chronosapi
-      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
-      SERVER_PORT: 8085
-      SPRING_DATASOURCE_HIKARI_READ_ONLY: "true"
-      SPRING_SQL_INIT_MODE: never
-      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC_CORE: DEBUG
-      SPRING_DATA_REDIS_HOST: redis-cache
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_CACHE_TYPE: redis
-      SERVER_COMPRESSION_ENABLED: "true"
-      SERVER_COMPRESSION_MIME_TYPES: application/json
-    depends_on:
-      - redis
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  tarefas-api:
-    build:
-      context: ./services/gestao-tarefas/criarTarefas/criarTarefas
-      dockerfile: Dockerfile
-    container_name: tarefas-api
-    environment:
-      SPRING_APPLICATION_NAME: criarTarefas
-      SERVER_PORT: 8089
-      PROJETO_API_URL: http://projeto-api:8084/projetos
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
-      SPRING_DATASOURCE_USERNAME: chronosapi
-      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SPRING_JPA_SHOW_SQL: "true"
-      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
-      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
-      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
-      SPRING_DATA_REDIS_HOST: redis-cache
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_CACHE_TYPE: redis
-      SERVER_COMPRESSION_ENABLED: "true"
-      SERVER_COMPRESSION_MIME_TYPES: application/json
-    depends_on:
-      - redis
-      - projeto
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - app-network
@@ -158,6 +81,93 @@ services:
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SPRING_JPA_SHOW_SQL: "true"
+      JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  projeto:
+    build:
+      context: ./services/gestao-projetos/projeto
+      dockerfile: Dockerfile
+    container_name: projeto-api
+    environment:
+      SPRING_APPLICATION_NAME: projeto
+      SERVER_PORT: 8084
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  financeiro:
+    build:
+      context: ./services/gestao-financeiro
+      dockerfile: Dockerfile
+    container_name: financeiro-api
+    environment:
+      SPRING_APPLICATION_NAME: financeiro
+      SERVER_PORT: 8085
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_DATASOURCE_HIKARI_READ_ONLY: "true"
+      SPRING_SQL_INIT_MODE: never
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC_CORE: DEBUG
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  tarefas-api:
+    build:
+      context: ./services/gestao-tarefas/criarTarefas/criarTarefas
+      dockerfile: Dockerfile
+    container_name: tarefas-api
+    environment:
+      SPRING_APPLICATION_NAME: criarTarefas
+      SERVER_PORT: 8089
+      PROJETO_API_URL: http://projeto:8084/projetos
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+    depends_on:
+      redis:
+        condition: service_healthy
+      projeto:
+        condition: service_started
     restart: unless-stopped
     networks:
       - app-network
@@ -172,13 +182,20 @@ services:
     environment:
       SPRING_APPLICATION_NAME: auth-gateway
       SERVER_PORT: 8080
+
       SPRING_REDIS_HOST: redis-cache
       SPRING_REDIS_PORT: 6379
       SPRING_DATA_REDIS_HOST: redis-cache
       SPRING_DATA_REDIS_PORT: 6379
-    restart: unless-stopped
-    networks:
-      - app-network
+
+      JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
+
+      LOGIN_API_URL: http://login-api:8083
+      PROFISSIONAIS_API_URL: http://ms-profissionais:8081
+      CONTROLE_HORAS_API_URL: http://controle-horas:8082
+      PROJETO_API_URL: http://projeto:8084
+      FINANCEIRO_API_URL: http://financeiro:8085
+      TAREFAS_API_URL: http://tarefas-api:8089
     depends_on:
       redis:
         condition: service_healthy
@@ -186,19 +203,31 @@ services:
         condition: service_started
       controle-horas:
         condition: service_started
+      login-api:
+        condition: service_started
       projeto:
         condition: service_started
       financeiro:
         condition: service_started
       tarefas-api:
         condition: service_started
-      login-api:
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      auth-gateway:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    restart: unless-stopped
+    networks:
+      - app-network
 
 networks:
   app-network:
