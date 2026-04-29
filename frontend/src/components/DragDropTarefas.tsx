@@ -12,7 +12,7 @@ import { Droppable } from './colunas';
 import { Draggable } from './cardTarefa';
 import { ApiTarefas } from '../service/servicoApi';
 import profissionalService from '../types/profissionalService';
-import ModalVisualizarTarefa from './modal/ModalVisualizarTarefa';
+import ModalVisualizarTarefa from './Modal/ModalVisualizarTarefa';
 import type { Profissional } from '../types/profissionalService';
 import { useAuth } from '../contexts/AuthContext';
 

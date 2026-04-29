@@ -60,6 +60,7 @@ services:
       SPRING_CACHE_TYPE: redis
       SERVER_COMPRESSION_ENABLED: "true"
       SERVER_COMPRESSION_MIME_TYPES: application/json
+      TAREFAS_API_URL: http://tarefas-api:8089/tarefas
     depends_on:
       redis:
         condition: service_healthy
@@ -164,6 +165,7 @@ services:
       SPRING_CACHE_TYPE: redis
       SERVER_COMPRESSION_ENABLED: "true"
       SERVER_COMPRESSION_MIME_TYPES: application/json
+      
     depends_on:
       redis:
         condition: service_healthy
