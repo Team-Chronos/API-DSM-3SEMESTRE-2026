@@ -165,11 +165,14 @@ services:
       SPRING_CACHE_TYPE: redis
       SERVER_COMPRESSION_ENABLED: "true"
       SERVER_COMPRESSION_MIME_TYPES: application/json
+      PROFISSIONAIS_API_URL: http://ms-profissionais:8081/api/profissionais
       
     depends_on:
       redis:
         condition: service_healthy
       projeto:
+        condition: service_started
+      ms-profissionais:
         condition: service_started
     restart: unless-stopped
     networks:

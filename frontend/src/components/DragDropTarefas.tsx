@@ -1,20 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   DndContext,
   closestCenter,
   PointerSensor,
   useSensor,
-  useSensors
-} from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+  useSensors,
+} from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
 
-import { Droppable } from './colunas';
-import { Draggable } from './cardTarefa';
-import { ApiTarefas } from '../service/servicoApi';
-import profissionalService from '../types/profissionalService';
-import ModalVisualizarTarefa from './Modal/ModalVisualizarTarefa';
-import type { Profissional } from '../types/profissionalService';
-import { useAuth } from '../contexts/AuthContext';
+import { Droppable } from "./colunas";
+import { Draggable } from "./cardTarefa";
+import { ApiTarefas } from "../service/servicoApi";
+import profissionalService from "../types/profissionalService";
+import ModalVisualizarTarefa from "./Modal/ModalVisualizarTarefa";
+import type { Profissional } from "../types/profissionalService";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Tarefa {
   id: number;
@@ -40,33 +40,51 @@ interface DragDropTarefasProps {
   refreshKey?: number;
 }
 
-export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKey }: DragDropTarefasProps) {
+export default function DragDropTarefas({
+  projetoId,
+  onAbrirModalItem,
+  refreshKey,
+}: DragDropTarefasProps) {
   const { user } = useAuth();
+  const userRoles = user?.roles ?? [];
+  const podeGerenciarTodasTarefas =
+    userRoles.includes("ROLE_FINANCE") ||
+    userRoles.includes("ROLE_GERENTE_PROJETO");
+  const rolesKey = userRoles.join("|");
   const [colunas, setColunas] = useState<Coluna[]>([
-    { id: 'pendente', titulo: 'Pendente', status: 'PENDENTE', tarefas: [] },
-    { id: 'em_andamento', titulo: 'Em Andamento', status: 'EM_ANDAMENTO', tarefas: [] },
-    { id: 'concluida', titulo: 'Concluída', status: 'CONCLUIDA', tarefas: [] },
+    { id: "pendente", titulo: "Pendente", status: "PENDENTE", tarefas: [] },
+    {
+      id: "em_andamento",
+      titulo: "Em Andamento",
+      status: "EM_ANDAMENTO",
+      tarefas: [],
+    },
+    { id: "concluida", titulo: "Concluída", status: "CONCLUIDA", tarefas: [] },
   ]);
 
-  const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
+  const [profissionais, setProfissionais] = useState<Map<number, string>>(
+    new Map(),
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(null);
+  const [tarefaSelecionada, setTarefaSelecionada] = useState<Tarefa | null>(
+    null,
+  );
   const [modalVisualizarAberto, setModalVisualizarAberto] = useState(false);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
   );
 
   useEffect(() => {
     if (projetoId && user?.id) {
       carregarTarefas();
     }
-  }, [projetoId, user?.id, refreshKey]);
+  }, [projetoId, user?.id, rolesKey, refreshKey]);
 
   const getNomeResponsavel = (responsavelId: number | null): string => {
-    if (!responsavelId) return 'Não atribuído';
-    return profissionais.get(responsavelId) ?? 'Não atribuído';
+    if (!responsavelId) return "Não atribuído";
+    return profissionais.get(responsavelId) ?? "Não atribuído";
   };
 
   const carregarTarefas = async () => {
@@ -75,16 +93,22 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
       setError(null);
 
       if (!user?.id) {
-        throw new Error('Usuário não autenticado');
+        throw new Error("Usuário não autenticado");
       }
 
-      const response = await ApiTarefas.get(`/tarefas/tarefas/projeto/${projetoId}/responsavel/${user.id}`);
+      const endpoint = podeGerenciarTodasTarefas
+        ? `/tarefas/tarefas/projeto/${projetoId}`
+        : `/tarefas/tarefas/projeto/${projetoId}/responsavel/${user.id}`;
+
+      const response = await ApiTarefas.get(endpoint);
       let tarefasData = response.data;
       if (!Array.isArray(tarefasData)) tarefasData = [];
 
       const profissionaisLista = await profissionalService.listarTodos();
       const profissionaisMap = new Map<number, string>();
-      profissionaisLista.forEach((p: Profissional) => profissionaisMap.set(p.id, p.nome));
+      profissionaisLista.forEach((p: Profissional) =>
+        profissionaisMap.set(p.id, p.nome),
+      );
       setProfissionais(profissionaisMap);
 
       const tarefas = tarefasData.map((t: any) => ({
@@ -98,15 +122,15 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         tempoMaximoMinutos: t.tempoMaximoMinutos,
       }));
 
-      setColunas(prev =>
-        prev.map(col => ({
+      setColunas((prev) =>
+        prev.map((col) => ({
           ...col,
-          tarefas: tarefas.filter((t:any) => t && t.status === col.status),
-        }))
+          tarefas: tarefas.filter((t: any) => t && t.status === col.status),
+        })),
       );
     } catch (err: any) {
-      console.error('Erro ao carregar tarefas:', err);
-      setError('Não foi possível carregar as tarefas do servidor.');
+      console.error("Erro ao carregar tarefas:", err);
+      setError("Não foi possível carregar as tarefas do servidor.");
     } finally {
       setLoading(false);
     }
@@ -121,34 +145,46 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
 
     let tarefaParaMover: Tarefa | undefined;
     let colOrigemIdx = -1;
-    const colDestinoIdx = colunas.findIndex(c => c.id === overId);
+    const colDestinoIdx = colunas.findIndex((c) => c.id === overId);
 
     colunas.forEach((col, idx) => {
-      const t = col.tarefas.find(task => task.id.toString() === activeId);
+      const t = col.tarefas.find((task) => task.id.toString() === activeId);
       if (t) {
         tarefaParaMover = t;
         colOrigemIdx = idx;
       }
     });
 
-    if (!tarefaParaMover || colDestinoIdx === -1 || colOrigemIdx === colDestinoIdx) return;
+    if (
+      !tarefaParaMover ||
+      colDestinoIdx === -1 ||
+      colOrigemIdx === colDestinoIdx
+    )
+      return;
 
     const novoStatus = colunas[colDestinoIdx].status;
 
     const novasColunas = [...colunas];
-    novasColunas[colOrigemIdx].tarefas = novasColunas[colOrigemIdx].tarefas.filter(
-      t => t.id.toString() !== activeId
-    );
-    novasColunas[colDestinoIdx].tarefas.push({ ...tarefaParaMover, status: novoStatus });
+    novasColunas[colOrigemIdx].tarefas = novasColunas[
+      colOrigemIdx
+    ].tarefas.filter((t) => t.id.toString() !== activeId);
+    novasColunas[colDestinoIdx].tarefas.push({
+      ...tarefaParaMover,
+      status: novoStatus,
+    });
     setColunas(novasColunas);
 
     try {
-      await ApiTarefas.patch(`/tarefas/tarefas/${tarefaParaMover.id}/status`, `"${novoStatus}"`, {
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await ApiTarefas.patch(
+        `/tarefas/tarefas/${tarefaParaMover.id}/status`,
+        `"${novoStatus}"`,
+        {
+          headers: { "Content-Type": "application/json" },
+        },
+      );
     } catch (err) {
-      console.error('Erro ao atualizar status:', err);
-      await carregarTarefas(); 
+      console.error("Erro ao atualizar status:", err);
+      await carregarTarefas();
     }
   };
 
@@ -183,7 +219,10 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
           <strong>Erro:</strong> {error}
         </div>
-        <button onClick={carregarTarefas} className="px-4 py-2 bg-blue-500 text-white rounded">
+        <button
+          onClick={carregarTarefas}
+          className="px-4 py-2 bg-blue-500 text-white rounded"
+        >
           Tentar novamente
         </button>
       </div>
@@ -193,9 +232,13 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
   return (
     <>
       <div className="p-6">
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {colunas.map(coluna => (
+            {colunas.map((coluna) => (
               <Droppable key={coluna.id} id={coluna.id} titulo={coluna.titulo}>
                 <div className="space-y-2">
                   {coluna.tarefas.length === 0 ? (
@@ -203,7 +246,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
                       Nenhuma tarefa
                     </div>
                   ) : (
-                    coluna.tarefas.map(tarefa => (
+                    coluna.tarefas.map((tarefa) => (
                       <div
                         key={tarefa.id}
                         onClick={() => handleAbrirVisualizar(tarefa)}
@@ -215,11 +258,16 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
                             id: tarefa.id,
                             titulo: tarefa.titulo,
                             descricao: tarefa.descricao,
-                            responsavel: getNomeResponsavel(tarefa.responsavelId),
-                            prazo: typeof tarefa.tempoMaximoMinutos === 'number' ? tarefa.tempoMaximoMinutos : null,
+                            responsavel: getNomeResponsavel(
+                              tarefa.responsavelId,
+                            ),
+                            prazo:
+                              typeof tarefa.tempoMaximoMinutos === "number"
+                                ? tarefa.tempoMaximoMinutos
+                                : null,
                             status: tarefa.status,
                           }}
-                          onAddItem={e => handleAbrirModalItem(tarefa.id, e)}
+                          onAddItem={(e) => handleAbrirModalItem(tarefa.id, e)}
                         />
                       </div>
                     ))
@@ -235,6 +283,7 @@ export default function DragDropTarefas({ projetoId, onAbrirModalItem, refreshKe
         isOpen={modalVisualizarAberto}
         onFechar={() => setModalVisualizarAberto(false)}
         onAtualizar={handleAtualizarTarefa}
+        podeGerenciarTodasTarefas={podeGerenciarTodasTarefas}
       />
     </>
   );
