@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import ModalBase from "./ModalBase";
 import type { ProfissionalGanhos, ProjetoProfissional } from "../../types/financeiro";
 
@@ -102,7 +103,7 @@ function CardMetrica({
   );
 }
 
-export default function ModalDetalheProfissional({
+function ModalDetalheProfissional({
   aberto,
   onFechar,
   profissional,
@@ -111,15 +112,25 @@ export default function ModalDetalheProfissional({
     return null;
   }
 
-  const quantidadeProjetos = profissional.projetos.length;
-  const mediaValorHora = calcularMediaValorHora(profissional.projetos);
-  const mediaHoras = calcularMediaHoras(profissional.projetos);
-  const projetoMaiorCusto = obterProjetoMaiorCusto(profissional.projetos);
+  const { quantidadeProjetos, mediaValorHora, mediaHoras, projetoMaiorCusto, horasTotais } =
+    useMemo(() => {
+      const quantidade = profissional.projetos.length;
+      const mediaHora = calcularMediaValorHora(profissional.projetos);
+      const media = calcularMediaHoras(profissional.projetos);
+      const maiorCusto = obterProjetoMaiorCusto(profissional.projetos);
+      const horas = profissional.projetos.reduce(
+        (acumulador, projeto) => acumulador + projeto.horasTrabalhadas,
+        0
+      );
 
-  const horasTotais = profissional.projetos.reduce(
-    (acumulador, projeto) => acumulador + projeto.horasTrabalhadas,
-    0
-  );
+      return {
+        quantidadeProjetos: quantidade,
+        mediaValorHora: mediaHora,
+        mediaHoras: media,
+        projetoMaiorCusto: maiorCusto,
+        horasTotais: horas,
+      };
+    }, [profissional.projetos]);
 
   return (
     <ModalBase
@@ -292,3 +303,5 @@ export default function ModalDetalheProfissional({
     </ModalBase>
   );
 }
+
+export default memo(ModalDetalheProfissional);

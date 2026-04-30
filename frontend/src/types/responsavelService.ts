@@ -1,4 +1,4 @@
-import { ApiTarefas } from './servicoApi';
+import { ApiTarefas } from '../service/servicoApi';
 
 export interface Responsavel {
   id: number;

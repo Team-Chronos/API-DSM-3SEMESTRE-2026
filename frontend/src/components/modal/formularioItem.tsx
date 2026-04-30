@@ -1,6 +1,5 @@
-import { useState,  } from "react";
-import itemService from "../../types/itemService";
-import { ApiTarefas } from "../../service/servicoApi";
+import { useState } from "react";
+import tarefaItemAdapter from "../../types/tarefaItemAdapter";
 
 interface Props {
   tarefaId: number;
@@ -35,33 +34,13 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
     }
 
     try {
-      
-      const novoItem = await itemService.criarItem(nome.trim(), descricao.trim(), tarefaId);
-      
-      const tarefaResponse = await ApiTarefas.get(`/tarefas/${tarefaId}`);
-      console.log("Tarefa após criar item:", tarefaResponse.data);
-      console.log("itemId na tarefa:", tarefaResponse.data.itemId);
-      
-      if (tarefaResponse.data.itemId === novoItem.id) {
-      } else {
-        const idCorreto = novoItem.id;
-        
-        const vinculado = await itemService.vincularItemATarefa(tarefaId, idCorreto);
-        
-        if (vinculado) {
-        } else {
-          setCarregando(false);
-          return;
-        }
-      }
-      
+      await tarefaItemAdapter.adicionarItemATarefa(tarefaId, nome.trim(), descricao.trim());
       setNome("");
       setDescricao("");
       onFechar();
       if (onSucesso) onSucesso();
-      
     } catch (err: any) {
-      console.error("Erro detalhado ao criar item:", err);
+      console.error("Erro ao criar item:", err);
       setErro(`Erro ao salvar o item: ${err.response?.data?.message || err.message || "Tente novamente."}`);
     } finally {
       setCarregando(false);
@@ -71,17 +50,13 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-black opacity-50" onClick={onFechar}></div>
-
       <div className="relative p-6 rounded shadow-lg w-full max-w-md z-10" style={{ backgroundColor: '#252525', border: '1px solid #3e3e3e' }}>
         <h2 className="text-lg font-bold mb-4 text-white">Cadastrar Item</h2>
-
         {erro && (
           <div className="mb-4 p-3 bg-red-500 text-white rounded whitespace-pre-wrap">
-            <strong>Erro:</strong><br />
-            {erro}
+            <strong>Erro:</strong><br />{erro}
           </div>
         )}
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <input
             type="text"
@@ -101,7 +76,6 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
             rows={3}
             required
           />
-
           <div className="flex justify-end gap-2 mt-2">
             <button
               type="button"
