@@ -3,7 +3,11 @@ import Search from "../../components/ui/Search";
 import { useProjetoContext } from "../../contexts/ProjetoContext";
 import type { Tarefa } from "../../types/tarefa";
 import type { Profissional } from "../../types/profissionalService";
-import { carregarItensPorProjeto, carregarTarefasPorProjeto } from "../../service/servicoTarefas";
+import {
+  carregarItensPorProjeto,
+  carregarTarefasPorProjeto,
+  carregarTarefasPorProjetoEResponsavel,
+} from "../../service/servicoTarefas";
 import { carregarProfissionaisPorProjeto } from "../../service/servicoProfissionais";
 import { normalizarTexto } from "../../utils";
 import InformacoesProjeto from "./InformacoesProjeto";
@@ -11,17 +15,25 @@ import type { Item } from "../../types/item";
 import type { TipoTarefa } from "../../types/tipoTarefa";
 import ApiTarefas from "../../service/servicoApi";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 function DetalhesProjeto() {
   const navigate = useNavigate();
   const { projeto, isLoading: projetoLoading } = useProjetoContext();
+  const { user } = useAuth();
 
+  const roles = user?.roles ?? [];
+  const podeGerenciarProjetos =
+    roles.includes("ROLE_FINANCE") || roles.includes("ROLE_GERENTE_PROJETO");
+
+  const [acessoNegado, setAcessoNegado] = useState(false);
   const [pesquisaTarefa, setPesquisaTarefa] = useState<string>("");
   const [filtroTipo, setFiltroTipo] = useState<number | null>(null);
   const [filtroItem, setFiltroItem] = useState<number | null>(null);
-  const [filtroProfissional, setFiltroProfissional] = useState<number | null>(null);
+  const [filtroProfissional, setFiltroProfissional] = useState<number | null>(
+    null,
+  );
   const [pesquisaProfissional, setPesquisaProfissional] = useState<string>("");
-
   const [tarefas, setTarefas] = useState<Tarefa[]>([]);
   const [tipos, setTipos] = useState<TipoTarefa[]>([]);
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
@@ -38,6 +50,7 @@ function DetalhesProjeto() {
         setTipos([]);
       }
     }
+
     loadTipos();
   }, []);
 
@@ -50,15 +63,50 @@ function DetalhesProjeto() {
       setLoadingItens(true);
 
       try {
-        const [tarefasData, profissionaisData, itensData] = await Promise.all([
-          carregarTarefasPorProjeto(id),
-          carregarProfissionaisPorProjeto(id),
+        const profissionaisData = await carregarProfissionaisPorProjeto(id);
+
+        const usuarioEstaNoProjeto = profissionaisData.some(
+          (profissional) => Number(profissional.id) === Number(user?.id),
+        );
+
+        if (!podeGerenciarProjetos && !usuarioEstaNoProjeto) {
+          setAcessoNegado(true);
+          setTarefas([]);
+          setProfissionais([]);
+          setItens([]);
+          return;
+        }
+
+        setAcessoNegado(false);
+
+        const [tarefasData, itensData] = await Promise.all([
+          podeGerenciarProjetos
+            ? carregarTarefasPorProjeto(id)
+            : carregarTarefasPorProjetoEResponsavel(id, Number(user?.id)),
           carregarItensPorProjeto(id),
         ]);
 
+        const itemIdsPermitidos = new Set(
+          tarefasData
+            .map((tarefa) => tarefa.itemId)
+            .filter((id): id is number => typeof id === "number"),
+        );
+
         setTarefas(tarefasData);
-        setProfissionais(profissionaisData);
-        setItens(itensData);
+        setProfissionais(
+          podeGerenciarProjetos
+            ? profissionaisData
+            : profissionaisData.filter(
+                (profissional) => Number(profissional.id) === Number(user?.id),
+              ),
+        );
+        setItens(
+          podeGerenciarProjetos
+            ? itensData
+            : itensData.filter((item) =>
+                itemIdsPermitidos.has(Number(item.idItem)),
+              ),
+        );
       } catch (error) {
         console.error("Erro ao carregar dados do projeto:", error);
       } finally {
@@ -67,7 +115,7 @@ function DetalhesProjeto() {
     }
 
     load(projetoId);
-  }, [projeto?.id]);
+  }, [projeto?.id, user?.id, podeGerenciarProjetos]);
 
   if (projetoLoading) {
     return (
@@ -88,19 +136,39 @@ function DetalhesProjeto() {
     );
   }
 
+  if (acessoNegado) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#1f1f1f]">
+        <div className="text-center">
+          <div className="text-red-500 mb-4">
+            Você não tem acesso a este projeto.
+          </div>
+          <button
+            onClick={() => navigate("/projetos")}
+            className="bg-black/21 rounded-lg py-2 px-4 cursor-pointer text-white"
+          >
+            Voltar para projetos
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex h-screen gap-8 p-4 text-white/95">
       <div className="flex flex-1 flex-col gap-4 overflow-y-auto">
         <div className="rounded-xl bg-white/7 p-4 flex flex-col gap-4">
           <h3 className="text-center text-lg">Projeto</h3>
           <InformacoesProjeto />
+
           <div className="flex justify-end gap-2">
             <button
               onClick={() => navigate("./tarefas")}
               className="bg-black/21 rounded-lg py-2 px-4 cursor-pointer"
             >
-              Gerenciar Tarefas
+              {podeGerenciarProjetos ? "Gerenciar Tarefas" : "Minhas Tarefas"}
             </button>
+
             <button
               onClick={() => navigate("./apontamento")}
               className="bg-black/21 rounded-lg py-2 px-4 cursor-pointer"
@@ -109,7 +177,9 @@ function DetalhesProjeto() {
             </button>
           </div>
         </div>
+
         <hr className="my-2 opacity-30" />
+
         <div className="mb-1 flex flex-col gap-4 rounded-xl bg-white/7 p-4 flex-wrap">
           <div className="h-9 min-w-1/5">
             <Search
@@ -119,17 +189,22 @@ function DetalhesProjeto() {
               className="h-full"
             />
           </div>
+
           <div className="flex gap-2 *:flex-1 *:rounded-lg *:bg-black/21 *:p-2 *:cursor-pointer flex-wrap">
-            <select onChange={(e) => setFiltroTipo(Number(e.target.value) || null)}>
+            <select
+              onChange={(e) => setFiltroTipo(Number(e.target.value) || null)}
+            >
               <option value="">Tipo de Tarefa</option>
-              {tipos.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.nome}
+              {tipos.map((tipo) => (
+                <option key={tipo.id} value={tipo.id}>
+                  {tipo.nome}
                 </option>
               ))}
             </select>
 
-            <select onChange={(e) => setFiltroItem(Number(e.target.value) || null)}>
+            <select
+              onChange={(e) => setFiltroItem(Number(e.target.value) || null)}
+            >
               <option value="">{loadingItens ? "Carregando..." : "Item"}</option>
               {itens.map((item) => (
                 <option key={item.idItem} value={item.idItem}>
@@ -138,25 +213,39 @@ function DetalhesProjeto() {
               ))}
             </select>
 
-            <select onChange={(e) => setFiltroProfissional(Number(e.target.value) || null)}>
+            <select
+              onChange={(e) =>
+                setFiltroProfissional(Number(e.target.value) || null)
+              }
+            >
               <option value="">Profissional</option>
-              {profissionais.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.nome}
+              {profissionais.map((profissional) => (
+                <option key={profissional.id} value={profissional.id}>
+                  {profissional.nome}
                 </option>
               ))}
             </select>
           </div>
         </div>
+
         <div className="flex flex-col gap-4 *:rounded-xl *:bg-white/7 *:px-4 *:py-8">
           {tarefas.length > 0 ? (
             tarefas
               .filter((tarefa) => {
-                const matchTexto = normalizarTexto(tarefa.titulo).includes(normalizarTexto(pesquisaTarefa));
-                const matchTipo = filtroTipo === null || tarefa.tipoTarefaId === filtroTipo;
-                const matchItem = filtroItem === null || tarefa.itemId === filtroItem;
-                const matchProfissional = filtroProfissional === null || tarefa.responsavelId === filtroProfissional;
-                return matchTexto && matchTipo && matchItem && matchProfissional;
+                const matchTexto = normalizarTexto(tarefa.titulo).includes(
+                  normalizarTexto(pesquisaTarefa),
+                );
+                const matchTipo =
+                  filtroTipo === null || tarefa.tipoTarefaId === filtroTipo;
+                const matchItem =
+                  filtroItem === null || tarefa.itemId === filtroItem;
+                const matchProfissional =
+                  filtroProfissional === null ||
+                  tarefa.responsavelId === filtroProfissional;
+
+                return (
+                  matchTexto && matchTipo && matchItem && matchProfissional
+                );
               })
               .map((tarefa) => <div key={tarefa.id}>{tarefa.titulo}</div>)
           ) : (
@@ -168,20 +257,28 @@ function DetalhesProjeto() {
       <div className="flex w-3/12 max-w-sm resize-x flex-col gap-4 overflow-y-auto rounded-xl bg-white/7 p-4 text-sm">
         <h3 className="text-center text-lg">Profissionais</h3>
         <hr className="opacity-30" />
+
         <Search
           placeholder="Pesquisar profissional..."
           value={pesquisaProfissional}
           onChange={setPesquisaProfissional}
         />
+
         <div className="flex flex-col gap-2">
           {profissionais.length > 0 ? (
             profissionais
               .filter((profissional) => {
                 if (pesquisaProfissional === "") return true;
-                return normalizarTexto(profissional.nome).includes(normalizarTexto(pesquisaProfissional));
+
+                return normalizarTexto(profissional.nome).includes(
+                  normalizarTexto(pesquisaProfissional),
+                );
               })
               .map((profissional) => (
-                <div key={profissional.id} className="rounded-xl bg-black/21 px-3 py-3">
+                <div
+                  key={profissional.id}
+                  className="rounded-xl bg-black/21 px-3 py-3"
+                >
                   {profissional.nome}
                 </div>
               ))

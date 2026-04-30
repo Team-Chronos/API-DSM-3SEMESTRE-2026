@@ -7,7 +7,6 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import type { DragEndEvent } from "@dnd-kit/core";
-
 import { Droppable } from "./colunas";
 import { Draggable } from "./cardTarefa";
 import { ApiTarefas } from "../service/servicoApi";
@@ -46,11 +45,13 @@ export default function DragDropTarefas({
   refreshKey,
 }: DragDropTarefasProps) {
   const { user } = useAuth();
+
   const userRoles = user?.roles ?? [];
   const podeGerenciarTodasTarefas =
     userRoles.includes("ROLE_FINANCE") ||
     userRoles.includes("ROLE_GERENTE_PROJETO");
   const rolesKey = userRoles.join("|");
+
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: "pendente", titulo: "Pendente", status: "PENDENTE", tarefas: [] },
     {
@@ -102,13 +103,18 @@ export default function DragDropTarefas({
 
       const response = await ApiTarefas.get(endpoint);
       let tarefasData = response.data;
-      if (!Array.isArray(tarefasData)) tarefasData = [];
+
+      if (!Array.isArray(tarefasData)) {
+        tarefasData = [];
+      }
 
       const profissionaisLista = await profissionalService.listarTodos();
       const profissionaisMap = new Map<number, string>();
+
       profissionaisLista.forEach((p: Profissional) =>
         profissionaisMap.set(p.id, p.nome),
       );
+
       setProfissionais(profissionaisMap);
 
       const tarefas = tarefasData.map((t: any) => ({
@@ -125,10 +131,10 @@ export default function DragDropTarefas({
       setColunas((prev) =>
         prev.map((col) => ({
           ...col,
-          tarefas: tarefas.filter((t: any) => t && t.status === col.status),
+          tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status),
         })),
       );
-    } catch (err: any) {
+    } catch (err) {
       console.error("Erro ao carregar tarefas:", err);
       setError("Não foi possível carregar as tarefas do servidor.");
     } finally {
@@ -138,6 +144,7 @@ export default function DragDropTarefas({
 
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
+
     if (!over) return;
 
     const activeId = active.id.toString();
@@ -148,9 +155,12 @@ export default function DragDropTarefas({
     const colDestinoIdx = colunas.findIndex((c) => c.id === overId);
 
     colunas.forEach((col, idx) => {
-      const t = col.tarefas.find((task) => task.id.toString() === activeId);
-      if (t) {
-        tarefaParaMover = t;
+      const tarefa = col.tarefas.find(
+        (task) => task.id.toString() === activeId,
+      );
+
+      if (tarefa) {
+        tarefaParaMover = tarefa;
         colOrigemIdx = idx;
       }
     });
@@ -159,19 +169,23 @@ export default function DragDropTarefas({
       !tarefaParaMover ||
       colDestinoIdx === -1 ||
       colOrigemIdx === colDestinoIdx
-    )
+    ) {
       return;
+    }
 
     const novoStatus = colunas[colDestinoIdx].status;
 
     const novasColunas = [...colunas];
+
     novasColunas[colOrigemIdx].tarefas = novasColunas[
       colOrigemIdx
     ].tarefas.filter((t) => t.id.toString() !== activeId);
+
     novasColunas[colDestinoIdx].tarefas.push({
       ...tarefaParaMover,
       status: novoStatus,
     });
+
     setColunas(novasColunas);
 
     try {
@@ -267,7 +281,11 @@ export default function DragDropTarefas({
                                 : null,
                             status: tarefa.status,
                           }}
-                          onAddItem={(e) => handleAbrirModalItem(tarefa.id, e)}
+                          onAddItem={
+                            podeGerenciarTodasTarefas
+                              ? (e) => handleAbrirModalItem(tarefa.id, e)
+                              : undefined
+                          }
                         />
                       </div>
                     ))
@@ -278,6 +296,7 @@ export default function DragDropTarefas({
           </div>
         </DndContext>
       </div>
+
       <ModalVisualizarTarefa
         tarefa={tarefaSelecionada}
         isOpen={modalVisualizarAberto}

@@ -11,10 +11,12 @@ export default function TarefasPorProjeto() {
   const { projeto, isLoading } = useProjetoContext();
   const navigate = useNavigate();
   const { user } = useAuth();
+
   const userRoles = user?.roles ?? [];
   const podeGerenciarTodasTarefas =
     userRoles.includes("ROLE_FINANCE") ||
     userRoles.includes("ROLE_GERENTE_PROJETO");
+
   const [nomeResponsavel, setNomeResponsavel] =
     useState<string>("Não informado");
   const [modalItemAberto, setModalItemAberto] = useState<boolean>(false);
@@ -41,6 +43,7 @@ export default function TarefasPorProjeto() {
   }, [projeto]);
 
   const handleSucesso = () => setRefreshKey((prev) => prev + 1);
+
   const abrirModalItem = (tarefaId: number) => {
     setTarefaSelecionadaId(tarefaId);
     setModalItemAberto(true);
@@ -99,6 +102,7 @@ export default function TarefasPorProjeto() {
             </svg>
             Voltar
           </button>
+
           <div className="flex justify-between items-start">
             <div>
               <h1 className="text-2xl font-bold text-white">{projeto.nome}</h1>
@@ -111,6 +115,7 @@ export default function TarefasPorProjeto() {
                 Responsável: {nomeResponsavel}
               </p>
             </div>
+
             {podeGerenciarTodasTarefas && (
               <button
                 onClick={() => setModalTarefaAberto(true)}
@@ -139,22 +144,29 @@ export default function TarefasPorProjeto() {
         <DragDropTarefas
           key={refreshKey}
           projetoId={Number(projeto.id)}
-          onAbrirModalItem={abrirModalItem}
+          onAbrirModalItem={
+            podeGerenciarTodasTarefas ? abrirModalItem : undefined
+          }
+          refreshKey={refreshKey}
         />
 
-        <ModalCadastroItem
-          tarefaId={tarefaSelecionadaId || 0}
-          isOpen={modalItemAberto}
-          onFechar={() => setModalItemAberto(false)}
-          onSucesso={handleSucesso}
-        />
+        {podeGerenciarTodasTarefas && (
+          <ModalCadastroItem
+            tarefaId={tarefaSelecionadaId || 0}
+            isOpen={modalItemAberto}
+            onFechar={() => setModalItemAberto(false)}
+            onSucesso={handleSucesso}
+          />
+        )}
 
-        <ModalCadastroTarefa
-          isOpen={modalTarefaAberto}
-          onFechar={() => setModalTarefaAberto(false)}
-          onSucesso={handleSucesso}
-          projetoIdPadrao={Number(projeto.id)}
-        />
+        {podeGerenciarTodasTarefas && (
+          <ModalCadastroTarefa
+            isOpen={modalTarefaAberto}
+            onFechar={() => setModalTarefaAberto(false)}
+            onSucesso={handleSucesso}
+            projetoIdPadrao={Number(projeto.id)}
+          />
+        )}
       </div>
     </div>
   );
