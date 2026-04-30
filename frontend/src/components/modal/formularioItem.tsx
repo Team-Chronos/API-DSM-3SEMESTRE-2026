@@ -1,5 +1,5 @@
 import { useState } from "react";
-import itemService from "../../types/itemService";
+import tarefaItemAdapter from "../../types/tarefaItemAdapter";
 
 interface Props {
   tarefaId: number;
@@ -34,7 +34,7 @@ export default function ModalCadastroItem({ tarefaId, isOpen, onFechar, onSucess
     }
 
     try {
-      await itemService.criarItem(nome.trim(), descricao.trim(), tarefaId);
+      await tarefaItemAdapter.adicionarItemATarefa(tarefaId, nome.trim(), descricao.trim());
       setNome("");
       setDescricao("");
       onFechar();

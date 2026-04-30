@@ -32,14 +32,14 @@ export default function ModalCadastro({
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
 
   useEffect(() => {
-    if (!aberto) return
+    if (!aberto) return;
 
     profissionaisService
       .listar()
       .then((r) => r.json())
       .then(setProfissionais)
-      .catch((e) => console.error("Erro ao buscar profissionais", e))
-  }, [aberto])
+      .catch((e) => console.error("Erro ao buscar profissionais", e));
+  }, [aberto]);
 
   const handleChange = (field: string, value: string | number) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -60,13 +60,29 @@ export default function ModalCadastro({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     try {
-      const response = await projetoService.criar(formData);
+      const payload = {
+        nome: formData.nome,
+        codigo: formData.codigo,
+        tipoProjeto: formData.tipoProjeto,
+        valorHoraBase: Number(formData.valorHoraBase),
+        horasContratadas:
+          formData.tipoProjeto === "HORA_FECHADA"
+            ? Number(formData.horasContratadas)
+            : null,
+        dataInicio: formData.dataInicio,
+        dataFim: formData.dataFim,
+        responsavelId: Number(formData.responsavelId),
+      };
+
+      const response = await projetoService.criar(payload);
 
       if (!response.ok) {
         alert("Erro ao cadastrar. Verifique os dados.");
         return;
       }
+
       alert("Projeto cadastrado com sucesso!");
       limparForm();
       onProjetoCadastrado?.();
@@ -84,9 +100,14 @@ export default function ModalCadastro({
       subtitulo="Preencha os dados para cadastrar um novo projeto."
       larguraClasse="max-w-2xl"
     >
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2"
+      >
         <div className="md:col-span-2">
-          <label className="mb-1 block font-semibold text-white">Nome do Projeto</label>
+          <label className="mb-1 block font-semibold text-white">
+            Nome do Projeto
+          </label>
           <input
             type="text"
             value={formData.nome}
@@ -96,7 +117,9 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Código do Projeto</label>
+          <label className="mb-1 block font-semibold text-white">
+            Código do Projeto
+          </label>
           <input
             type="text"
             value={formData.codigo}
@@ -119,27 +142,38 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Valor Hora Base</label>
+          <label className="mb-1 block font-semibold text-white">
+            Valor Hora Base
+          </label>
           <input
             type="number"
             value={formData.valorHoraBase}
-            onChange={(e) => handleChange("valorHoraBase", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("valorHoraBase", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Horas Contratadas</label>
+          <label className="mb-1 block font-semibold text-white">
+            Horas Contratadas
+          </label>
           <input
             type="number"
             value={formData.horasContratadas}
-            onChange={(e) => handleChange("horasContratadas", Number(e.target.value))}
-            className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
+            onChange={(e) =>
+              handleChange("horasContratadas", Number(e.target.value))
+            }
+            disabled={formData.tipoProjeto !== "HORA_FECHADA"}
+            className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Data de Início</label>
+          <label className="mb-1 block font-semibold text-white">
+            Data de Início
+          </label>
           <input
             type="date"
             value={formData.dataInicio}
@@ -149,7 +183,9 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Data Fim</label>
+          <label className="mb-1 block font-semibold text-white">
+            Data Fim
+          </label>
           <input
             type="date"
             value={formData.dataFim}
@@ -159,10 +195,14 @@ export default function ModalCadastro({
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block font-semibold text-white">Responsável</label>
+          <label className="mb-1 block font-semibold text-white">
+            Responsável
+          </label>
           <select
             value={formData.responsavelId}
-            onChange={(e) => handleChange("responsavelId", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("responsavelId", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           >
             <option value={0}>Selecione</option>
