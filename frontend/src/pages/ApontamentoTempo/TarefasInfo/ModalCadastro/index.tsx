@@ -54,10 +54,10 @@ function ModalCadastro({
       if (!validarData(form.data_inicio, form.data_fim)) return;
       if (!validarDuracao(calcularDuracao(form.data_inicio, form.data_fim))) return;
     }
-
-    if (!tarefaId) {
-      console.error("Não foi passado tarefaId");
-      return;
+    
+    if (!tarefaId){
+      toast.error("Erro interno: tarefa não identificada")
+      return
     }
 
     const data = {
@@ -75,9 +75,11 @@ function ModalCadastro({
       await reloadTarefas();
       await reloadRegistros();
     } catch (error: any) {
-      console.error("Erro ao enviar formulário", error);
-    }
-  };
+  toast.error(
+    error?.response?.data?.message || "Erro ao enviar formulário"
+  )
+}
+  }
 
   const calcularDuracao = (data_inicio: string | Date, data_fim: string | Date): number => {
     return Math.round((new Date(data_fim).getTime() - new Date(data_inicio).getTime()) / 60000);

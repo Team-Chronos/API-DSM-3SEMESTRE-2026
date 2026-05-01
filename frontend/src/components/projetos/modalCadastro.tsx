@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
 import { projetoService, profissionaisService } from "../../services/gateway";
+import { toastPromise, toastError } from "../../utils/toastUtils";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -79,16 +80,17 @@ export default function ModalCadastro({
       const response = await projetoService.criar(payload);
 
       if (!response.ok) {
-        alert("Erro ao cadastrar. Verifique os dados.");
+        toastError("Erro ao cadastrar. Verifique os dados.");
         return;
       }
 
-      alert("Projeto cadastrado com sucesso!");
+      toastError("Projeto cadastrado com sucesso!");
       limparForm();
       onProjetoCadastrado?.();
       onFechar();
     } catch (error) {
       console.error("Erro na requisição:", error);
+      toastError("Erro ao cadastrar projeto. Tente novamente.");
     }
   };
 

@@ -3,6 +3,7 @@ import { ApiTarefas } from "../../service/servicoApi";
 import projetoService from "../../types/projetoService";
 import profissionalService from "../../types/profissionalService";
 import type { Projeto1 } from "../../types/projetoService";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 
 interface Props {
   isOpen: boolean;
@@ -60,7 +61,7 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
       }
     } catch (err) {
       console.error("Erro ao carregar dados:", err);
-      setErro("Erro ao carregar dados necessários. Tente novamente.");
+      toastError("Erro ao carregar dados. Tente novamente.");
     } finally {
       setCarregandoDados(false);
     }
@@ -73,8 +74,15 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
       try {
         const projeto = await projetoService.buscarPorId(Number(id));
         setProjetoSelecionado(projeto || null);
-        setResponsavelId(projeto?.responsavelId ? String(projeto.responsavelId) : "");
-      } catch {
+
+        if (projeto?.responsavelId) {
+          setResponsavelId(String(projeto.responsavelId));
+        } else {
+          setResponsavelId("");
+        }
+      } catch (err) {
+        console.error("Erro ao buscar detalhes do projeto:", err);
+        toastError("Erro ao carregar projeto.");
         setProjetoSelecionado(null);
         setResponsavelId("");
       }
@@ -109,33 +117,33 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
     setCarregando(true);
 
     if (!titulo.trim()) {
-      setErro("Título é obrigatório");
+      toastError("Título é obrigatório");
       setCarregando(false);
       return;
     }
     if (!descricao.trim()) {
-      setErro("Descrição é obrigatória");
+      toastError("Descrição é obrigatória");
       setCarregando(false);
       return;
     }
     if (!prazo) {
-      setErro("Prazo (minutos) é obrigatório");
+      toastError("Prazo (minutos) é obrigatório");
       setCarregando(false);
       return;
     }
     const minutos = Number(prazo);
     if (isNaN(minutos) || minutos <= 0) {
-      setErro("Prazo deve ser um número válido em minutos (ex: 30, 60, 120)");
+      toastError("Prazo deve ser um número válido em minutos (ex: 30, 60, 120)");
       setCarregando(false);
       return;
     }
     if (!tipoId) {
-      setErro("Selecione um tipo de tarefa");
+      toastError("Selecione um tipo de tarefa");
       setCarregando(false);
       return;
     }
     if (!projetoId) {
-      setErro("Selecione um projeto");
+      toastError("Selecione um projeto");
       setCarregando(false);
       return;
     }
@@ -152,16 +160,23 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
 
     try {
       await ApiTarefas.post("/tarefas/tarefas", novaTarefa);
+      
+      toastSuccess("Tarefa criada com sucesso!");
       resetForm();
       onFechar();
       if (onSucesso) onSucesso();
     } catch (err: any) {
       console.error("Erro ao criar tarefa:", err);
       let mensagemErro = "Erro ao criar tarefa. Tente novamente.";
-      if (err.response?.data?.message) mensagemErro = err.response.data.message;
-      else if (err.response?.data?.errors) mensagemErro = Object.values(err.response.data.errors).join("\n");
-      else if (err.message) mensagemErro = err.message;
-      setErro(mensagemErro);
+      if (err.response?.data?.message) {
+        mensagemErro = err.response.data.message;
+      } else if (err.response?.data?.errors) {
+        mensagemErro = Object.values(err.response.data.errors).join("\n");
+      } else if (err.message) {
+        mensagemErro = err.message;
+      }
+      
+      toastError(mensagemErro);
     } finally {
       setCarregando(false);
     }
@@ -191,12 +206,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
             &times;
           </button>
         </div>
-
-        {erro && (
-          <div className="mb-4 p-3 bg-red-500 text-white rounded whitespace-pre-wrap">
-            <strong>Erro:</strong><br />{erro}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <div>

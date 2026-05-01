@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
+import { toastError } from "../../utils/toastUtils";
 
 interface Projeto {
   id: number;
@@ -86,6 +87,7 @@ function Projetos() {
     } catch (err) {
       console.error("Erro ao carregar dados:", err);
       setErro(err instanceof Error ? err.message : "Falha ao carregar dados");
+      toastError("Erro ao carregar projetos. Tente novamente.");
     } finally {
       setLoading(false);
     }

@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import type { User } from '../types/usuario';
+import { toastError } from "../utils/toastUtils";
 
 type AuthContextType = {
   user?: User;
@@ -79,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(decodedUser);
       return true;
     } catch (error) {
-      console.error('Erro no login:', error);
+      toastError('Erro no login:', error);
       return false;
     }
   }

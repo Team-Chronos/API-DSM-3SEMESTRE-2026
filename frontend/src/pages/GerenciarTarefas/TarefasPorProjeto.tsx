@@ -6,6 +6,7 @@ import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
 import { useProjetoContext } from "../../contexts/ProjetoContext";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
+import { toastError } from "../../utils/toastUtils";
 
 export default function TarefasPorProjeto() {
   const { projeto, isLoading } = useProjetoContext();

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import logoGSW from "../../assets/inteiro.png";
 import { Eye, EyeOff } from "lucide-react";
+import { toastError } from "../../utils/toastUtils";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -29,6 +30,8 @@ function Login() {
     }
     setMensagem({ tipo: "erro", texto: "Email ou senha inválidos" });
     setTimeout(() => setMensagem(null), 3000);
+
+    toastError("Email ou senha inválidos");
   };
 
   return (

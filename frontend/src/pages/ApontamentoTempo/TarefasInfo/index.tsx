@@ -1,4 +1,3 @@
-// src/pages/ApontamentoTempo/TarefasInfo/index.tsx
 import { useEffect, useState } from "react";
 import type { Tarefa } from "../../../types/tarefa";
 import type { RegistroHorasTarefa } from "../../../types/registroTempo";
@@ -8,6 +7,7 @@ import ModalCadastro from "./ModalCadastro";
 import apiApontamento from "../../../services/apiApontamento";
 import type { TipoTarefa } from "../../../types/tipoTarefa";
 import { getNomeTipoTarefa } from "..";
+import { toastError } from "../../../utils/toastUtils"
 
 interface TarefasInfoProps {
   tarefa: Tarefa;
@@ -22,12 +22,13 @@ function TarefasInfo({ tarefa, item, tiposTarefa, setTarefa, reloadTarefas }: Ta
   const [porcentagemTempo, setPorcentagemTempo] = useState<number>(0);
   const [modalCadastro, setModalCadastro] = useState<boolean>(false);
 
-  async function buscarRegistroHorasTarefa() {
-    try {
-      const response = await apiApontamento.get<RegistroHorasTarefa>("/registros/tarefa/" + tarefa.id);
-      setRegistroHorasTarefa(response.data);
-    } catch (error: any) {
-      console.error("Erro ao buscar registro de horas da tarefa");
+    async function buscarRegistroHorasTarefa() {
+        try {
+            const response = await apiApontamento.get<RegistroHorasTarefa>("/registros/tarefa/" + tarefa.id)
+            setRegistroHorasTarefa(response.data)
+        } catch (error: any) {
+            toastError("Erro ao buscar registro de horas da tarefa")
+        }
     }
   }
 

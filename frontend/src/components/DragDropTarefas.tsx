@@ -16,6 +16,7 @@ import ModalVisualizarTarefa from "./Modal/ModalVisualizarTarefa";
 import type { Profissional } from "../types/profissionalService";
 import { useAuth } from "../contexts/AuthContext";
 
+import { toastError } from '../utils/toastUtils';
 
 interface Tarefa {
   id: number;
@@ -130,14 +131,15 @@ export default function DragDropTarefas({
         tempoMaximoMinutos: t.tempoMaximoMinutos,
       }));
 
-      setColunas((prev) =>
-        prev.map((col) => ({
-          ...col,
-          tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status),
-        })),
-      );
-    } catch (err) {
-      console.error("Erro ao carregar tarefas:", err);
+      console.log(`Tarefas carregadas para projeto ${projetoId}:`, tarefas.length);
+
+      setColunas(prev => prev.map(col => ({
+        ...col,
+        tarefas: tarefas.filter((t: Tarefa) => t && t.status === col.status)
+      })));
+
+    } catch (err: any) {
+      toastError("Erro ao carregar tarefas. Tente novamente.");
       setError("Não foi possível carregar as tarefas do servidor.");
     } finally {
       setLoading(false);
@@ -199,7 +201,7 @@ export default function DragDropTarefas({
         },
       );
     } catch (err) {
-      console.error("Erro ao atualizar status:", err);
+      toastError("Erro ao atualizar status da tarefa. Tente novamente.");
       await carregarTarefas();
     }
   };
