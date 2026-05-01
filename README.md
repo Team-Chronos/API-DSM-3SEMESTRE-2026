@@ -112,83 +112,53 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 - Java JDK 21 ou superior
 - Node.js
-- Git
-- Variáveis de ambiente configuradas para acesso ao banco
+- Git (para clonar o repositório)
+- Docker (e Docker Compose, rodando em segundo plano)
+- Ambiente Windows (recomendado para a execução direta do script .bat)
 
-### Clonando os repositórios dos micro-serviços
+### Passo a Passo de Instalação e Execução
+#### 1. Clonar o repositório principal
 
-- Serviço Login
+Abra o terminal na pasta onde deseja salvar o projeto e execute o comando abaixo para baixar todo o ecossistema da aplicação:
+
 ```bash
-git clone https://github.com/Team-Chronos/API3-servico-login
-cd API3-servico-login
-```
-iniciar src/main/java/br/com/chronos/servicologin/AplicacaoServicoLogin.java
-
-- Serviço Gestão Tarefas
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-gestao-tarefas
-cd API3-servico-login
-```
-iniciar criarTarefas/criarTarefas/src/main/java/com/criarTarefas/criarTarefas/Application.java
-
-- Serviço Gateway
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-auth-gateway
-cd API3-servico-login
-```
-iniciar gateway/src/test/java/com/api/gateway/GatewayApplicationTests.java
-
-- Serviço Gestão de Horas
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-gestao-horas
-cd API3-servico-login
-```
-iniciar controle-horas/src/main/java/com/api/controle_horas/ControleHorasApplication.java
-
-- Serviço Gestão de Projetos
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-gestao-projetos
-cd API3-servico-login
-```
-iniciar projeto/src/main/java/com/api/projeto/ProjetoApplication.java
-
-- Serviço Gestão de Profissionais
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-gestao-profissionais
-cd API3-servico-login
-```
-iniciar profissionais/src/main/java/br/com/chronos/profissionais/MsProfissionaisApplication.java
-
-- Serviço Gestão do Financeiro
-```bash
-git clone https://github.com/Team-Chronos/API3-servico-gestao-financeiro
-cd API3-servico-login
-```
-iniciar src/main/java/com/api/financeiro/FinanceiroApplication.java
-
-## Configuração do Frontend
-
-1. Clonar o Repositório
-```bash
-git clone https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026
+git clone https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git
 cd API-DSM-3SEMESTRE-2026
 ```
 
-2. Instalar dependências
+#### 2. Iniciar os serviços
+
+Com o Docker aberto e rodando em sua máquina, basta executar o script de inicialização. Esse script se encarregará de baixar as imagens, criar os contêineres, subir o banco de dados e iniciar todos os microsserviços simultaneamente.
+
+No terminal, execute:
+
 ```bash
-npm install
+Start.bat
 ```
 
-3. Executar o projeto
-```bash
-cd frontend
-npm run dev
+(Alternativamente, você pode navegar até a pasta do projeto pelo Explorador de Arquivos e dar um duplo clique no arquivo start.bat).
+
+#### 3. Acessar o sistema
+
+Aguarde alguns instantes até que todos os contêineres do Docker terminem de subir. Após a inicialização completa, o frontend da aplicação estará disponível no seu navegador no seguinte endereço:
+
+```
+http://localhost
 ```
 
-A aplicação deverá rodar em:
-```
-http://localhost:5173
-```
+## Perfis de Acesso e Usuários de Teste
+
+O sistema possui controle de acesso baseado em cargos (`cargo_id`). Dependendo do nível de acesso do usuário logado, diferentes menus e funcionalidades serão liberados.
+
+Para testar as funcionalidades da aplicação, utilize as credenciais recomendadas abaixo:
+
+| `cargo_id` | Perfil de Acesso | Permissões no Sistema | Credenciais de Teste Recomendadas |
+| :---: | :--- | :--- | :--- |
+| **1** | **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@dev`<br>**Senha:** `dev` |
+| **2** | **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `enrico@gsw.com`<br>**Senha:** `testecors` |
+| **3** | **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `renato@email.com`<br>**Senha:** `renato` |
+
+*(Nota: Caso as senhas hash não estejam descriptografadas no banco de testes local, utilize os usuários acima que possuem senhas simples já configuradas na base).*
 
 ---
 
