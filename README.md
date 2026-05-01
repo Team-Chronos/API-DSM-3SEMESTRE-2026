@@ -106,57 +106,53 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ---
 
-## Manual de Instalação <a id="instalacao"></a>
+## 📖 Manual de Instalação <a id="instalacao"></a>
 
-### Pré-requisitos
+### ⚙️ Pré-requisitos
 
-- Java JDK 21 ou superior
-- Node.js
-- Git (para clonar o repositório)
-- Docker (e Docker Compose, rodando em segundo plano)
-- Ambiente Windows (recomendado para a execução direta do script .bat)
+Para rodar a aplicação localmente, certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
+- 📦 **Git** (para clonar o repositório)
+- 🐳 **Docker** (e Docker Compose, rodando em segundo plano)
+- 🪟 **Ambiente Windows** (recomendado para a execução direta do script `.bat`)
 
-### Passo a Passo de Instalação e Execução
-#### 1. Clonar o repositório principal
+---
 
+## 🚀 Passo a Passo de Instalação e Execução
+### 1. 📥 Clonar o repositório principal
 Abra o terminal na pasta onde deseja salvar o projeto e execute o comando abaixo para baixar todo o ecossistema da aplicação:
-
 ```bash
-git clone https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git
+git clone [https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git](https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git)
 cd API-DSM-3SEMESTRE-2026
 ```
 
-#### 2. Iniciar os serviços
-
+### 2. ▶️ Iniciar os serviços
 Com o Docker aberto e rodando em sua máquina, basta executar o script de inicialização. Esse script se encarregará de baixar as imagens, criar os contêineres, subir o banco de dados e iniciar todos os microsserviços simultaneamente.
 
 No terminal, execute:
-
-```bash
+```cmd
 Start.bat
 ```
+*(Alternativamente, você pode navegar até a pasta do projeto pelo Explorador de Arquivos e dar um duplo clique no arquivo `Start.bat`).*
 
-(Alternativamente, você pode navegar até a pasta do projeto pelo Explorador de Arquivos e dar um duplo clique no arquivo start.bat).
-
-#### 3. Acessar o sistema
-
+### 3. 🌐 Acessar o sistema
 Aguarde alguns instantes até que todos os contêineres do Docker terminem de subir. Após a inicialização completa, o frontend da aplicação estará disponível no seu navegador no seguinte endereço:
-
-```
+```text
 http://localhost
 ```
 
-## Perfis de Acesso e Usuários de Teste
+---
+
+## 👥 Perfis de Acesso e Usuários de Teste
 
 O sistema possui controle de acesso baseado em cargos (`cargo_id`). Dependendo do nível de acesso do usuário logado, diferentes menus e funcionalidades serão liberados.
 
 Para testar as funcionalidades da aplicação, utilize as credenciais recomendadas abaixo:
 
-| `cargo_id` | Perfil de Acesso | Permissões no Sistema | Credenciais de Teste Recomendadas |
+| 🆔 `cargo_id` | 👤 Perfil de Acesso | 🔐 Permissões no Sistema | 🔑 Credenciais de Teste Recomendadas |
 | :---: | :--- | :--- | :--- |
-| **1** | **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@dev`<br>**Senha:** `dev` |
-| **2** | **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `enrico@gsw.com`<br>**Senha:** `testecors` |
-| **3** | **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `renato@email.com`<br>**Senha:** `renato` |
+| **1** | 💻 **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@dev`<br>**Senha:** `dev` |
+| **2** | 📊 **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `enrico@gsw.com`<br>**Senha:** `testecors` |
+| **3** | 💰 **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `renato@email.com`<br>**Senha:** `renato` |
 
 *(Nota: Caso as senhas hash não estejam descriptografadas no banco de testes local, utilize os usuários acima que possuem senhas simples já configuradas na base).*
 
