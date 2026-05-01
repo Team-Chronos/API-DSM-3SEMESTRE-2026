@@ -1,31 +1,19 @@
-import Axios from "axios";
+import axios, { type AxiosInstance } from "axios";
 
-export const ApiTarefas = Axios.create({
-  baseURL: "http://localhost:8089",
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-<<<<<<< Updated upstream
-export const ApiUsuarios = Axios.create({
-  baseURL: "http://localhost:8089", 
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-=======
-import type { AxiosInstance } from "axios";
+const PROXY_BASE = "/api";
 
 const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
   client.interceptors.request.use(
     (config) => {
       const token = localStorage.getItem("token");
-      if (token && config.headers) config.headers.Authorization = `Bearer ${token}`;
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
       return config;
     },
     (error) => Promise.reject(error)
   );
+
   client.interceptors.response.use(
     (response) => response,
     (error) => {
@@ -36,15 +24,20 @@ const setupInterceptors = (client: AxiosInstance): AxiosInstance => {
       return Promise.reject(error);
     }
   );
+
   return client;
 };
->>>>>>> Stashed changes
 
-export const ApiResponsaveis = Axios.create({
-  baseURL: "http://localhost:8081",
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+export const ApiGateway = setupInterceptors(
+  axios.create({
+    baseURL: PROXY_BASE,
+    headers: { "Content-Type": "application/json" },
+  })
+);
 
-export default ApiTarefas;
+export const ApiTarefas = ApiGateway;
+export const ApiProjeto = ApiGateway;
+export const ApiLogin = ApiGateway;
+export const ApiProfissionais = ApiGateway;
+
+export default ApiGateway;
