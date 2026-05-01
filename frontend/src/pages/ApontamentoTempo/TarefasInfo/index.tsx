@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import type { Tarefa } from "../../../types/tarefa";
 import type { RegistroHorasTarefa } from "../../../types/registroTempo";
 import type { Item } from "../../../types/item";
-import TabelaRegistroHoras from "./TabelaRegistroHoras";
-import ModalCadastro from "./ModalCadastro";
 import apiApontamento from "../../../services/apiApontamento";
 import type { TipoTarefa } from "../../../types/tipoTarefa";
+import { toastError } from "../../../utils/toastUtils";
+import TabelaRegistroHoras from "./TabelaRegistroHoras";
 import { getNomeTipoTarefa } from "..";
-import { toastError } from "../../../utils/toastUtils"
+import ModalCadastro from "./ModalCadastro";
 
 interface TarefasInfoProps {
   tarefa: Tarefa;
@@ -22,13 +22,14 @@ function TarefasInfo({ tarefa, item, tiposTarefa, setTarefa, reloadTarefas }: Ta
   const [porcentagemTempo, setPorcentagemTempo] = useState<number>(0);
   const [modalCadastro, setModalCadastro] = useState<boolean>(false);
 
-    async function buscarRegistroHorasTarefa() {
-        try {
-            const response = await apiApontamento.get<RegistroHorasTarefa>("/registros/tarefa/" + tarefa.id)
-            setRegistroHorasTarefa(response.data)
-        } catch (error: any) {
-            toastError("Erro ao buscar registro de horas da tarefa")
-        }
+  async function buscarRegistroHorasTarefa() {
+    try {
+      const response = await apiApontamento.get<RegistroHorasTarefa>(
+        "/registros/tarefa/" + tarefa.id,
+      );
+      setRegistroHorasTarefa(response.data);
+    } catch (error: any) {
+      toastError("Erro ao buscar registro de horas da tarefa");
     }
   }
 

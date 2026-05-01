@@ -6,7 +6,6 @@ import ModalCadastroTarefa from "../../components/Modal/formularioTarefas";
 import { useProjetoContext } from "../../contexts/ProjetoContext";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
-import { toastError } from "../../utils/toastUtils";
 
 export default function TarefasPorProjeto() {
   const { projeto, isLoading } = useProjetoContext();
@@ -15,26 +14,20 @@ export default function TarefasPorProjeto() {
 
   const userRoles = user?.roles ?? [];
   const podeGerenciarTodasTarefas =
-    userRoles.includes("ROLE_FINANCE") ||
-    userRoles.includes("ROLE_GERENTE_PROJETO");
+    userRoles.includes("ROLE_FINANCE") || userRoles.includes("ROLE_GERENTE_PROJETO");
 
-  const [nomeResponsavel, setNomeResponsavel] =
-    useState<string>("Não informado");
+  const [nomeResponsavel, setNomeResponsavel] = useState<string>("Não informado");
   const [modalItemAberto, setModalItemAberto] = useState<boolean>(false);
   const [modalTarefaAberto, setModalTarefaAberto] = useState<boolean>(false);
   const [refreshKey, setRefreshKey] = useState<number>(0);
-  const [tarefaSelecionadaId, setTarefaSelecionadaId] = useState<number | null>(
-    null,
-  );
+  const [tarefaSelecionadaId, setTarefaSelecionadaId] = useState<number | null>(null);
 
   useEffect(() => {
     if (projeto?.responsavelId) {
       profissionalService
         .listarTodos()
         .then((profissionais) => {
-          const responsavel = profissionais.find(
-            (p) => p.id === projeto.responsavelId,
-          );
+          const responsavel = profissionais.find((p) => p.id === projeto.responsavelId);
           setNomeResponsavel(responsavel?.nome || "Não informado");
         })
         .catch(() => setNomeResponsavel("Erro ao carregar"));
@@ -88,12 +81,7 @@ export default function TarefasPorProjeto() {
             onClick={() => navigate("/projetos")}
             className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -108,13 +96,9 @@ export default function TarefasPorProjeto() {
             <div>
               <h1 className="text-2xl font-bold text-white">{projeto.nome}</h1>
               {projeto.codigo && (
-                <p className="text-gray-500 text-sm mt-1">
-                  Código: {projeto.codigo}
-                </p>
+                <p className="text-gray-500 text-sm mt-1">Código: {projeto.codigo}</p>
               )}
-              <p className="text-gray-500 text-sm mt-1">
-                Responsável: {nomeResponsavel}
-              </p>
+              <p className="text-gray-500 text-sm mt-1">Responsável: {nomeResponsavel}</p>
             </div>
 
             {podeGerenciarTodasTarefas && (
@@ -123,12 +107,7 @@ export default function TarefasPorProjeto() {
                 className="text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
                 style={{ backgroundColor: "#3e3e3e" }}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -145,9 +124,7 @@ export default function TarefasPorProjeto() {
         <DragDropTarefas
           key={refreshKey}
           projetoId={Number(projeto.id)}
-          onAbrirModalItem={
-            podeGerenciarTodasTarefas ? abrirModalItem : undefined
-          }
+          onAbrirModalItem={podeGerenciarTodasTarefas ? abrirModalItem : undefined}
           refreshKey={refreshKey}
         />
 

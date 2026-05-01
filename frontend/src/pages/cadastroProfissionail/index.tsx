@@ -6,14 +6,7 @@ import {
   type ProjetoVinculoPayload,
 } from "../../services/profissionaisApi";
 
-import {
-  BriefcaseBusiness,
-  ChevronDown,
-  Eye,
-  EyeOff,
-  Search,
-  UserPlus,
-} from "lucide-react";
+import { BriefcaseBusiness, ChevronDown, Eye, EyeOff, Search, UserPlus } from "lucide-react";
 import { toastError, toastSuccess } from "../../utils/toastUtils";
 
 const CARGOS = [
@@ -35,7 +28,6 @@ function CadastroProfissional() {
   const [projetosSelecionados, setProjetosSelecionados] = useState<Record<number, string>>({});
   const [carregandoProjetos, setCarregandoProjetos] = useState(false);
   const [salvando, setSalvando] = useState(false);
-  const [mensagem, setMensagem] = useState("");
 
   useEffect(() => {
     const carregarProjetos = async () => {
@@ -45,8 +37,7 @@ function CadastroProfissional() {
         const projetos = await listarProjetos();
         setProjetosDisponiveis(projetos);
       } catch (error) {
-        const mensagemErro =
-          error instanceof Error ? error.message : "Erro ao carregar projetos.";
+        const mensagemErro = error instanceof Error ? error.message : "Erro ao carregar projetos.";
         toastError(mensagemErro);
       } finally {
         setCarregandoProjetos(false);
@@ -59,9 +50,9 @@ function CadastroProfissional() {
   const projetosFiltrados = useMemo(
     () =>
       projetosDisponiveis.filter((projeto) =>
-        `${projeto.nome} ${projeto.codigo}`.toLowerCase().includes(busca.toLowerCase())
+        `${projeto.nome} ${projeto.codigo}`.toLowerCase().includes(busca.toLowerCase()),
       ),
-    [busca, projetosDisponiveis]
+    [busca, projetosDisponiveis],
   );
 
   const totalProjetosSelecionados = Object.keys(projetosSelecionados).length;
@@ -105,12 +96,12 @@ function CadastroProfissional() {
       return;
     }
 
-    const projetosPayload: ProjetoVinculoPayload[] = Object.entries(
-      projetosSelecionados
-    ).map(([projetoId, valorHora]) => ({
-      projetoId: Number(projetoId),
-      valorHora: Number(valorHora),
-    }));
+    const projetosPayload: ProjetoVinculoPayload[] = Object.entries(projetosSelecionados).map(
+      ([projetoId, valorHora]) => ({
+        projetoId: Number(projetoId),
+        valorHora: Number(valorHora),
+      }),
+    );
 
     try {
       setSalvando(true);
@@ -154,9 +145,7 @@ function CadastroProfissional() {
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                Resumo
-              </p>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Resumo</p>
               <p className="text-sm font-medium text-white">
                 {totalProjetosSelecionados} projeto(s) selecionado(s)
               </p>
@@ -302,7 +291,8 @@ function CadastroProfissional() {
                       <div>
                         <p className="text-sm font-medium text-white">Conferiu os dados?</p>
                         <p className="text-sm text-slate-400">
-                          Os campos principais são obrigatórios. Os projetos podem ser vinculados agora ou depois.
+                          Os campos principais são obrigatórios. Os projetos podem ser vinculados
+                          agora ou depois.
                         </p>
                       </div>
 

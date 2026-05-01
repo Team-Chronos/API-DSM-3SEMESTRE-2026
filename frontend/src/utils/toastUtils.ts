@@ -40,15 +40,15 @@ export const toastInfo = (message: string, options?: ToastOptions) => {
 /**
  * Executa uma promise com notificações de loading, sucesso e erro
  */
-export const toastPromise = <T,>(
-  promise: Promise<T>,
+export const toastPromise = (
+  promise: Promise<unknown>,
   messages: {
     pending: string;
     success: string;
     error: string;
   },
   options?: ToastOptions
-): Promise<T> => {
+): Promise<unknown> => {
   return toast.promise(promise, messages, { ...defaultOptions, ...options });
 };
 
