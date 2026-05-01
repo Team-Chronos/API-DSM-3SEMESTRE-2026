@@ -278,54 +278,30 @@ function Projetos() {
 
   return (
     <div className="p-6">
-      <div className="mb-6 flex justify-between items-center">
+      <div className="mb-6 flex flex-wrap justify-between items-center gap-2">
         <h1 className="text-2xl font-semibold text-white">Projetos</h1>
-        <div className="flex gap-2">
-        <div className="flex items-center gap-2">
-          <div className="relative">
-            <input
-              type="text"
-              value={busca}
-              onChange={(e) => setBusca(e.target.value)}
-              placeholder="Pesquisar projeto..."
-              className="w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          <button
-            onClick={() => setModalAberto(true)}
-            className="cursor-pointer rounded-lg bg-gradient-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 font-medium text-white shadow-lg transition hover:scale-[1.03] hover:brightness-110"
-          >
-            + Novo
-          </button>
-        <div className="flex flex-col md:flex-row md:items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <input
             type="text"
-            placeholder="Pesquisar..."
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
-            className="w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white"
+            placeholder="Pesquisar projeto..."
+            className="w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-
           {podeGerenciarProjetos && (
-            onChange={e => setBusca(e.target.value)}
-            className="w-full md:w-64 rounded-lg bg-[#2a2a2c] px-3 py-2 text-white"
-          />
-          <div className="flex flex-wrap gap-2">
             <button
               onClick={gerarRelatorioPdf}
               className="rounded-lg bg-[#4a1898] px-4 py-2 text-white hover:bg-[#5f24c9]"
             >
               Gerar relatório PDF
             </button>
-            <button
-              onClick={() => setModalAberto(true)}
-              className="rounded-lg bg-linear-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 text-white"
-            >
-              + Novo
-            </button>
           )}
-          </div>
+          <button
+            onClick={() => setModalAberto(true)}
+            className="cursor-pointer rounded-lg bg-gradient-to-b from-[#6627cc] to-[#4a1898] px-4 py-2 font-medium text-white shadow-lg transition hover:scale-[1.03] hover:brightness-110"
+          >
+            + Novo
+          </button>
         </div>
       </div>
 
