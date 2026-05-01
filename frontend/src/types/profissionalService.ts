@@ -1,4 +1,4 @@
-import { ApiResponsaveis } from "../service/servicoApi";
+import { ApiProfissionais } from "../service/servicoApi";
 
 export interface Profissional {
   id: number;
@@ -7,41 +7,37 @@ export interface Profissional {
   ativo?: boolean;
 }
 
+export interface ProjetoVinculado {
+  id?: number;
+  projetoId?: number;
+  nome?: string;
+  codigo?: string;
+  responsavelId?: number;
+}
+
 class ProfissionalService {
   async listarTodos(): Promise<Profissional[]> {
     try {
-      // Endpoint que retorna todos os profissionais com id e nome
-      const response = await ApiResponsaveis.get("/api/profissionais");
-      
-      console.log("Resposta do microsserviço:", response.data);
-      
-      if (response.data && Array.isArray(response.data)) {
-        // Mapeia para garantir que só temos id e nome
-        return response.data.map((item: any) => ({
-          id: item.id,
-          nome: item.nome,
-          email: item.email,
-          ativo: item.ativo
-        }));
-      }
-      return [];
+      const response = await ApiProfissionais.get(
+        "/profissionais/api/profissionais",
+      );
+      return response.data || [];
     } catch (error) {
       console.error("Erro ao buscar profissionais:", error);
       return [];
     }
   }
 
-  // Método específico para buscar apenas nomes (se o endpoint /nomes existir)
-  async listarNomes(): Promise<Profissional[]> {
+  async listarProjetosVinculados(
+    usuarioId: number,
+  ): Promise<ProjetoVinculado[]> {
     try {
-      const response = await ApiResponsaveis.get("/api/profissionais/nomes");
-      
-      if (response.data && Array.isArray(response.data)) {
-        return response.data;
-      }
-      return [];
+      const response = await ApiProfissionais.get(
+        `/profissionais/api/profissionais/${usuarioId}/projetos`,
+      );
+      return Array.isArray(response.data) ? response.data : [];
     } catch (error) {
-      console.warn("Erro ao buscar nomes dos profissionais:", error);
+      console.error("Erro ao buscar projetos vinculados:", error);
       return [];
     }
   }

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import SemConteudo from "../ui/SemConteudo";
 import Search from "../ui/Search";
 import ModalDetalheProfissional from "../modais/ModalDetalheProfissional";
@@ -6,6 +6,8 @@ import type { ProfissionalGanhos } from "../../types/financeiro";
 
 interface ListaProfissionaisProps {
   profissionais: ProfissionalGanhos[];
+  buscaExterna?: string;
+  onBuscaExternaChange?: (valor: string) => void;
 }
 
 function formatarMoeda(valor: number): string {
@@ -32,13 +34,18 @@ function formatarHoras(valor: number): string {
   return `${horas}h${String(minutos).padStart(2, "0")}m`;
 }
 
-export default function ListaProfissionais({
+function ListaProfissionais({
   profissionais,
+  buscaExterna,
+  onBuscaExternaChange,
 }: ListaProfissionaisProps) {
   const [buscaAberta, setBuscaAberta] = useState(false);
-  const [busca, setBusca] = useState("");
+  const [buscaInterna, setBuscaInterna] = useState("");
   const [profissionalSelecionado, setProfissionalSelecionado] =
     useState<ProfissionalGanhos | null>(null);
+
+  const busca = buscaExterna ?? buscaInterna;
+  const atualizarBusca = onBuscaExternaChange ?? setBuscaInterna;
 
   const profissionaisFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -54,6 +61,18 @@ export default function ListaProfissionais({
       );
     });
   }, [profissionais, busca]);
+
+  const profissionaisComHoras = useMemo(
+    () =>
+      profissionaisFiltrados.map((profissional) => ({
+        profissional,
+        horasTotais: profissional.projetos.reduce(
+          (acumulador, projeto) => acumulador + projeto.horasTrabalhadas,
+          0
+        ),
+      })),
+    [profissionaisFiltrados]
+  );
 
   return (
     <>
@@ -106,7 +125,7 @@ export default function ListaProfissionais({
               >
                 <Search
                   value={busca}
-                  onChange={setBusca}
+                  onChange={atualizarBusca}
                   placeholder="Buscar por nome ou ID"
                 />
               </div>
@@ -122,13 +141,7 @@ export default function ListaProfissionais({
                 description="Tente outro filtro para localizar profissionais."
               />
             ) : (
-              profissionaisFiltrados.map((profissional) => {
-                const horasTotais = profissional.projetos.reduce(
-                  (acumulador, projeto) =>
-                    acumulador + projeto.horasTrabalhadas,
-                  0
-                );
-
+              profissionaisComHoras.map(({ profissional, horasTotais }) => {
                 return (
                   <button
                     key={profissional.usuarioId}
@@ -184,3 +197,5 @@ export default function ListaProfissionais({
     </>
   );
 }
+
+export default memo(ListaProfissionais);

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 import SemConteudo from "../ui/SemConteudo";
 import Search from "../ui/Search";
 import ModalDetalheProjeto from "../modais/ModalDetalheProjeto";
@@ -7,6 +7,8 @@ import type { ProjetoDetalhe, ProjetoFinanceiro } from "../../types/financeiro";
 
 interface ListaProjetosProps {
   projetos: ProjetoFinanceiro[];
+  buscaExterna?: string;
+  onBuscaExternaChange?: (valor: string) => void;
 }
 
 function formatarMoeda(valor: number): string {
@@ -33,15 +35,22 @@ function formatarHoras(valor: number): string {
   return `${horas}h${String(minutos).padStart(2, "0")}m`;
 }
 
-export default function ListaProjetos({ projetos }: ListaProjetosProps) {
+function ListaProjetos({
+  projetos,
+  buscaExterna,
+  onBuscaExternaChange,
+}: ListaProjetosProps) {
   const [buscaAberta, setBuscaAberta] = useState(false);
-  const [busca, setBusca] = useState("");
+  const [buscaInterna, setBuscaInterna] = useState("");
   const [projetoSelecionado, setProjetoSelecionado] =
     useState<ProjetoDetalhe | null>(null);
   const [carregandoProjetoId, setCarregandoProjetoId] = useState<number | null>(
     null
   );
   const [erroDetalhe, setErroDetalhe] = useState<string | null>(null);
+
+  const busca = buscaExterna ?? buscaInterna;
+  const atualizarBusca = onBuscaExternaChange ?? setBuscaInterna;
 
   const projetosFiltrados = useMemo(() => {
     const termo = busca.trim().toLowerCase();
@@ -131,7 +140,7 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
               >
                 <Search
                   value={busca}
-                  onChange={setBusca}
+                  onChange={atualizarBusca}
                   placeholder="Buscar por nome, tipo ou ID"
                 />
               </div>
@@ -199,3 +208,5 @@ export default function ListaProjetos({ projetos }: ListaProjetosProps) {
     </>
   );
 }
+
+export default memo(ListaProjetos);

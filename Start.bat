@@ -1,0 +1,1 @@
+git submodule sync & git submodule update --init --recursive & git submodule update --remote --recursive & docker compose up --build

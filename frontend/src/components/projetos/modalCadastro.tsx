@@ -1,11 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
+import { projetoService, profissionaisService } from "../../services/gateway";
 import { toastPromise, toastError } from "../../utils/toastUtils";
 
 interface ModalCadastroProps {
   aberto: boolean;
   onFechar: () => void;
   onProjetoCadastrado?: () => void;
+}
+
+interface Profissional {
+  id: number;
+  nome: string;
 }
 
 export default function ModalCadastro({
@@ -24,11 +30,20 @@ export default function ModalCadastro({
     responsavelId: 0,
   });
 
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
+
+  useEffect(() => {
+    if (!aberto) return;
+
+    profissionaisService
+      .listar()
+      .then((r) => r.json())
+      .then(setProfissionais)
+      .catch((e) => console.error("Erro ao buscar profissionais", e));
+  }, [aberto]);
+
   const handleChange = (field: string, value: string | number) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   const limparForm = () => {
@@ -48,25 +63,28 @@ export default function ModalCadastro({
     e.preventDefault();
 
     try {
-      await toastPromise(
-        fetch("http://localhost:8084/projetos", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }).then(async (response) => {
-          if (!response.ok) {
-            throw new Error("Erro ao cadastrar. Verifique os dados.");
-          }
-          return response.json();
-        }),
-        {
-          pending: "Cadastrando projeto...",
-          success: "Projeto cadastrado com sucesso!",
-          error: "Erro ao cadastrar projeto"
-        }
-      );
+      const payload = {
+        nome: formData.nome,
+        codigo: formData.codigo,
+        tipoProjeto: formData.tipoProjeto,
+        valorHoraBase: Number(formData.valorHoraBase),
+        horasContratadas:
+          formData.tipoProjeto === "HORA_FECHADA"
+            ? Number(formData.horasContratadas)
+            : null,
+        dataInicio: formData.dataInicio,
+        dataFim: formData.dataFim,
+        responsavelId: Number(formData.responsavelId),
+      };
+
+      const response = await projetoService.criar(payload);
+
+      if (!response.ok) {
+        toastError("Erro ao cadastrar. Verifique os dados.");
+        return;
+      }
+
+      toastError("Projeto cadastrado com sucesso!");
       limparForm();
       onProjetoCadastrado?.();
       onFechar();
@@ -84,7 +102,10 @@ export default function ModalCadastro({
       subtitulo="Preencha os dados para cadastrar um novo projeto."
       larguraClasse="max-w-2xl"
     >
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 gap-4 md:grid-cols-2"
+      >
         <div className="md:col-span-2">
           <label className="mb-1 block font-semibold text-white">
             Nome do Projeto
@@ -129,7 +150,9 @@ export default function ModalCadastro({
           <input
             type="number"
             value={formData.valorHoraBase}
-            onChange={(e) => handleChange("valorHoraBase", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("valorHoraBase", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
           />
         </div>
@@ -141,8 +164,11 @@ export default function ModalCadastro({
           <input
             type="number"
             value={formData.horasContratadas}
-            onChange={(e) => handleChange("horasContratadas", Number(e.target.value))}
-            className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
+            onChange={(e) =>
+              handleChange("horasContratadas", Number(e.target.value))
+            }
+            disabled={formData.tipoProjeto !== "HORA_FECHADA"}
+            className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed disabled:opacity-50"
           />
         </div>
 
@@ -159,7 +185,9 @@ export default function ModalCadastro({
         </div>
 
         <div>
-          <label className="mb-1 block font-semibold text-white">Data Fim</label>
+          <label className="mb-1 block font-semibold text-white">
+            Data Fim
+          </label>
           <input
             type="date"
             value={formData.dataFim}
@@ -170,14 +198,22 @@ export default function ModalCadastro({
 
         <div className="md:col-span-2">
           <label className="mb-1 block font-semibold text-white">
-            Responsável ID
+            Responsável
           </label>
-          <input
-            type="number"
+          <select
             value={formData.responsavelId}
-            onChange={(e) => handleChange("responsavelId", Number(e.target.value))}
+            onChange={(e) =>
+              handleChange("responsavelId", Number(e.target.value))
+            }
             className="w-full rounded-lg border border-white/10 bg-[#3d3d40] p-3 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
-          />
+          >
+            <option value={0}>Selecione</option>
+            {profissionais.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.nome}
+              </option>
+            ))}
+          </select>
         </div>
 
         <div className="md:col-span-2 flex justify-end gap-3 pt-2">
@@ -191,7 +227,7 @@ export default function ModalCadastro({
 
           <button
             type="submit"
-            className="rounded-xl bg-gradient-to-r from-[#6627cc] to-[#4a1898] px-5 py-3 font-medium text-white transition hover:brightness-110"
+            className="rounded-xl bg-linear-to-r from-[#6627cc] to-[#4a1898] px-5 py-3 font-medium text-white transition hover:brightness-110"
           >
             Adicionar
           </button>
