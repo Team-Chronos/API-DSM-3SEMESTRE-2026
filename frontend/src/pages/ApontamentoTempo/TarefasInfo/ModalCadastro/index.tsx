@@ -37,6 +37,17 @@ function ModalCadastro({
 
   const tempoRestanteMinutos = tempoMaximoMinutos - tempoRegistradoMinutos;
 
+  function limpar() {
+    setForm({
+      data_inicio: "",
+      data_fim: "",
+    });
+    setErroDataInicio(null);
+    setErroDataFim(null);
+    setErroDuracao(null);
+    setDuracaoMinutos(0);
+  }
+
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
@@ -54,10 +65,10 @@ function ModalCadastro({
       if (!validarData(form.data_inicio, form.data_fim)) return;
       if (!validarDuracao(calcularDuracao(form.data_inicio, form.data_fim))) return;
     }
-    
-    if (!tarefaId){
-      toast.error("Erro interno: tarefa não identificada")
-      return
+
+    if (!tarefaId) {
+      toast.error("Erro interno: tarefa não identificada");
+      return;
     }
 
     const data = {
@@ -75,11 +86,11 @@ function ModalCadastro({
       await reloadTarefas();
       await reloadRegistros();
     } catch (error: any) {
-  toast.error(
-    error?.response?.data?.message || "Erro ao enviar formulário"
-  )
-}
-  }
+      toast.error(error?.response?.data?.message || "Erro ao enviar formulário");
+    } finally {
+      limpar()
+    }
+  };
 
   const calcularDuracao = (data_inicio: string | Date, data_fim: string | Date): number => {
     return Math.round((new Date(data_fim).getTime() - new Date(data_inicio).getTime()) / 60000);

@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(decodedUser);
       return true;
     } catch (error) {
-      toastError('Erro no login:', error);
+      toastError(`Erro no login: ${error}`);
       return false;
     }
   }

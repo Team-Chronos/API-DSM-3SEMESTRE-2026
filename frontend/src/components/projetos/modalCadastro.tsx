@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
 import { projetoService, profissionaisService } from "../../services/gateway";
-import { toastPromise, toastError } from "../../utils/toastUtils";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -84,7 +84,7 @@ export default function ModalCadastro({
         return;
       }
 
-      toastError("Projeto cadastrado com sucesso!");
+      toastSuccess("Projeto cadastrado com sucesso!");
       limparForm();
       onProjetoCadastrado?.();
       onFechar();

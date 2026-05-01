@@ -25,7 +25,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
   const [status, setStatus] = useState("PENDENTE");
   const [tipoId, setTipoId] = useState<string>("");
   const [projetoId, setProjetoId] = useState<string>(projetoIdPadrao ? String(projetoIdPadrao) : "");
-  const [erro, setErro] = useState<string | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [tiposTarefa, setTiposTarefa] = useState<TipoTarefa[]>([]);
   const [projetos, setProjetos] = useState<Projeto1[]>([]);
@@ -43,7 +42,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
 
   const carregarDadosIniciais = async () => {
     setCarregandoDados(true);
-    setErro(null);
     try {
       const tiposRes = await ApiTarefas.get("/tarefas/tipoTarefa");
       setTiposTarefa(tiposRes.data || []);
@@ -101,7 +99,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
     setTipoId("");
     if (!projetoIdPadrao) setProjetoId("");
     setProjetoSelecionado(null);
-    setErro(null);
   };
 
   const handleClose = () => {
@@ -113,7 +110,6 @@ export default function ModalCadastroTarefa({ isOpen, onFechar, onSucesso, proje
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErro(null);
     setCarregando(true);
 
     if (!titulo.trim()) {
