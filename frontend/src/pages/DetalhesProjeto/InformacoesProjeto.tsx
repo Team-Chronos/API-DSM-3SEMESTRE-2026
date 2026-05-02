@@ -162,21 +162,38 @@ function InformacoesProjeto() {
   return (
     <>
       <div className="grid grid-cols-3 grid-rows-3 gap-y-4 *:not-first:px-4">
-        <div className="col-span-2 row-span-2 rounded-xl bg-black/21 p-4">
-          <div className="mb-3 flex justify-end">
-            {!isEditando ? (
-              <button
-                type="button"
-                onClick={() => void iniciarEdicao()}
-                className="rounded-lg bg-white/10 px-3 py-1.5 text-sm hover:bg-white/20"
-              >
-                Editar projeto
-              </button>
-            ) : null}
-          </div>
+        <div className="col-span-3 row-span-2 rounded-xl bg-black/21 p-4">
+          {sucessoEdicao ? <p className="mb-3 text-sm text-green-300">{sucessoEdicao}</p> : null}
 
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <span className="text-xs text-white/60">Código</span>
+              <div>{projeto.codigo}</div>
+            </div>
+            <div>
+              <span className="text-xs text-white/60">Nome</span>
+              <div>{projeto.nome}</div>
+            </div>
+            <div>
+              <span className="text-xs text-white/60">Responsável</span>
+              <div>{responsavel?.nome || "carregando..."}</div>
+            </div>
+            <div>
+              <span className="text-xs text-white/60">Data Início</span>
+              <div>{projeto.dataInicio}</div>
+            </div>
+            <div>
+              <span className="text-xs text-white/60">Data Fim</span>
+              <div>{projeto.dataFim}</div>
+            </div>
+            <div>
+              <span className="text-xs text-white/60">Tipo do projeto</span>
+              <div>{projeto.tipoProjeto}</div>
+            </div>
+          </div>
+          
           {isEditando && formProjeto ? (
-            <form onSubmit={salvarEdicao} className="mb-4 grid grid-cols-2 gap-3 rounded-lg bg-white/8 p-3">
+            <form onSubmit={salvarEdicao} className="mt-6 grid grid-cols-2 gap-3 rounded-lg bg-white/8 p-3">
               <div className="col-span-2">
                 <span className="mb-1 block text-xs text-white/60">Nome</span>
                 <input
@@ -307,37 +324,18 @@ function InformacoesProjeto() {
             </form>
           ) : null}
 
-          {sucessoEdicao ? <p className="mb-3 text-sm text-green-300">{sucessoEdicao}</p> : null}
-
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <span className="text-xs text-white/60">Código</span>
-              <div>{projeto.codigo}</div>
-            </div>
-            <div>
-              <span className="text-xs text-white/60">Nome</span>
-              <div>{projeto.nome}</div>
-            </div>
-            <div>
-              <span className="text-xs text-white/60">Responsável</span>
-              <div>{responsavel?.nome || "carregando..."}</div>
-            </div>
-            <div>
-              <span className="text-xs text-white/60">Data Início</span>
-              <div>{projeto.dataInicio}</div>
-            </div>
-            <div>
-              <span className="text-xs text-white/60">Data Fim</span>
-              <div>{projeto.dataFim}</div>
-            </div>
-            <div>
-              <span className="text-xs text-white/60">Tipo do projeto</span>
-              <div>{projeto.tipoProjeto}</div>
-            </div>
+          <div className="mt-4 flex justify-end">
+            {!isEditando ? (
+              <button
+                type="button"
+                onClick={() => void iniciarEdicao()}
+                className="rounded-lg bg-white/10 px-3 py-1.5 text-sm hover:bg-white/20"
+              >
+                Editar projeto
+              </button>
+            ) : null}
           </div>
         </div>
-        {/* <div>coisa1</div>
-        <div>coisa2</div> */}
 
         {isHoraFechada ? (
           <div className="col-span-3 rounded-xl bg-black/21 px-5 py-4 flex flex-col gap-3">
@@ -388,11 +386,6 @@ function InformacoesProjeto() {
           </>
         )}
       </div>
-      <div>coisa1</div>
-      <div>coisa2</div>
-      <div>coisa3</div>
-      <div>coisa4</div>
-      <div>coisa5</div>
     </>
   );
 }

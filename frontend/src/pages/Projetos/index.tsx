@@ -291,7 +291,7 @@ function Projetos() {
           {podeGerenciarProjetos && (
             <button
               onClick={gerarRelatorioPdf}
-              className="rounded-lg bg-[#4a1898] px-4 py-2 text-white hover:bg-[#5f24c9]"
+              className="rounded-lg bg-gradient-to-b from-[#6627cc] to-[#4a1898]  px-4 py-2 text-white transition hover:scale-103 hover:brightness-110"
             >
               Gerar relatório PDF
             </button>
@@ -331,7 +331,7 @@ function Projetos() {
             <div
               key={projeto.id}
               onClick={() => navigate(`/projetos/${projeto.id}`)}
-              className="cursor-pointer rounded-2xl bg-[#2a2a2c] p-4 text-white transition hover:scale-[1.02] hover:border-purple-500"
+              className="cursor-pointer rounded-2xl bg-[#2a2a2c] p-4 text-white transition hover:scale-[1.02] hover:bg-[#7121c6]"
             >
               <h2 className="text-lg font-semibold">{projeto.nome}</h2>
               <p>Código: {projeto.codigo}</p>

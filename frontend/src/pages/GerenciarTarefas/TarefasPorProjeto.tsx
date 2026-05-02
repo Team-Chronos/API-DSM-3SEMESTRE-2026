@@ -64,7 +64,7 @@ export default function TarefasPorProjeto() {
           <strong>Erro:</strong> Projeto não encontrado
         </div>
         <button
-          onClick={() => navigate("/projetos")}
+          onClick={() => navigate(`/projetos/${projeto!.id}`)}
           className="px-4 py-2 bg-blue-500 text-white rounded"
         >
           Voltar para projetos
@@ -78,7 +78,7 @@ export default function TarefasPorProjeto() {
       <div className="p-6">
         <div className="mb-6">
           <button
-            onClick={() => navigate("/projetos")}
+            onClick={() => navigate(`/projetos/${projeto!.id}`)}
             className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

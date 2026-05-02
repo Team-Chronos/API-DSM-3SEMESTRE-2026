@@ -6,8 +6,8 @@ import {
   Users,
   ChevronLeft,
   Link,
-  LogOut,
-  ClipboardList
+  LogOut
+
 } from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
@@ -18,8 +18,7 @@ const ALL_NAV_ITEMS = [
   { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["ROLE_FINANCE"] },
   { to: "/projetos", icon: FolderKanban, label: "Projetos", allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO", "ROLE_USER"] },
   { to: "/profissionais", icon: Users, label: "Profissionais", allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO"] },
-  { to: "/associacoes", icon: Link, label: "Associações", allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO"] },
-  { to: "/tarefas", icon: ClipboardList, label: "Tarefas", allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO", "ROLE_USER"] }
+  { to: "/associacoes", icon: Link, label: "Associações", allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO"] }
 ];
 
 export default function Sidebar() {
