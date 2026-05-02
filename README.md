@@ -150,9 +150,9 @@ Para testar as funcionalidades da aplicação, utilize as credenciais recomendad
 
 | 🆔 `cargo_id` | 👤 Perfil de Acesso | 🔐 Permissões no Sistema | 🔑 Credenciais de Teste Recomendadas |
 | :---: | :--- | :--- | :--- |
-| **1** | 💻 **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@dev`<br>**Senha:** `dev` |
-| **2** | 📊 **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `enrico@gsw.com`<br>**Senha:** `testecors` |
-| **3** | 💰 **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `renato@email.com`<br>**Senha:** `renato` |
+| **1** | 💻 **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@email`<br>**Senha:** `senha123` |
+| **2** | 📊 **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `gerente@email`<br>**Senha:** `senha123` |
+| **3** | 💰 **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `adm@email`<br>**Senha:** `senha123` |
 
 *(Nota: Caso as senhas hash não estejam descriptografadas no banco de testes local, utilize os usuários acima que possuem senhas simples já configuradas na base).*
 
