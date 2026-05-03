@@ -1,7 +1,10 @@
 FROM node:24 AS build
 WORKDIR /app
+
+COPY package*.json ./
+RUN npm install --no-audit --no-fund
+
 COPY . .
-RUN npm install
 RUN npm run build
 
 FROM nginx:alpine

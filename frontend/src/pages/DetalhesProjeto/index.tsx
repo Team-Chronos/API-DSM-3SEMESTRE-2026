@@ -12,9 +12,27 @@ import { carregarProfissionaisPorProjeto } from "../../service/servicoProfission
 import { normalizarTexto } from "../../utils";
 import type { Item } from "../../types/item";
 import type { TipoTarefa } from "../../types/tipoTarefa";
-import { ApiTarefas } from "../../service/servicoApi";
+import { ApiTarefas, ApiProjeto } from "../../service/servicoApi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
+import profissionalService from "../../types/profissionalService";
+import { carregarProfissionalPorId } from "../../service/servicoProfissionais";
+
+type FormProjeto = {
+  nome: string
+  codigo: string
+  tipoProjeto: "HORA_FECHADA" | "ALOCACAO"
+  valorHoraBase: number
+  horasContratadas: number
+  dataInicio: string
+  dataFim: string
+  responsavelId: number
+}
+
+function formatarDataInput(valor: string) {
+  if (!valor) return ""
+  return valor.length >= 10 ? valor.slice(0, 10) : valor
+}
 
 function formatarData(data?: string | null) {
   if (!data) return "Sem data";
@@ -135,6 +153,13 @@ function DetalhesProjeto() {
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [itens, setItens] = useState<Item[]>([]);
   const [loadingDados, setLoadingDados] = useState(false);
+  const [isEditando, setIsEditando] = useState(false);
+  const [salvando, setSalvando] = useState(false);
+  const [erroEdicao, setErroEdicao] = useState<string | null>(null);
+  const [sucessoEdicao, setSucessoEdicao] = useState<string | null>(null);
+  const [responsaveisDisponiveis, setResponsaveisDisponiveis] = useState<Profissional[]>([]);
+  const [formProjeto, setFormProjeto] = useState<FormProjeto | null>(null);
+  const [nomeResponsavelProjeto, setNomeResponsavelProjeto] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadTipos() {
@@ -212,6 +237,25 @@ function DetalhesProjeto() {
 
     load(projetoId);
   }, [projeto?.id, user?.id, podeGerenciarProjetos]);
+
+  useEffect(() => {
+    async function loadResponsavelProjeto() {
+      if (!projeto?.responsavelId) {
+        setNomeResponsavelProjeto(null);
+        return;
+      }
+
+      try {
+        const responsavel = await carregarProfissionalPorId(projeto.responsavelId);
+        setNomeResponsavelProjeto(responsavel?.nome ?? null);
+      } catch (error) {
+        console.error("Erro ao carregar responsável do projeto:", error);
+        setNomeResponsavelProjeto(null);
+      }
+    }
+
+    loadResponsavelProjeto();
+  }, [projeto?.responsavelId]);
 
   const getNomeProfissional = (id?: number | null) => {
     if (!id) return "Não atribuído";
@@ -319,6 +363,87 @@ function DetalhesProjeto() {
   }, [tarefas, projeto]);
 
   const responsavelProjeto = getNomeProfissional(projeto?.responsavelId);
+  const responsavelProjetoExibicao = nomeResponsavelProjeto ?? responsavelProjeto;
+
+  const iniciarEdicao = async () => {
+    if (!projeto) return;
+
+    setErroEdicao(null)
+    setSucessoEdicao(null)
+    setFormProjeto({
+      nome: projeto.nome,
+      codigo: projeto.codigo,
+      tipoProjeto: projeto.tipoProjeto,
+      valorHoraBase: projeto.valorHoraBase,
+      horasContratadas: projeto.horasContratadas ?? 0,
+      dataInicio: formatarDataInput(projeto.dataInicio),
+      dataFim: formatarDataInput(projeto.dataFim),
+      responsavelId: projeto.responsavelId,
+    })
+
+    const lista = await profissionalService.listarTodos()
+    setResponsaveisDisponiveis(lista)
+    setIsEditando(true)
+  }
+
+  const cancelarEdicao = () => {
+    setIsEditando(false)
+    setFormProjeto(null)
+    setErroEdicao(null)
+  }
+
+  const salvarEdicao = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!projeto || !formProjeto) return
+
+    if (
+      !formProjeto.nome.trim() ||
+      !formProjeto.codigo.trim() ||
+      !formProjeto.dataInicio ||
+      !formProjeto.dataFim ||
+      !formProjeto.responsavelId
+    ) {
+      setErroEdicao("Preencha todos os campos obrigatórios.")
+      return
+    }
+
+    if (formProjeto.tipoProjeto === "HORA_FECHADA" && formProjeto.horasContratadas <= 0) {
+      setErroEdicao("Para projeto de hora fechada, informe horas contratadas maiores que zero.")
+      return
+    }
+
+    if (formProjeto.valorHoraBase <= 0) {
+      setErroEdicao("Informe um valor hora base maior que zero.")
+      return
+    }
+
+    try {
+      setSalvando(true)
+      setErroEdicao(null)
+
+      await ApiProjeto.put(`/projeto/projetos/${projeto.id}`, {
+        nome: formProjeto.nome,
+        codigo: projeto.codigo,
+        tipoProjeto: formProjeto.tipoProjeto,
+        valorHoraBase: Number(formProjeto.valorHoraBase),
+        horasContratadas:
+          formProjeto.tipoProjeto === "HORA_FECHADA"
+            ? Number(formProjeto.horasContratadas)
+            : null,
+        dataInicio: formProjeto.dataInicio,
+        dataFim: formProjeto.dataFim,
+        responsavelId: Number(formProjeto.responsavelId),
+      })
+
+      window.location.reload()
+      setSucessoEdicao("Projeto atualizado com sucesso.")
+    } catch (error) {
+      console.error(error)
+      setErroEdicao("Não foi possível atualizar o projeto. Verifique a rota PUT no backend.")
+    } finally {
+      setSalvando(false)
+    }
+  }
 
   if (projetoLoading) {
     return (
@@ -384,7 +509,7 @@ function DetalhesProjeto() {
 
   return (
     <div className="min-h-screen bg-[#1f1f1f] p-6 text-white">
-      <div className="mx-auto flex max-w-[1500px] flex-col gap-5">
+      <div className="mx-auto flex max-w-375 flex-col gap-5">
         <section className="overflow-hidden rounded-[20px] border border-white/10 bg-[#232329] shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
           <div className="border-b border-white/10 bg-[#26262b] px-6 py-6 sm:px-8">
             <div className="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
@@ -427,7 +552,7 @@ function DetalhesProjeto() {
                 </h1>
 
                 <p className="mt-2 text-sm text-slate-400">
-                  Código {projeto.codigo} • Responsável: {responsavelProjeto}
+                  Código {projeto.codigo} • Responsável: {responsavelProjetoExibicao}
                 </p>
               </div>
 
@@ -471,6 +596,28 @@ function DetalhesProjeto() {
                   </svg>
                   {podeGerenciarProjetos ? "Gerenciar tarefas" : "Minhas tarefas"}
                 </button>
+
+                {podeGerenciarProjetos && !isEditando && (
+                  <button
+                    onClick={() => void iniciarEdicao()}
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-bold text-white transition hover:bg-white/10"
+                  >
+                    <svg
+                      width="17"
+                      height="17"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M12 20h9" />
+                      <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19H4v-3L16.5 3.5z" />
+                    </svg>
+                    Editar projeto
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -563,7 +710,7 @@ function DetalhesProjeto() {
                 <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-4">
                   <p className="text-xs text-slate-500">Responsável</p>
                   <p className="mt-2 truncate text-xl font-bold text-white">
-                    {responsavelProjeto}
+                    {responsavelProjetoExibicao}
                   </p>
                 </div>
               </div>
@@ -595,6 +742,144 @@ function DetalhesProjeto() {
                   </div>
                 </div>
               )}
+
+              {isEditando && formProjeto && podeGerenciarProjetos ? (
+                <form onSubmit={salvarEdicao} className="mt-6 rounded-2xl border border-white/10 bg-[#1f1f24] p-5">
+                  <h3 className="mb-4 text-lg font-bold text-white">Editar Projeto</h3>
+                  
+                  {sucessoEdicao ? <p className="mb-3 text-sm text-green-300">{sucessoEdicao}</p> : null}
+                  
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="col-span-2">
+                      <span className="mb-1 block text-xs text-white/60">Nome</span>
+                      <input
+                        type="text"
+                        value={formProjeto.nome}
+                        onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, nome: e.target.value } : prev))}
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Código</span>
+                      <input
+                        type="text"
+                        value={formProjeto.codigo}
+                        readOnly
+                        disabled
+                        className="w-full cursor-not-allowed rounded-md bg-black/25 px-3 py-2 opacity-60 outline-none text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Tipo</span>
+                      <select
+                        value={formProjeto.tipoProjeto}
+                        onChange={(e) =>
+                          setFormProjeto((prev) =>
+                            prev ? { ...prev, tipoProjeto: e.target.value as "HORA_FECHADA" | "ALOCACAO" } : prev
+                          )
+                        }
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      >
+                        <option value="HORA_FECHADA">Hora Fechada</option>
+                        <option value="ALOCACAO">Alocação</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Data Início</span>
+                      <input
+                        type="date"
+                        value={formProjeto.dataInicio}
+                        onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, dataInicio: e.target.value } : prev))}
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Data Fim</span>
+                      <input
+                        type="date"
+                        value={formProjeto.dataFim}
+                        onChange={(e) => setFormProjeto((prev) => (prev ? { ...prev, dataFim: e.target.value } : prev))}
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Valor Hora Base</span>
+                      <input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        value={formProjeto.valorHoraBase}
+                        onChange={(e) =>
+                          setFormProjeto((prev) =>
+                            prev ? { ...prev, valorHoraBase: Number(e.target.value) || 0 } : prev
+                          )
+                        }
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      />
+                    </div>
+
+                    <div>
+                      <span className="mb-1 block text-xs text-white/60">Horas Contratadas</span>
+                      <input
+                        type="number"
+                        min={0}
+                        value={formProjeto.horasContratadas}
+                        onChange={(e) =>
+                          setFormProjeto((prev) =>
+                            prev ? { ...prev, horasContratadas: Number(e.target.value) || 0 } : prev
+                          )
+                        }
+                        disabled={formProjeto.tipoProjeto !== "HORA_FECHADA"}
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white disabled:opacity-50"
+                      />
+                    </div>
+
+                    <div className="col-span-2">
+                      <span className="mb-1 block text-xs text-white/60">Responsável</span>
+                      <select
+                        value={formProjeto.responsavelId}
+                        onChange={(e) =>
+                          setFormProjeto((prev) =>
+                            prev ? { ...prev, responsavelId: Number(e.target.value) || 0 } : prev
+                          )
+                        }
+                        className="w-full rounded-md bg-black/25 px-3 py-2 outline-none text-white"
+                      >
+                        <option value={0}>Selecione</option>
+                        {responsaveisDisponiveis.map((p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.nome}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {erroEdicao ? <p className="col-span-2 text-sm text-red-300">{erroEdicao}</p> : null}
+
+                    <div className="col-span-2 flex justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={cancelarEdicao}
+                        className="rounded-lg bg-white/10 px-3 py-2 text-sm hover:bg-white/20"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={salvando}
+                        className="rounded-lg bg-white/20 px-3 py-2 text-sm font-medium hover:bg-white/30 disabled:opacity-60"
+                      >
+                        {salvando ? "Salvando..." : "Salvar alterações"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              ) : null}
             </section>
 
             <section className="rounded-[20px] border border-white/10 bg-[#232329] p-5 shadow-lg shadow-black/10">
@@ -612,7 +897,7 @@ function DetalhesProjeto() {
                 </div>
 
                 <div className="flex flex-col gap-3 md:flex-row">
-                  <div className="min-w-[260px]">
+                  <div className="min-w-65">
                     <Search
                       placeholder="Pesquisar tarefa..."
                       value={pesquisaTarefa}
@@ -863,7 +1148,7 @@ function DetalhesProjeto() {
                 onChange={setPesquisaProfissional}
               />
 
-              <div className="mt-4 max-h-[520px] space-y-3 overflow-y-auto pr-1">
+              <div className="mt-4 max-h-130 space-y-3 overflow-y-auto pr-1">
                 {profissionaisFiltrados.length > 0 ? (
                   profissionaisFiltrados.map((profissional) => {
                     const tarefasDoProfissional = tarefas.filter(
