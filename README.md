@@ -13,6 +13,7 @@
   <a href ="#dod">DoD</a>  |
   <a href ="#requisitos">Requisitos</a>  |
   <a href ="#instalacao">Manual de Instalação</a> |
+  <a href ="#soft">Manual de Software</a>  |
   <a href ="#branch">Estratégia de Branch</a>  |
   <a href ="#sprint">Cronograma de Sprints</a>  |
   <a href ="#tecnologias">Tecnologias</a> |
@@ -158,10 +159,19 @@ Para testar as funcionalidades da aplicação, utilize as credenciais recomendad
 
 ---
 
+## 📖 Manual do Sistema <a id="soft"></a>
+
+**:link: Clique no link para visualizar o Manual do Usuário:** 
+[Documentação do Manual do Sistema](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.1pulqy2w6ksi)
+
+---
+
 ## 🚀 Estratégia de Branch <a id="branch"></a>
 
 **:link: Clique no link para visualizar a Estratégia de Branch:** 
 [Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.tizfg2z79z37)
+
+---
 
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
 
