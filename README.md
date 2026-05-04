@@ -25,7 +25,6 @@
 > Documentação: [Documentação das Sprints](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
 > 
 > Video do Projeto: <a href ="sprint">Vídeos</a>
-> Video do Projeto: <a href ="sprint">Vídeos</a>
 
 ## 😢 Dor do Cliente <a id="dor"></a>
 
@@ -51,13 +50,13 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 |   2  |    Alta    | Como Desenvolvedor, eu quero apontar o tempo gasto selecionando um projeto, o item e a atividade para que o registro do meu esforço seja centralizado e rápido.                                                                             |       5      |    1   |   ✅​   |
 |   3  |    Alta    | Como Gestor, eu quero criar tarefas dentro dos projetos e coloca-los em uma hierarquia de "Itens", para que a equipe saiba exatamente onde o esforço deve ser alocado.                                 |       4      |    1   |   ✅​   |
 |   4  |    Alta    | Como Administrador do sistema, eu quero cadastrar os profissionais e vinculá-los aos projetos correspondentes, para garantir que cada pessoa só lance horas onde realmente está atuando.                                         |       6      |    1   |   ✅​   |
-|   5  |    Baixa    | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou análisada. |             |    3   |      |
-|   6  |    Média    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |             |    2   |      |
-|   7  |    Média    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |             |    2   |      |
-|   8  |    Baixa   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |             |    2   |      |
-|   9  |    Alta   | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada.                                            |       5      |    1   |   ✅​   |
-|  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |             |    3   |      |
-|  11  |    Baixa   | Como Gestor, eu quero visualizar um dashboard centralizado com os principais indicadores de esforço e custo, para que eu possa ter uma visão rápida da saúde dos projetos e tomar decisões sem precisar de gerar relatórios complexos. |             |    3   |      |
+|   5  |    Alta    | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada. |      5      |    1   |   ✅   |
+|   6  |    Média    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |      6       |    2   |   🔁   |
+|   7  |    Média    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |      3       |    2   |   🔁   |
+|   8  |    Média   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |      2      |    2   |   🔁   |
+|   9  |    Baixa   | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou analisada.                                            |       5      |    3   |   🔁   |
+|  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |      3       |    3   |   🔁   |
+|  11  |    Baixa   | Como gestor quero gerenciar os projetos cadastrados no sistema (criar, editar e visualizar) para manter as informações atualizadas e acompanhar os detalhes de cada projeto de forma eficiente. |       5       |    3   |   🔁   |
 
 ---
 
@@ -123,7 +122,7 @@ Para rodar a aplicação localmente, certifique-se de ter as seguintes ferrament
 ### 1. 📥 Clonar o repositório principal
 Abra o terminal na pasta onde deseja salvar o projeto e execute o comando abaixo para baixar todo o ecossistema da aplicação:
 ```bash
-git clone [https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git](https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git)
+git clone https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git
 cd API-DSM-3SEMESTRE-2026
 ```
 
@@ -266,6 +265,3 @@ Para testar as funcionalidades da aplicação, utilize as credenciais recomendad
     </tr>
   </table>
 </div>
-
-
-
