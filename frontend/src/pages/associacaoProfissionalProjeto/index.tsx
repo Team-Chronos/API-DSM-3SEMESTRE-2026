@@ -1,14 +1,15 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   listarProfissionais,
   listarProjetos,
   listarProjetosVinculados,
   vincularProjetoAoProfissional,
+  desvincularProjetoDoProfissional,
   type ProfissionalResposta,
   type ProjetoDisponivel,
   type ProjetoVinculadoResposta,
 } from "../../services/profissionaisApi";
-import { BriefcaseBusiness, ChevronDown, UserPlus } from "lucide-react";
+import { BriefcaseBusiness, Search, UserPlus, X } from "lucide-react";
 import { toast } from "react-toastify";
 import SearchInput from "../../components/ui/Search";
 
@@ -17,41 +18,67 @@ function AssociacaoProfissionalProjeto() {
   const [projetos, setProjetos] = useState<ProjetoDisponivel[]>([]);
 
   const [profissionalId, setProfissionalId] = useState("");
+  const [buscaProfissional, setBuscaProfissional] = useState("");
+  const [dropdownProfissionalAberto, setDropdownProfissionalAberto] = useState(false);
+
   const [projetoId, setProjetoId] = useState("");
+  const [buscaProjeto, setBuscaProjeto] = useState("");
+  const [dropdownProjetoAberto, setDropdownProjetoAberto] = useState(false);
+
   const [valorHora, setValorHora] = useState("");
   const [buscaVinculo, setBuscaVinculo] = useState("");
 
-  const [projetosVinculados, setProjetosVinculados] =
-    useState<ProjetoVinculadoResposta[]>([]);
+  const [projetosVinculados, setProjetosVinculados] = useState<ProjetoVinculadoResposta[]>([]);
 
   const [carregando, setCarregando] = useState(true);
   const [salvando, setSalvando] = useState(false);
+  const [desvinculando, setDesvinculando] = useState<number | null>(null);
+  const [confirmandoDesvincular, setConfirmandoDesvincular] = useState<number | null>(null);
   const [mensagem, setMensagem] = useState("");
+
+  const dropdownProfissionalRef = useRef<HTMLDivElement>(null);
+  const dropdownProjetoRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickFora = (e: MouseEvent) => {
+      if (
+        dropdownProfissionalRef.current &&
+        !dropdownProfissionalRef.current.contains(e.target as Node)
+      ) {
+        setDropdownProfissionalAberto(false);
+        if (!profissionalId) setBuscaProfissional("");
+      }
+      if (
+        dropdownProjetoRef.current &&
+        !dropdownProjetoRef.current.contains(e.target as Node)
+      ) {
+        setDropdownProjetoAberto(false);
+        if (!projetoId) setBuscaProjeto("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickFora);
+    return () => document.removeEventListener("mousedown", handleClickFora);
+  }, [profissionalId, projetoId]);
 
   useEffect(() => {
     const carregarDadosIniciais = async () => {
       setCarregando(true);
       setMensagem("");
-
       try {
         const [listaProfissionais, listaProjetos] = await Promise.all([
           listarProfissionais(),
           listarProjetos(),
         ]);
-
         setProfissionais(listaProfissionais);
         setProjetos(listaProjetos);
       } catch (error) {
-        const mensagemErro =
-          error instanceof Error
-            ? error.message
-            : "Não foi possível carregar os dados da tela.";
-        setMensagem(mensagemErro);
+        setMensagem(
+          error instanceof Error ? error.message : "Não foi possível carregar os dados da tela."
+        );
       } finally {
         setCarregando(false);
       }
     };
-
     void carregarDadosIniciais();
   }, []);
 
@@ -61,61 +88,85 @@ function AssociacaoProfissionalProjeto() {
         setProjetosVinculados([]);
         return;
       }
-
       try {
         const vinculos = await listarProjetosVinculados(Number(profissionalId));
         setProjetosVinculados(vinculos);
       } catch (error) {
-        const mensagemErro =
-          error instanceof Error
-            ? error.message
-            : "Não foi possível carregar os vínculos.";
-        setMensagem(mensagemErro);
+        setMensagem(
+          error instanceof Error ? error.message : "Não foi possível carregar os vínculos."
+        );
       }
     };
-
     void carregarVinculos();
   }, [profissionalId]);
 
   const profissionalSelecionado = profissionais.find(
-    (profissional) => profissional.id === Number(profissionalId)
+    (p) => p.id === Number(profissionalId)
   );
 
-  const projetosDisponiveisParaVinculo = useMemo(() => {
-    const idsJaVinculados = new Set(
-      projetosVinculados.map((projeto) => projeto.projetoId)
+  const profissionaisFiltrados = useMemo(() => {
+    const termo = buscaProfissional.trim().toLowerCase();
+    if (!termo) return profissionais;
+    return profissionais.filter((p) =>
+      `${p.nome} ${p.email}`.toLowerCase().includes(termo)
     );
+  }, [buscaProfissional, profissionais]);
 
-    return projetos.filter((projeto) => !idsJaVinculados.has(projeto.id));
+  const projetosDisponiveisParaVinculo = useMemo(() => {
+    const idsJaVinculados = new Set(projetosVinculados.map((p) => p.projetoId));
+    return projetos.filter((p) => !idsJaVinculados.has(p.id));
   }, [projetos, projetosVinculados]);
+
+  const projetosFiltrados = useMemo(() => {
+    const termo = buscaProjeto.trim().toLowerCase();
+    if (!termo) return projetosDisponiveisParaVinculo;
+    return projetosDisponiveisParaVinculo.filter((p) =>
+      `${p.nome} ${p.codigo}`.toLowerCase().includes(termo)
+    );
+  }, [buscaProjeto, projetosDisponiveisParaVinculo]);
 
   const projetosVinculadosFiltrados = useMemo(() => {
     const termo = buscaVinculo.trim().toLowerCase();
-
-    if (!termo) {
-      return projetosVinculados;
-    }
-
-    return projetosVinculados.filter((projeto) =>
-      `${projeto.nomeProjeto} ${projeto.codigoProjeto}`
-        .toLowerCase()
-        .includes(termo)
+    if (!termo) return projetosVinculados;
+    return projetosVinculados.filter((p) =>
+      `${p.nomeProjeto} ${p.codigoProjeto}`.toLowerCase().includes(termo)
     );
   }, [buscaVinculo, projetosVinculados]);
 
-  const handleSelecionarProjeto = (novoProjetoId: string) => {
-    setProjetoId(novoProjetoId);
+  const limparProfissional = () => {
+    setProfissionalId("");
+    setBuscaProfissional("");
+    setProjetoId("");
+    setBuscaProjeto("");
+    setValorHora("");
+    setBuscaVinculo("");
+    setConfirmandoDesvincular(null);
+    setDropdownProfissionalAberto(false);
+  };
 
-    if (!novoProjetoId) {
-      setValorHora("");
-      return;
-    }
+  const limparProjeto = () => {
+    setProjetoId("");
+    setBuscaProjeto("");
+    setValorHora("");
+    setDropdownProjetoAberto(false);
+  };
 
-    const projetoSelecionado = projetos.find(
-      (projeto) => projeto.id === Number(novoProjetoId)
-    );
+  const selecionarProfissional = (p: ProfissionalResposta) => {
+    setProfissionalId(String(p.id));
+    setBuscaProfissional(p.nome);
+    setProjetoId("");
+    setBuscaProjeto("");
+    setValorHora("");
+    setBuscaVinculo("");
+    setConfirmandoDesvincular(null);
+    setDropdownProfissionalAberto(false);
+  };
 
-    setValorHora(projetoSelecionado?.valorHoraBase?.toString() || "0");
+  const selecionarProjeto = (p: ProjetoDisponivel) => {
+    setProjetoId(String(p.id));
+    setBuscaProjeto(`${p.nome} (${p.codigo})`);
+    setValorHora(p.valorHoraBase?.toString() || "0");
+    setDropdownProjetoAberto(false);
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -136,37 +187,47 @@ function AssociacaoProfissionalProjeto() {
 
     try {
       setSalvando(true);
-
       await toast.promise(
-        vincularProjetoAoProfissional(
-          Number(profissionalId),
-          Number(projetoId),
-          valorHoraNumero
-        ),
+        vincularProjetoAoProfissional(Number(profissionalId), Number(projetoId), valorHoraNumero),
         {
           pending: "Realizando associação",
           success: "Associado com sucesso!",
           error: "Erro ao realizar associação",
         }
       );
-
-      const vinculosAtualizados = await listarProjetosVinculados(
-        Number(profissionalId)
-      );
-
+      const vinculosAtualizados = await listarProjetosVinculados(Number(profissionalId));
       setProjetosVinculados(vinculosAtualizados);
       setProjetoId("");
+      setBuscaProjeto("");
       setValorHora("");
       setMensagem("Projeto associado com sucesso.");
     } catch (error) {
-      const mensagemErro =
-        error instanceof Error
-          ? error.message
-          : "Erro ao associar projeto ao profissional.";
-
-      setMensagem(mensagemErro);
+      setMensagem(
+        error instanceof Error ? error.message : "Erro ao associar projeto ao profissional."
+      );
     } finally {
       setSalvando(false);
+    }
+  };
+
+  const handleDesvincular = async (projetoIdParaRemover: number) => {
+    if (!profissionalId) return;
+    setDesvinculando(projetoIdParaRemover);
+    setConfirmandoDesvincular(null);
+    try {
+      await toast.promise(
+        desvincularProjetoDoProfissional(Number(profissionalId), projetoIdParaRemover),
+        {
+          pending: "Removendo vínculo...",
+          success: "Vínculo removido com sucesso!",
+          error: "Erro ao remover vínculo",
+        }
+      );
+      const vinculosAtualizados = await listarProjetosVinculados(Number(profissionalId));
+      setProjetosVinculados(vinculosAtualizados);
+    } catch {
+    } finally {
+      setDesvinculando(null);
     }
   };
 
@@ -187,11 +248,8 @@ function AssociacaoProfissionalProjeto() {
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
               <BriefcaseBusiness size={20} className="text-white" />
             </div>
-
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                Resumo
-              </p>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Resumo</p>
               <p className="text-sm font-medium text-white">
                 {projetosVinculados.length} vínculo(s) do profissional selecionado
               </p>
@@ -265,71 +323,146 @@ function AssociacaoProfissionalProjeto() {
                       </div>
 
                       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        {/* Profissional */}
                         <div className="md:col-span-2">
                           <label className="mb-2 block text-sm font-medium text-slate-300">
                             Profissional
                           </label>
+                          <div className="relative" ref={dropdownProfissionalRef}>
+                            <div className="relative">
+                              <Search
+                                size={16}
+                                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                              />
+                              <input
+                                type="text"
+                                value={buscaProfissional}
+                                onChange={(e) => {
+                                  setBuscaProfissional(e.target.value);
+                                  setProfissionalId("");
+                                  setDropdownProfissionalAberto(true);
+                                }}
+                                onFocus={() => setDropdownProfissionalAberto(true)}
+                                placeholder="Buscar profissional"
+                                className="w-full rounded-xl border border-white/10 bg-[#3d3d40] py-3 pl-9 pr-10 text-white outline-none transition placeholder:text-white/40 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
+                              />
+                              {(buscaProfissional || profissionalId) && (
+                                <button
+                                  type="button"
+                                  onClick={limparProfissional}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-white"
+                                >
+                                  <X size={15} />
+                                </button>
+                              )}
+                            </div>
 
-                          <div className="relative">
-                            <select
-                              value={profissionalId}
-                              onChange={(event) => {
-                                setProfissionalId(event.target.value);
-                                setProjetoId("");
-                                setValorHora("");
-                                setBuscaVinculo("");
-                              }}
-                              className="w-full appearance-none rounded-xl border border-white/10 bg-[#3d3d40] px-4 py-3 pr-10 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30"
-                            >
-                              <option value="">Selecione um profissional</option>
-
-                              {profissionais.map((profissional) => (
-                                <option key={profissional.id} value={profissional.id}>
-                                  {profissional.nome} ({profissional.email})
-                                </option>
-                              ))}
-                            </select>
-
-                            <ChevronDown
-                              size={18}
-                              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                            />
+                            {dropdownProfissionalAberto && (
+                              <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#2a2a2e] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                                {profissionaisFiltrados.length === 0 ? (
+                                  <p className="px-4 py-3 text-sm text-slate-400">
+                                    Nenhum profissional encontrado.
+                                  </p>
+                                ) : (
+                                  <ul className="max-h-52 overflow-y-auto">
+                                    {profissionaisFiltrados.map((p) => (
+                                      <li key={p.id}>
+                                        <button
+                                          type="button"
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => selecionarProfissional(p)}
+                                          className={`w-full px-4 py-2.5 text-left transition hover:bg-white/8 ${
+                                            profissionalId === String(p.id) ? "bg-violet-500/15" : ""
+                                          }`}
+                                        >
+                                          <p className="text-sm font-medium text-white">{p.nome}</p>
+                                          <p className="text-xs text-slate-400">{p.email}</p>
+                                        </button>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
 
+                        {/* Projeto */}
                         <div>
                           <label className="mb-2 block text-sm font-medium text-slate-300">
                             Projeto
                           </label>
+                          <div
+                            className={`relative ${!profissionalId ? "pointer-events-none opacity-50" : ""}`}
+                            ref={dropdownProjetoRef}
+                          >
+                            <div className="relative">
+                              <Search
+                                size={16}
+                                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                              />
+                              <input
+                                type="text"
+                                value={buscaProjeto}
+                                onChange={(e) => {
+                                  setBuscaProjeto(e.target.value);
+                                  setProjetoId("");
+                                  setValorHora("");
+                                  setDropdownProjetoAberto(true);
+                                }}
+                                onFocus={() => setDropdownProjetoAberto(true)}
+                                disabled={!profissionalId}
+                                placeholder="Buscar projeto"
+                                className="w-full rounded-xl border border-white/10 bg-[#3d3d40] py-3 pl-9 pr-10 text-white outline-none transition placeholder:text-white/40 focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed"
+                              />
+                              {(buscaProjeto || projetoId) && (
+                                <button
+                                  type="button"
+                                  onClick={limparProjeto}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-white"
+                                >
+                                  <X size={15} />
+                                </button>
+                              )}
+                            </div>
 
-                          <div className="relative">
-                            <select
-                              value={projetoId}
-                              onChange={(event) => handleSelecionarProjeto(event.target.value)}
-                              disabled={!profissionalId}
-                              className="w-full appearance-none rounded-xl border border-white/10 bg-[#3d3d40] px-4 py-3 pr-10 text-white outline-none transition focus:border-violet-400 focus:ring-2 focus:ring-violet-500/30 disabled:cursor-not-allowed disabled:opacity-50"
-                            >
-                              <option value="">Selecione um projeto</option>
-
-                              {projetosDisponiveisParaVinculo.map((projeto) => (
-                                <option key={projeto.id} value={projeto.id}>
-                                  {projeto.nome} ({projeto.codigo})
-                                </option>
-                              ))}
-                            </select>
-
-                            <ChevronDown
-                              size={18}
-                              className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
-                            />
+                            {dropdownProjetoAberto && profissionalId && (
+                              <div className="absolute z-50 mt-1 w-full overflow-hidden rounded-xl border border-white/10 bg-[#2a2a2e] shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                                {projetosFiltrados.length === 0 ? (
+                                  <p className="px-4 py-3 text-sm text-slate-400">
+                                    Nenhum projeto disponível.
+                                  </p>
+                                ) : (
+                                  <ul className="max-h-52 overflow-y-auto">
+                                    {projetosFiltrados.map((p) => (
+                                      <li key={p.id}>
+                                        <button
+                                          type="button"
+                                          onMouseDown={(e) => e.preventDefault()}
+                                          onClick={() => selecionarProjeto(p)}
+                                          className={`w-full px-4 py-2.5 text-left transition hover:bg-white/8 ${
+                                            projetoId === String(p.id) ? "bg-violet-500/15" : ""
+                                          }`}
+                                        >
+                                          <p className="text-sm font-medium text-white">{p.nome}</p>
+                                          <p className="text-xs text-slate-400">
+                                            {p.codigo} · R$ {p.valorHoraBase?.toFixed(2)}/h
+                                          </p>
+                                        </button>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
 
+                        {/* Valor por hora */}
                         <div>
                           <label className="mb-2 block text-sm font-medium text-slate-300">
                             Valor por hora
                           </label>
-
                           <input
                             type="number"
                             step="0.01"
@@ -431,9 +564,47 @@ function AssociacaoProfissionalProjeto() {
                                 </p>
                               </div>
 
-                              <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300">
-                                R$ {projeto.valorHora.toFixed(2)}/h
-                              </span>
+                              <div className="flex shrink-0 items-center gap-2">
+                                <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-slate-300">
+                                  R$ {projeto.valorHora.toFixed(2)}/h
+                                </span>
+
+                                {confirmandoDesvincular === projeto.projetoId ? (
+                                  <div className="flex items-center gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => void handleDesvincular(projeto.projetoId)}
+                                      disabled={desvinculando === projeto.projetoId}
+                                      className="rounded-lg border border-red-500/30 bg-red-500/20 px-2 py-1 text-xs font-medium text-red-400 transition hover:bg-red-500/35 disabled:opacity-50"
+                                    >
+                                      Confirmar
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => setConfirmandoDesvincular(null)}
+                                      className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs font-medium text-slate-400 transition hover:bg-white/10"
+                                    >
+                                      Cancelar
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    onClick={() => setConfirmandoDesvincular(projeto.projetoId)}
+                                    title="Remover vínculo"
+                                    className="flex h-7 w-7 items-center justify-center rounded-lg border border-red-500/20 bg-red-500/10 text-red-400 transition hover:bg-red-500/25"
+                                  >
+                                    {desvinculando === projeto.projetoId ? (
+                                      <div className="h-3 w-3 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+                                    ) : (
+                                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18" />
+                                        <line x1="6" y1="6" x2="18" y2="18" />
+                                      </svg>
+                                    )}
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}

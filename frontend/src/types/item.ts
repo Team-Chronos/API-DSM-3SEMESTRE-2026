@@ -1,5 +1,5 @@
 export type Item = {
   idItem: number,
-  nome: String,
-  descricao: String
+  nome: string,
+  descricao: string
 }

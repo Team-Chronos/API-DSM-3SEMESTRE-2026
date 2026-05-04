@@ -1,9 +1,7 @@
-
 // para rodar no localhost
 const API_BASE_URL =
   import.meta.env.VITE_API_PROFISSIONAIS_URL?.replace(/\/$/, "") ||
-  "http://localhost:8081/api";
-
+  "/api/profissionais/api";
 // para rodar no codespace trocar a URL e abrir portas
 // const API_BASE_URL =
 //   import.meta.env.VITE_API_PROFISSIONAIS_URL?.replace(/\/$/, "") ||
@@ -13,7 +11,10 @@ type RequestOptions = Omit<RequestInit, "body"> & {
   body?: unknown;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+async function request<T>(
+  path: string,
+  options: RequestOptions = {},
+): Promise<T> {
   const { body, headers, ...rest } = options;
   const hasBody = body !== undefined;
 
@@ -34,9 +35,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       if (errorBody?.erro) {
         errorMessage = errorBody.erro;
       }
-    } catch {
-
-    }
+    } catch {}
 
     throw new Error(errorMessage);
   }
@@ -45,7 +44,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     return undefined as T;
   }
 
-  if (response.status === 205 || response.headers.get("content-length") === "0") {
+  if (
+    response.status === 205 ||
+    response.headers.get("content-length") === "0"
+  ) {
     return undefined as T;
   }
 
