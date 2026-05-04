@@ -12,7 +12,7 @@ import { toastError, toastSuccess } from "../../utils/toastUtils";
 const CARGOS = [
   { id: 1, nome: "Desenvolvedor" },
   { id: 2, nome: "Gerente" },
-  { id: 3, nome: "Financeiro" },
+  { id: 3, nome: "Administrador" },
 ];
 
 function CadastroProfissional() {

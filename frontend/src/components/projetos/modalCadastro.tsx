@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ModalBase from "../modais/ModalBase";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import { toastError, toastSuccess } from "../../utils/toastUtils";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface ModalCadastroProps {
   aberto: boolean;
@@ -12,6 +13,7 @@ interface ModalCadastroProps {
 interface Profissional {
   id: number;
   nome: string;
+  cargoId: number;
 }
 
 export default function ModalCadastro({
@@ -19,6 +21,8 @@ export default function ModalCadastro({
   onFechar,
   onProjetoCadastrado,
 }: ModalCadastroProps) {
+  const { user } = useAuth();
+
   const [formData, setFormData] = useState({
     nome: "",
     codigo: "",
@@ -38,8 +42,15 @@ export default function ModalCadastro({
     profissionaisService
       .listar()
       .then((r) => r.json())
-      .then(setProfissionais)
+      .then((todos: Profissional[]) => {
+        const filtrados = todos.filter((p) => p.cargoId === 2 || p.cargoId === 3);
+        setProfissionais(filtrados);
+      })
       .catch((e) => console.error("Erro ao buscar profissionais", e));
+
+    if (user?.id) {
+      setFormData((prev) => ({ ...prev, responsavelId: user.id }));
+    }
   }, [aberto]);
 
   const handleChange = (field: string, value: string | number) => {

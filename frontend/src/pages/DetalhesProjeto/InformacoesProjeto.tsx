@@ -7,6 +7,7 @@ import apiApontamento from "../../services/apiApontamento"
 import { Clock, AlertTriangle, AlertCircle } from "lucide-react"
 import profissionalService from "../../types/profissionalService"
 import { ApiProjeto } from "../../service/servicoApi"
+import { useAuth } from "../../contexts/AuthContext"
 
 type FormProjeto = {
   nome: string
@@ -26,6 +27,14 @@ function formatarDataInput(valor: string) {
 
 function InformacoesProjeto() {
   const { projeto, refetch } = useProjetoContext()
+  const { user, loading: authLoading } = useAuth()
+
+  const podeEditar = !authLoading && (
+  user?.roles?.includes("ROLE_FINANCE") ||
+  user?.roles?.includes("ROLE_GERENTE_PROJETO") ||
+  user?.roles?.includes("ROLE_ADMIN") ||
+  false
+)
 
   const [responsavel, setResponsavel] = useState<Profissional | null>(null)
   const [totalMinutos, setTotalMinutos] = useState<number>(0)
@@ -39,17 +48,18 @@ function InformacoesProjeto() {
   useEffect(() => {
     async function load() {
       if (projeto?.responsavelId) {
-        const resp = await carregarProfissionalPorId(projeto.responsavelId);
-        setResponsavel(resp);
+        const resp = await carregarProfissionalPorId(projeto.responsavelId)
+        setResponsavel(resp)
       }
     }
-    load();
-  }, [projeto?.id]);
+    load()
+  }, [projeto?.id])
 
   useEffect(() => {
     async function loadHoras() {
+      if (!projeto) return
       try {
-        const tarefas = await carregarTarefasPorProjeto(projeto!.id)
+        const tarefas = await carregarTarefasPorProjeto(projeto.id)
         const resultados = await Promise.all(
           tarefas.map((t) => apiApontamento.get(`/registros/tarefa/${t.id}`))
         )
@@ -63,11 +73,10 @@ function InformacoesProjeto() {
       }
     }
     loadHoras()
-  }, [projeto!.id])
-
-  if (!projeto) return
+  }, [projeto?.id])
 
   const iniciarEdicao = async () => {
+    if (!projeto) return
     setErroEdicao(null)
     setSucessoEdicao(null)
     setFormProjeto({
@@ -80,7 +89,6 @@ function InformacoesProjeto() {
       dataFim: formatarDataInput(projeto.dataFim),
       responsavelId: projeto.responsavelId,
     })
-
     const lista = await profissionalService.listarTodos()
     setResponsaveisDisponiveis(lista)
     setIsEditando(true)
@@ -94,7 +102,7 @@ function InformacoesProjeto() {
 
   const salvarEdicao = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!formProjeto) return
+    if (!formProjeto || !projeto) return
 
     if (
       !formProjeto.nome.trim() ||
@@ -146,6 +154,8 @@ function InformacoesProjeto() {
     }
   }
 
+  if (!projeto) return null
+
   const isHoraFechada = projeto.tipoProjeto === "HORA_FECHADA"
   const isAlocacao = projeto.tipoProjeto === "ALOCACAO"
   const horasContratadas = projeto.horasContratadas ?? 0
@@ -191,7 +201,7 @@ function InformacoesProjeto() {
               <div>{projeto.tipoProjeto}</div>
             </div>
           </div>
-          
+
           {isEditando && formProjeto ? (
             <form onSubmit={salvarEdicao} className="mt-6 grid grid-cols-2 gap-3 rounded-lg bg-white/8 p-3">
               <div className="col-span-2">
@@ -325,7 +335,7 @@ function InformacoesProjeto() {
           ) : null}
 
           <div className="mt-4 flex justify-end">
-            {!isEditando ? (
+            {!isEditando && !authLoading && podeEditar ? (
               <button
                 type="button"
                 onClick={() => void iniciarEdicao()}
@@ -387,7 +397,7 @@ function InformacoesProjeto() {
         )}
       </div>
     </>
-  );
+  )
 }
 
-export default InformacoesProjeto;
+export default InformacoesProjeto

@@ -91,7 +91,6 @@ export function listarProjetos(): Promise<ProjetoDisponivel[]> {
 
 export function listarProfissionais(): Promise<ProfissionalResposta[]> {
   return request<ProfissionalResposta[]>("/profissionais/api/profissionais", { method: "GET" });
-
 }
 
 export function listarProjetosVinculados(profissionalId: number): Promise<ProjetoVinculadoResposta[]> {
@@ -106,6 +105,15 @@ export function vincularProjetoAoProfissional(
   return request<void>(`/profissionais/api/profissionais/${profissionalId}/projetos/${projetoId}`, {
     method: "POST",
     body: { valorHora },
+  });
+}
+
+export function desvincularProjetoDoProfissional(
+  profissionalId: number,
+  projetoId: number
+): Promise<void> {
+  return request<void>(`/profissionais/api/profissionais/${profissionalId}/projetos/${projetoId}`, {
+    method: "DELETE",
   });
 }
 

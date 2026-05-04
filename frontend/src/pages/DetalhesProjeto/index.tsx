@@ -164,7 +164,7 @@ function DetalhesProjeto() {
   useEffect(() => {
     async function loadTipos() {
       try {
-        const res = await ApiTarefas.get("/tarefas/tipoTarefa");
+        const res = await ApiTarefas.get("/tipoTarefa");
         setTipos(Array.isArray(res.data) ? res.data : []);
       } catch (error) {
         console.error("Erro ao carregar tipos de tarefa:", error);

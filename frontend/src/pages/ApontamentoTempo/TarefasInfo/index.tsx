@@ -173,7 +173,7 @@ function TarefasInfo({
             {tempoEsgotado && (
               <div className="mb-5 rounded-2xl border border-yellow-500/20 bg-yellow-500/10 p-4 text-sm text-yellow-100">
                 Tempo máximo atingido. Fale com o gerente do projeto para
-                ajustar o limite da tarefa.
+                ajustar o limite da tarefa se necessário.
               </div>
             )}
 

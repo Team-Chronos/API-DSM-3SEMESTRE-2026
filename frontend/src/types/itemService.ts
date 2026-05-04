@@ -19,11 +19,12 @@ class ItemService {
   }
 
   async criarItem(nome: string, descricao: string, tarefaId: number): Promise<Item> {
-    const response = await ApiTarefas.post("/tarefas/itens", {
-      nome,
-      descricao,
-      tarefaId
-    });
+    const response = await ApiTarefas.post("/tarefas/itens", { nome, descricao, tarefaId });
+    return response.data;
+  }
+
+  async atualizarItem(idItem: number, nome: string, descricao: string, tarefaId: number): Promise<Item> {
+    const response = await ApiTarefas.put(`/tarefas/itens/${idItem}`, { nome, descricao, tarefaId });
     return response.data;
   }
 }

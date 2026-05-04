@@ -62,6 +62,7 @@ export default function DragDropTarefas({
 
   const userRoles = user?.roles ?? [];
   const podeGerenciarTodasTarefas =
+    userRoles.includes("ROLE_ADMIN") ||
     userRoles.includes("ROLE_FINANCE") ||
     userRoles.includes("ROLE_GERENTE_PROJETO");
   const rolesKey = userRoles.join("|");

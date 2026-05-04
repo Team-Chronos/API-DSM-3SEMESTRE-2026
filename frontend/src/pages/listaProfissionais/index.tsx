@@ -19,7 +19,7 @@ export interface Profissional {
 
 const CARGO_MAP: Record<number, { label: string; color: string }> = {
   1: {
-    label: "Dev",
+    label: "Desenvolvedor",
     color: "bg-[#2d1f6e] text-[#a78bfa] border border-[#6627cc]/40",
   },
   2: {
@@ -27,18 +27,14 @@ const CARGO_MAP: Record<number, { label: string; color: string }> = {
     color: "bg-[#1a2e1a] text-[#4ade80] border border-[#22c55e]/30",
   },
   3: {
-    label: "Financeiro",
+    label: "Administrador",
     color: "bg-[#1e2a1e] text-[#86efac] border border-[#16a34a]/30",
   },
 };
 
 export function getInitials(nome: string): string {
   const parts = nome.trim().split(" ");
-
-  if (parts.length === 1) {
-    return parts[0].slice(0, 2).toUpperCase();
-  }
-
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
@@ -56,6 +52,23 @@ function getAvatarColor(id: number): string {
 
 const ITEMS_PER_PAGE = 8;
 
+function buildPageItems(pagina: number, totalPaginas: number): (number | "...")[] {
+  const delta = 2;
+  const pages: (number | "...")[] = [];
+  const left = pagina - delta;
+  const right = pagina + delta;
+
+  for (let i = 1; i <= totalPaginas; i++) {
+    if (i === 1 || i === totalPaginas || (i >= left && i <= right)) {
+      pages.push(i);
+    } else if (i === left - 1 || i === right + 1) {
+      pages.push("...");
+    }
+  }
+
+  return pages;
+}
+
 function TelaListaProfissionais() {
   const navigate = useNavigate();
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
@@ -70,10 +83,7 @@ function TelaListaProfissionais() {
 
     fetch("/api/profissionais/api/profissionais")
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Erro ao buscar profissionais");
-        }
-
+        if (!res.ok) throw new Error("Erro ao buscar profissionais");
         return res.json();
       })
       .then((data: Profissional[]) => {
@@ -88,22 +98,15 @@ function TelaListaProfissionais() {
 
   const filtrados = useMemo(() => {
     const termo = busca.toLowerCase().trim();
-
-    if (!termo) {
-      return profissionais;
-    }
-
+    if (!termo) return profissionais;
     return profissionais.filter(
-      (profissional) =>
-        profissional.nome.toLowerCase().includes(termo) ||
-        profissional.email.toLowerCase().includes(termo),
+      (p) =>
+        p.nome.toLowerCase().includes(termo) ||
+        p.email.toLowerCase().includes(termo)
     );
   }, [profissionais, busca]);
 
-  const totalPaginas = Math.max(
-    1,
-    Math.ceil(filtrados.length / ITEMS_PER_PAGE),
-  );
+  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / ITEMS_PER_PAGE));
 
   const paginaAtual = useMemo(() => {
     const inicio = (pagina - 1) * ITEMS_PER_PAGE;
@@ -123,6 +126,8 @@ function TelaListaProfissionais() {
     );
   }
 
+  const pageItems = buildPageItems(pagina, totalPaginas);
+
   return (
     <div className="p-6 text-white">
       <div className="mx-auto max-w-6xl space-y-5">
@@ -138,16 +143,7 @@ function TelaListaProfissionais() {
 
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#232329] px-4 py-3 shadow-lg">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="white"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -155,13 +151,9 @@ function TelaListaProfissionais() {
               </svg>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
-                Resumo
-              </p>
+              <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Resumo</p>
               <p className="text-sm font-semibold text-white">
-                {loading
-                  ? "..."
-                  : `${profissionais.length} profissional(is) cadastrado(s)`}
+                {loading ? "..." : `${profissionais.length} profissional(is) cadastrado(s)`}
               </p>
             </div>
           </div>
@@ -178,8 +170,7 @@ function TelaListaProfissionais() {
                   Lista de profissionais
                 </h2>
                 <p className="mt-2 text-sm text-white/75 sm:text-base">
-                  Veja todos os profissionais cadastrados e gerencie suas
-                  informações.
+                  Veja todos os profissionais cadastrados e gerencie suas informações.
                 </p>
               </div>
 
@@ -195,21 +186,10 @@ function TelaListaProfissionais() {
 
           <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div className="relative w-full max-w-sm">
-              <svg
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-
               <input
                 type="text"
                 placeholder="Buscar profissional..."
@@ -233,33 +213,22 @@ function TelaListaProfissionais() {
             </div>
 
             {loading ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
-                Carregando...
-              </div>
+              <div className="py-16 text-center text-slate-400 text-sm">Carregando...</div>
             ) : erro ? (
-              <div className="py-16 text-center text-red-400 text-sm">
-                {erro}
-              </div>
+              <div className="py-16 text-center text-red-400 text-sm">{erro}</div>
             ) : paginaAtual.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-sm">
-                Nenhum profissional encontrado.
-              </div>
+              <div className="py-16 text-center text-slate-400 text-sm">Nenhum profissional encontrado.</div>
             ) : (
               <div className="divide-y divide-white/5">
                 {paginaAtual.map((profissional) => {
                   const cargo = getCargo(profissional.cargoId);
-
                   return (
                     <div
                       key={profissional.id}
                       className="grid grid-cols-[2fr_1fr_2fr_auto] items-center gap-4 rounded-xl px-4 py-3.5 transition hover:bg-white/5"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(
-                            profissional.id,
-                          )} text-xs font-bold text-white shadow`}
-                        >
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(profissional.id)} text-xs font-bold text-white shadow`}>
                           {getInitials(profissional.nome)}
                         </div>
                         <span className="truncate font-medium text-white text-sm">
@@ -268,34 +237,19 @@ function TelaListaProfissionais() {
                       </div>
 
                       <div>
-                        <span
-                          className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}
-                        >
+                        <span className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}>
                           {cargo.label}
                         </span>
                       </div>
 
-                      <span className="truncate text-sm text-slate-400">
-                        {profissional.email}
-                      </span>
+                      <span className="truncate text-sm text-slate-400">{profissional.email}</span>
 
                       <button
-                        onClick={() =>
-                          navigate(`/profissionais/${profissional.id}`)
-                        }
+                        onClick={() => navigate(`/profissionais/${profissional.id}`)}
                         className="flex items-center gap-1 text-sm font-medium text-[#9d71f5] transition hover:text-white whitespace-nowrap"
                       >
                         Ver detalhes
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                           <line x1="5" y1="12" x2="19" y2="12" />
                           <polyline points="12 5 19 12 12 19" />
                         </svg>
@@ -312,10 +266,7 @@ function TelaListaProfissionais() {
               Mostrando{" "}
               {filtrados.length === 0
                 ? 0
-                : Math.min(
-                    (pagina - 1) * ITEMS_PER_PAGE + 1,
-                    filtrados.length,
-                  )}
+                : Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, filtrados.length)}
               –{Math.min(pagina * ITEMS_PER_PAGE, filtrados.length)} de{" "}
               {filtrados.length} profissionais
             </span>
@@ -326,53 +277,40 @@ function TelaListaProfissionais() {
                 disabled={pagina === 1}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
 
-              {Array.from({ length: totalPaginas }, (_, i) => i + 1).map(
-                (num) => (
+              {pageItems.map((item, idx) =>
+                item === "..." ? (
+                  <span
+                    key={`ellipsis-${idx}`}
+                    className="flex h-8 w-8 items-center justify-center text-slate-500 text-sm select-none"
+                  >
+                    ...
+                  </span>
+                ) : (
                   <button
-                    key={num}
-                    onClick={() => setPagina(num)}
+                    key={item}
+                    onClick={() => setPagina(item)}
                     className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                      num === pagina
+                      item === pagina
                         ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
                         : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
                     }`}
                   >
-                    {num}
+                    {item}
                   </button>
-                ),
+                )
               )}
 
               <button
-                onClick={() =>
-                  setPagina((p) => Math.min(totalPaginas, p + 1))
-                }
+                onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                 disabled={pagina === totalPaginas}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
@@ -385,3 +323,116 @@ function TelaListaProfissionais() {
 }
 
 export default TelaListaProfissionais;
+
+export type ProjetoDisponivel = {
+  id: number;
+  nome: string;
+  codigo: string;
+  valorHoraBase: number;
+};
+
+export type ProjetoVinculoPayload = {
+  projetoId: number;
+  valorHora: number;
+};
+
+export type ProfissionalPayload = {
+  nome: string;
+  email: string;
+  senhaHash: string;
+  ativo: boolean;
+  cargoId: number;
+  projetos: ProjetoVinculoPayload[];
+};
+
+export type ProfissionalResposta = {
+  id: number;
+  nome: string;
+  email: string;
+  ativo: boolean;
+  cargoId: number;
+  projetos: Array<{
+    projetoId: number;
+    nomeProjeto: string;
+    codigoProjeto: string;
+    valorHora: number;
+  }>;
+};
+
+export type ProjetoVinculadoResposta = {
+  projetoId: number;
+  nomeProjeto: string;
+  codigoProjeto: string;
+  valorHora: number;
+};
+
+const API_BASE = "/api";
+
+type RequestOptions = Omit<RequestInit, "body"> & { body?: unknown };
+
+async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+  const { body, headers, ...rest } = options;
+  const token = localStorage.getItem("token");
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...rest,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+      ...headers,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (response.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+    throw new Error("Sessão expirada. Faça login novamente.");
+  }
+
+  if (!response.ok) {
+    let errorMessage = "Erro ao processar requisição.";
+    try {
+      const errorBody = await response.json();
+      errorMessage = errorBody.erro || errorBody.message || errorMessage;
+    } catch {}
+    throw new Error(errorMessage);
+  }
+
+  if (response.status === 204) return undefined as T;
+
+  const responseText = await response.text();
+  if (!responseText.trim()) return undefined as T;
+
+  return JSON.parse(responseText) as T;
+}
+
+export function listarProjetos(): Promise<ProjetoDisponivel[]> {
+  return request<ProjetoDisponivel[]>("/profissionais/api/profissionais/projetos", { method: "GET" });
+}
+
+export function listarProfissionais(): Promise<ProfissionalResposta[]> {
+  return request<ProfissionalResposta[]>("/profissionais/api/profissionais", { method: "GET" });
+}
+
+export function listarProjetosVinculados(profissionalId: number): Promise<ProjetoVinculadoResposta[]> {
+  return request<ProjetoVinculadoResposta[]>(`/profissionais/api/profissionais/${profissionalId}/projetos`, { method: "GET" });
+}
+
+export function vincularProjetoAoProfissional(
+  profissionalId: number,
+  projetoId: number,
+  valorHora: number
+): Promise<void> {
+  return request<void>(`/profissionais/api/profissionais/${profissionalId}/projetos/${projetoId}`, {
+    method: "POST",
+    body: { valorHora },
+  });
+}
+
+export function cadastrarProfissional(payload: ProfissionalPayload): Promise<ProfissionalResposta> {
+  return request<ProfissionalResposta>("/profissionais/api/profissionais", {
+    method: "POST",
+    body: payload,
+  });
+}

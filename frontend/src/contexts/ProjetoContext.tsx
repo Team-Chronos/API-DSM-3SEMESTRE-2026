@@ -11,7 +11,6 @@ type ProjetoContextType = {
 };
 
 async function carregarProjeto(projetoId: string): Promise<Projeto> {
-  // Endpoint correto com o gateway: /projeto/projetos/{id}
   const response = await ApiProjeto.get(`/projeto/projetos/${projetoId}`);
   return response.data;
 }

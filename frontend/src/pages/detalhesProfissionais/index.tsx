@@ -16,7 +16,7 @@ const CARGOS = [
   },
   {
     id: 3,
-    label: "Financeiro",
+    label: "Administrador",
     color: "bg-[#1e2a1e] text-[#86efac] border border-[#16a34a]/30",
   },
 ];
@@ -98,7 +98,14 @@ function TelaDetalhesProfissional() {
         body: JSON.stringify({ ...profissional, ...form }),
       });
 
-      if (!res.ok) throw new Error("Erro ao salvar alterações");
+      if (!res.ok) {
+        let mensagem = "Erro ao salvar alterações";
+        try {
+          const body = await res.json();
+          mensagem = body.erro || body.message || mensagem;
+        } catch {}
+        throw new Error(mensagem);
+      }
 
       const atualizado: Profissional = await res.json();
 
@@ -131,7 +138,14 @@ function TelaDetalhesProfissional() {
         method: "DELETE",
       });
 
-      if (!res.ok) throw new Error("Erro ao excluir profissional");
+      if (!res.ok) {
+        let mensagem = "Erro ao excluir profissional";
+        try {
+          const body = await res.json();
+          mensagem = body.erro || body.message || mensagem;
+        } catch {}
+        throw new Error(mensagem);
+      }
 
       navigate("/profissionais");
     } catch (err: any) {
@@ -447,11 +461,7 @@ function TelaDetalhesProfissional() {
                       className="w-full rounded-xl border border-white/10 bg-[#1a1a20] px-4 py-2.5 text-sm text-white outline-none focus:border-[#6627cc]/60 focus:ring-1 focus:ring-[#6627cc]/40 transition appearance-none cursor-pointer"
                     >
                       {CARGOS.map((c) => (
-                        <option
-                          key={c.id}
-                          value={c.id}
-                          className="bg-[#1a1a20]"
-                        >
+                        <option key={c.id} value={c.id} className="bg-[#1a1a20]">
                           {c.label}
                         </option>
                       ))}
