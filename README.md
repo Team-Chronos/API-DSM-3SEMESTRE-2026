@@ -24,7 +24,7 @@
 >
 > Documentação: [Documentação das Sprints](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
 > 
-> Video do Projeto: <a href ="sprint">Vídeos</a>
+> Video do Projeto: <a href ="#sprint">Vídeos</a>
 
 ## 😢 Dor do Cliente <a id="dor"></a>
 
@@ -177,7 +177,7 @@ Para testar as funcionalidades da aplicação, utilize as credenciais recomendad
 
 | Sprint          |    Período    | Vídeo do projeto | Documentação                                     |
 | --------------- | :-----------: | ---------------- | ------------------------------------------------ |
-| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/4c6249vc36k) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
+| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/ls2dpN4ofok) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
 | 🔖 **SPRINT 2** | 13/04 - 03/05 | [Vídeo Sprint 2]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
 | 🔖 **SPRINT 3** | 11/05 - 31/05 | [Vídeo Sprint 3]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
 
