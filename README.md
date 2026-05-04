@@ -161,7 +161,7 @@ Para testar as funcionalidades da aplicação, utilize as credenciais recomendad
 
 ## 📖 Manual do Sistema <a id="soft"></a>
 
-**:link: Clique no link para visualizar o Manual do Usuário:** 
+**:link: Clique no link para visualizar o Manual do Sistema:** 
 [Documentação do Manual do Sistema](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.1pulqy2w6ksi)
 
 ---
