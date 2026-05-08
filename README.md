@@ -57,6 +57,8 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 |   9  |    Baixa   | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou analisada.                                            |       5      |    2   |   ✅   |
 |  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |      3       |    2   |   ✅   |
 |  11  |    Baixa   | Como gestor quero gerenciar os projetos cadastrados no sistema (criar, editar e visualizar) para manter as informações atualizadas e acompanhar os detalhes de cada projeto de forma eficiente. |       5       |    2   |   ✅   |
+|  12  |    Baixa   | Como um usuário do sistema (Desenvolvedor, Gestor ou Administrador), Desejo acessar a plataforma de forma adaptável em qualquer dispositivo (smartphone, tablet ou desktop), Para facilitar o acompanhamento de projetos, gestão de tarefas e o apontamento de horas de onde eu estiver. |       7       |    3   |   🔄​   |
+|  13  |    Baixa   | Como um Gestor (ou Administrador), Desejo visualizar um registro (log) completo de todas as atividades e mudanças que ocorrem no sistema, Para garantir a segurança, rastreabilidade e saber exatamente quais informações foram alteradas, por quem e quando. |       6       |    3   |   🔄​   |
 
 ---
 
