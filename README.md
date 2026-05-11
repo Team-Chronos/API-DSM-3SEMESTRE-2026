@@ -13,6 +13,7 @@
   <a href ="#dod">DoD</a>  |
   <a href ="#requisitos">Requisitos</a>  |
   <a href ="#instalacao">Manual de Instalação</a> |
+  <a href ="#soft">Manual de Software</a>  |
   <a href ="#branch">Estratégia de Branch</a>  |
   <a href ="#sprint">Cronograma de Sprints</a>  |
   <a href ="#tecnologias">Tecnologias</a> |
@@ -23,7 +24,7 @@
 >
 > Documentação: [Documentação das Sprints](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?usp=sharing)
 > 
-> Video do Projeto: <a href ="sprint">Vídeos</a>
+> Video do Projeto: <a href ="#sprint">Vídeos</a>
 
 ## 😢 Dor do Cliente <a id="dor"></a>
 
@@ -49,13 +50,15 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 |   2  |    Alta    | Como Desenvolvedor, eu quero apontar o tempo gasto selecionando um projeto, o item e a atividade para que o registro do meu esforço seja centralizado e rápido.                                                                             |       5      |    1   |   ✅​   |
 |   3  |    Alta    | Como Gestor, eu quero criar tarefas dentro dos projetos e coloca-los em uma hierarquia de "Itens", para que a equipe saiba exatamente onde o esforço deve ser alocado.                                 |       4      |    1   |   ✅​   |
 |   4  |    Alta    | Como Administrador do sistema, eu quero cadastrar os profissionais e vinculá-los aos projetos correspondentes, para garantir que cada pessoa só lance horas onde realmente está atuando.                                         |       6      |    1   |   ✅​   |
-|   5  |    Baixa    | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou análisada. |      5      |    3   |   🔁   |
-|   6  |    Média    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |      6       |    2   |   🔁   |
-|   7  |    Média    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |      3       |    2   |   🔁   |
-|   8  |    Baixa   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |      2      |    2   |   🔁   |
-|   9  |    Alta   | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada.                                            |       5      |    1   |   ✅​   |
-|  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |      3       |    3   |   🔁   |
-|  11  |    Baixa   | Como gestor quero gerenciar os projetos cadastrados no sistema (criar, editar e visualizar) para manter as informações atualizadas e acompanhar os detalhes de cada projeto de forma eficiente. |       5       |    3   |   🔁   |
+|   5  |    Alta    | Como Financeiro, eu quero visualizar os projetos que estão sendo desenvolvidos e ver quanto eles estão custando e quanto cada pessoa vai ganhar, para ter um controle de quanto o projeto custa e quanto cada desenvolvedor vai ganhar de acordo com a hora trabalhada. |      5      |    1   |   ✅   |
+|   6  |    Média    | Como Gestor, eu quero comparar as horas consumidas em um projeto de "hora fechada" contra o teto estabelecido, para evitar que o esforço ultrapasse o que foi vendido.                                                                             |      6       |    2   |   ✅   |
+|   7  |    Média    | Como Gestor (PMO/PO), eu quero acompanhar a capacidade e a distribuição de esforço dos profissionais, para identificar sobrecargas ou ociosidade na equipe.                                                                     |      3       |    2   |   ✅   |
+|   8  |    Média   | Como Financeiro, eu quero ter a flexibilidade de variar o valor da hora cobrada de acordo com o perfil do profissional ou o tipo de atividade executada, para atender contratos que possuem essas particularidades.    |      2      |    2   |   ✅   |
+|   9  |    Baixa   | Como Gestor, eu quero gerar relatórios de horas consumidas por projetos e por profissionais, para facilitar o acesso a essa informação, podendo ser compartilhada e/ou analisada.                                            |       5      |    2   |   ✅   |
+|  10  |    Baixa   | Como Financeiro, eu quero exportar um relatório consolidado com a base de cobrança mensal por cliente e projeto, para realizar o faturamento sem necessidade de retrabalho manual.                                                      |      3       |    2   |   ✅   |
+|  11  |    Baixa   | Como gestor quero gerenciar os projetos cadastrados no sistema (criar, editar e visualizar) para manter as informações atualizadas e acompanhar os detalhes de cada projeto de forma eficiente. |       5       |    2   |   ✅   |
+|  12  |    Baixa   | Como um usuário do sistema (Desenvolvedor, Gestor ou Administrador), Desejo acessar a plataforma de forma adaptável em qualquer dispositivo (smartphone, tablet ou desktop), Para facilitar o acompanhamento de projetos, gestão de tarefas e o apontamento de horas de onde eu estiver. |       7       |    3   |   🔄​   |
+|  13  |    Baixa   | Como um Gestor (ou Administrador), Desejo visualizar um registro (log) completo de todas as atividades e mudanças que ocorrem no sistema, Para garantir a segurança, rastreabilidade e saber exatamente quais informações foram alteradas, por quem e quando. |       6       |    3   |   🔄​   |
 
 ---
 
@@ -106,9 +109,62 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ---
 
-## Manual de Instalação <a id="instalacao"></a>
+## 📖 Manual de Instalação <a id="instalacao"></a>
 
-🚧 Pendente – Atualizando
+### ⚙️ Pré-requisitos
+
+Para rodar a aplicação localmente, certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
+- 📦 **Git** (para clonar o repositório)
+- 🐳 **Docker** (e Docker Compose, rodando em segundo plano)
+- 🪟 **Ambiente Windows** (recomendado para a execução direta do script `.bat`)
+
+---
+
+## 🚀 Passo a Passo de Instalação e Execução
+### 1. 📥 Clonar o repositório principal
+Abra o terminal na pasta onde deseja salvar o projeto e execute o comando abaixo para baixar todo o ecossistema da aplicação:
+```bash
+git clone https://github.com/Team-Chronos/API-DSM-3SEMESTRE-2026.git
+cd API-DSM-3SEMESTRE-2026
+```
+
+### 2. ▶️ Iniciar os serviços
+Com o Docker aberto e rodando em sua máquina, basta executar o script de inicialização. Esse script se encarregará de baixar as imagens, criar os contêineres, subir o banco de dados e iniciar todos os microsserviços simultaneamente.
+
+No terminal, execute:
+```cmd
+Start.bat
+```
+*(Alternativamente, você pode navegar até a pasta do projeto pelo Explorador de Arquivos e dar um duplo clique no arquivo `Start.bat`).*
+
+### 3. 🌐 Acessar o sistema
+Aguarde alguns instantes até que todos os contêineres do Docker terminem de subir. Após a inicialização completa, o frontend da aplicação estará disponível no seu navegador no seguinte endereço:
+```text
+http://localhost
+```
+
+---
+
+## 👥 Perfis de Acesso e Usuários de Teste
+
+O sistema possui controle de acesso baseado em cargos (`cargo_id`). Dependendo do nível de acesso do usuário logado, diferentes menus e funcionalidades serão liberados.
+
+Para testar as funcionalidades da aplicação, utilize as credenciais recomendadas abaixo:
+
+| 🆔 `cargo_id` | 👤 Perfil de Acesso | 🔐 Permissões no Sistema | 🔑 Credenciais de Teste Recomendadas |
+| :---: | :--- | :--- | :--- |
+| **1** | 💻 **Desenvolvedor / Profissional** | Acesso padrão. Pode visualizar os projetos em que está alocado, navegar pela hierarquia de itens/atividades e realizar o apontamento diário de horas trabalhadas. Não tem acesso a dados financeiros. | **E-mail:** `dev@email`<br>**Senha:** `senha123` |
+| **2** | 📊 **Gestor / PMO** | Acesso gerencial. Pode criar e editar novos projetos, cadastrar a hierarquia de tarefas, vincular profissionais aos projetos e visualizar o *dashboard* de consumo de horas e capacidade da equipe. | **E-mail:** `gerente@email`<br>**Senha:** `senha123` |
+| **3** | 💰 **Administrador / Financeiro** | Acesso total. Além das permissões de Gestor, possui acesso exclusivo ao módulo financeiro, podendo configurar os valores de custo e cobrança, definir "Valor Fixo" e exportar relatórios de faturamento. | **E-mail:** `adm@email`<br>**Senha:** `senha123` |
+
+*(Nota: Caso as senhas hash não estejam descriptografadas no banco de testes local, utilize os usuários acima que possuem senhas simples já configuradas na base).*
+
+---
+
+## 📖 Manual do Sistema <a id="soft"></a>
+
+**:link: Clique no link para visualizar o Manual do Sistema:** 
+[Documentação do Manual do Sistema](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.1pulqy2w6ksi)
 
 ---
 
@@ -117,12 +173,14 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 **:link: Clique no link para visualizar a Estratégia de Branch:** 
 [Documentação da Estrátegia de Branch](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.tizfg2z79z37)
 
+---
+
 ## 📅 Cronograma de Sprints <a id="sprint"></a>
 
 | Sprint          |    Período    | Vídeo do projeto | Documentação                                     |
 | --------------- | :-----------: | ---------------- | ------------------------------------------------ |
-| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/4c6249vc36k) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
-| 🔖 **SPRINT 2** | 13/04 - 03/05 | [Vídeo Sprint 2]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
+| 🔖 **SPRINT 1** | 16/03 - 05/04 | [Vídeo Sprint 1](https://youtu.be/ls2dpN4ofok) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.mmvjmyq4cl7s) |
+| 🔖 **SPRINT 2** | 13/04 - 03/05 | [Vídeo Sprint 2](https://youtu.be/6mVxZLrQ19M) | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.753vbek8aqdn) |
 | 🔖 **SPRINT 3** | 11/05 - 31/05 | [Vídeo Sprint 3]() | [Ver Documentação](https://docs.google.com/document/d/1O_trfXtQ8lO5D2ksU1aD-819RmUyD9XAhrF1bne7AYY/edit?tab=t.28xhhcschnkh) |
 
 ## 💻 Tecnologias <a id="tecnologias"></a>
@@ -209,6 +267,3 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
     </tr>
   </table>
 </div>
-
-
-
