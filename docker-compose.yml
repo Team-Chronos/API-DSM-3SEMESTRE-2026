@@ -179,6 +179,37 @@ services:
     networks:
       - app-network
 
+  tarefas-get-api:
+    build:
+      context: ./services/visualizar-tarefas/visualizarTarefas/
+      dockerfile: Dockerfile
+    container_name: tarefas-get-api
+    environment:
+      SPRING_APPLICATION_NAME: visualizarTarefas
+      SERVER_PORT: 8099
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SPRING_JPA_SHOW_SQL: "true"
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: "true"
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: "true"
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+      PROFISSIONAIS_API_URL: http://ms-profissionais:8081/api/profissionais
+
+    depends_on:
+      ms-profissionais:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - app-network
+
   auth-gateway:
     build:
       context: ./services/gateway/gateway
@@ -203,6 +234,7 @@ services:
       PROJETO_API_URL: http://projeto:8084
       FINANCEIRO_API_URL: http://financeiro:8085
       TAREFAS_API_URL: http://tarefas-api:8089
+      TAREFAS_GET_API_URL: http://tarefas-get-api:8099
     depends_on:
       redis:
         condition: service_healthy
@@ -217,6 +249,8 @@ services:
       financeiro:
         condition: service_started
       tarefas-api:
+        condition: service_started
+      tarefas-get-api:
         condition: service_started
     restart: unless-stopped
     networks:
