@@ -1,12 +1,7 @@
-import { useAuth } from "../../contexts/AuthContext";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar";
-import { Navigate, Outlet } from "react-router-dom";
 
 export default function AppLayout() {
-  const { user } = useAuth()
-  if (!user){
-    return <Navigate to={"/login"} replace/>
-  }
   return (
     <div className="flex h-screen overflow-hidden bg-[#0f1020]">
       <Sidebar />
