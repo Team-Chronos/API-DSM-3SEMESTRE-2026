@@ -69,6 +69,31 @@ services:
     networks:
       - app-network
 
+  controle-visualizar-horas:
+    build:
+      context: ./services/controle-horas/controle-horas
+      dockerfile: Dockerfile
+    container_name: controle-visualizar-horas-api
+    environment:
+      SPRING_APPLICATION_NAME: controle-visualizar-horas
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8092
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+      TAREFAS_API_URL: http://tarefas-api:8089/tarefas
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
   login-api:
     build:
       context: ./services/login
@@ -231,10 +256,12 @@ services:
       LOGIN_API_URL: http://login-api:8083
       PROFISSIONAIS_API_URL: http://ms-profissionais:8081
       CONTROLE_HORAS_API_URL: http://controle-horas:8082
+      CONTROLE_HORAS_GET_API_URL: http://controle-visualizar-horas:8092
       PROJETO_API_URL: http://projeto:8084
       FINANCEIRO_API_URL: http://financeiro:8085
       TAREFAS_API_URL: http://tarefas-api:8089
       TAREFAS_GET_API_URL: http://tarefas-get-api:8099
+
     depends_on:
       redis:
         condition: service_healthy
