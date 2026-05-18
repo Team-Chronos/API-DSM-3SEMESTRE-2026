@@ -132,13 +132,7 @@ function getInitials(nome?: string) {
 function DetalhesProjeto() {
   const navigate = useNavigate();
   const { projeto, isLoading: projetoLoading } = useProjetoContext();
-  const { user } = useAuth();
-
-  const roles = user?.roles ?? [];
-  const podeGerenciarProjetos =
-    roles.includes("ROLE_FINANCE") ||
-    roles.includes("ROLE_GERENTE_PROJETO") ||
-    roles.includes("ROLE_ADMIN");
+  const { user, podeGerenciarProjetos } = useAuth();
 
   const [acessoNegado, setAcessoNegado] = useState(false);
   const [pesquisaTarefa, setPesquisaTarefa] = useState("");

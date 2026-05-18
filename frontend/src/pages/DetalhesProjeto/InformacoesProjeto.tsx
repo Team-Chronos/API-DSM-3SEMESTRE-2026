@@ -27,14 +27,9 @@ function formatarDataInput(valor: string) {
 
 function InformacoesProjeto() {
   const { projeto, refetch } = useProjetoContext()
-  const { user, loading: authLoading } = useAuth()
+  const { loading: authLoading, podeEditarProjeto } = useAuth()
 
-  const podeEditar = !authLoading && (
-  user?.roles?.includes("ROLE_FINANCE") ||
-  user?.roles?.includes("ROLE_GERENTE_PROJETO") ||
-  user?.roles?.includes("ROLE_ADMIN") ||
-  false
-)
+  const podeEditar = !authLoading && podeEditarProjeto
 
   const [responsavel, setResponsavel] = useState<Profissional | null>(null)
   const [totalMinutos, setTotalMinutos] = useState<number>(0)

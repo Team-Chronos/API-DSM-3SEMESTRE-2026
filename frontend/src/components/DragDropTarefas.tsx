@@ -58,14 +58,9 @@ export default function DragDropTarefas({
   onAbrirModalItem,
   refreshKey,
 }: DragDropTarefasProps) {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, podeGerenciarProjetos } = useAuth();
 
-  const userRoles = user?.roles ?? [];
-  const podeGerenciarTodasTarefas =
-    userRoles.includes("ROLE_ADMIN") ||
-    userRoles.includes("ROLE_FINANCE") ||
-    userRoles.includes("ROLE_GERENTE_PROJETO");
-  const rolesKey = userRoles.join("|");
+  const podeGerenciarTodasTarefas = podeGerenciarProjetos;
 
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: "pendente", titulo: "Pendente", status: "PENDENTE", tarefas: [] },
@@ -87,7 +82,7 @@ export default function DragDropTarefas({
     if (!authLoading && projetoId && user?.id) {
       carregarTarefas();
     }
-  }, [projetoId, user?.id, rolesKey, refreshKey, authLoading]);
+  }, [projetoId, user?.id, podeGerenciarTodasTarefas, refreshKey, authLoading]);
 
   const getNomeResponsavel = (responsavelId: number | null): string => {
     if (!responsavelId) return "Não atribuído";

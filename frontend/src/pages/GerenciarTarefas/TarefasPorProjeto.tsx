@@ -10,11 +10,9 @@ import { useAuth } from "../../contexts/AuthContext";
 export default function TarefasPorProjeto() {
   const { projeto, isLoading } = useProjetoContext();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { podeGerenciarProjetos } = useAuth();
 
-  const userRoles = user?.roles ?? [];
-  const podeGerenciarTodasTarefas =
-    userRoles.includes("ROLE_FINANCE") || userRoles.includes("ROLE_GERENTE_PROJETO");
+  const podeGerenciarTodasTarefas = podeGerenciarProjetos;
 
   const [nomeResponsavel, setNomeResponsavel] = useState<string>("Não informado");
   const [modalItemAberto, setModalItemAberto] = useState<boolean>(false);

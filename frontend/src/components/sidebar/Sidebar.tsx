@@ -13,20 +13,20 @@ import logoMetade from "../../assets/metade.png";
 import { useAuth } from "../../contexts/AuthContext";
 
 const ALL_NAV_ITEMS = [
-  { to: "/financeiro", icon: LayoutDashboard, label: "Financeiro", allowedRoles: ["ROLE_ADMIN"] },
+  { to: "/financeiro", icon: LayoutDashboard, label: "Financeiro", allowedCargos: [3] },
   { to: "/projetos", icon: FolderKanban, label: "Projetos" },
-  { to: "/profissionais", icon: Users, label: "Profissionais", allowedRoles: ["ROLE_ADMIN", "ROLE_GERENTE_PROJETO"] },
-  { to: "/associacoes", icon: Link, label: "Associações", allowedRoles: ["ROLE_ADMIN", "ROLE_GERENTE_PROJETO"] },
+  { to: "/profissionais", icon: Users, label: "Profissionais", allowedCargos: [2, 3] },
+  { to: "/associacoes", icon: Link, label: "Associações", allowedCargos: [2, 3] },
 ];
 
 export default function Sidebar() {
-  const { user, logout, hasAnyRole } = useAuth();
+  const { user, logout, hasAnyCargo } = useAuth();
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
 
   const visibleNavItems = ALL_NAV_ITEMS.filter((item) => {
-    if (!item.allowedRoles) return true;
-    return hasAnyRole(item.allowedRoles);
+    if (!item.allowedCargos) return true;
+    return hasAnyCargo(item.allowedCargos);
   });
 
   function handleLogout() {

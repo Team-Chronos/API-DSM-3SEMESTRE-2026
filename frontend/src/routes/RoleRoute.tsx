@@ -4,12 +4,12 @@ import { useAuth } from "../contexts/AuthContext";
 import AccessLoading from "./AccessLoading";
 
 type RoleRouteProps = {
-  allowedRoles: string[];
+  allowedCargos: number[];
   children?: ReactNode;
 };
 
-export default function RoleRoute({ allowedRoles, children }: RoleRouteProps) {
-  const { user, loading, hasAnyRole } = useAuth();
+export default function RoleRoute({ allowedCargos, children }: RoleRouteProps) {
+  const { user, loading, hasAnyCargo } = useAuth();
 
   if (loading) {
     return <AccessLoading message="Verificando acesso..." />;
@@ -19,7 +19,7 @@ export default function RoleRoute({ allowedRoles, children }: RoleRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!hasAnyRole(allowedRoles)) {
+  if (!hasAnyCargo(allowedCargos)) {
     return <Navigate to="/sem-acesso" replace />;
   }
 

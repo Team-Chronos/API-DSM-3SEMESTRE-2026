@@ -6,14 +6,15 @@ import { toastError } from "../utils/toastUtils";
 type AuthContextType = {
   user?: User;
   loading: boolean;
-  roles: string[];
-  isAdmin: boolean;
+  cargoId: number | null;
+  isDev: boolean;
   isGerenteProjeto: boolean;
-  isFinanceiro: boolean;
+  isAdmin: boolean;
   podeEditarProjeto: boolean;
   podeGerenciarProjetos: boolean;
-  hasRole: (role: string) => boolean;
-  hasAnyRole: (allowedRoles: string[]) => boolean;
+  podeAcessarFinanceiro: boolean;
+  hasCargo: (cargo: number) => boolean;
+  hasAnyCargo: (allowedCargos: number[]) => boolean;
   login: (email: string, senha: string) => Promise<boolean>;
   logout: () => void;
   getToken: () => string | null;
@@ -24,6 +25,22 @@ type LoginResponse = { token: string };
 
 const API_BASE = "/api";
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+function resolverCargoId(user?: User): number | null {
+  if (!user) return null;
+
+  const dados = user as User & {
+    cargoId?: number | string;
+    cargo_id?: number | string;
+    id_cargo?: number | string;
+    ID_Cargo?: number | string;
+  };
+
+  const valor = dados.cargo_id ?? dados.cargoId ?? dados.id_cargo ?? dados.ID_Cargo;
+  const cargo = Number(valor);
+
+  return Number.isFinite(cargo) && cargo > 0 ? cargo : null;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User>();
@@ -45,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw new Error("Token expirado");
       }
 
-      setUser({ ...decoded, roles: decoded.roles ?? [] });
+      setUser(decoded);
     } catch {
       localStorage.removeItem("token");
       setUser(undefined);
@@ -54,20 +71,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const roles = useMemo(() => user?.roles ?? [], [user]);
+  const cargoId = useMemo(() => resolverCargoId(user), [user]);
 
-  const hasRole = (role: string) => roles.includes(role);
+  const hasCargo = (cargo: number) => cargoId === Number(cargo);
 
-  const hasAnyRole = (allowedRoles: string[]) => {
-    if (!allowedRoles.length) return true;
-    return allowedRoles.some((role) => roles.includes(role));
+  const hasAnyCargo = (allowedCargos: number[]) => {
+    if (!allowedCargos.length) return true;
+    if (!cargoId) return false;
+    return allowedCargos.some((cargo) => Number(cargo) === cargoId);
   };
 
-  const isAdmin = hasRole("ROLE_ADMIN");
-  const isGerenteProjeto = hasRole("ROLE_GERENTE_PROJETO");
-  const isFinanceiro = hasRole("ROLE_FINANCE");
-  const podeEditarProjeto = isAdmin || isGerenteProjeto;
-  const podeGerenciarProjetos = isAdmin || isGerenteProjeto;
+  const isDev = cargoId === 1;
+  const isGerenteProjeto = cargoId === 2;
+  const isAdmin = cargoId === 3;
+
+  const podeEditarProjeto = isGerenteProjeto || isAdmin;
+  const podeGerenciarProjetos = isGerenteProjeto || isAdmin;
+  const podeAcessarFinanceiro = isAdmin;
 
   const apiFetch = async (endpoint: string, options: RequestInit = {}) => {
     const token = localStorage.getItem("token");
@@ -112,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("token", data.token);
 
       const decodedUser = jwtDecode<User>(data.token);
-      setUser({ ...decodedUser, roles: decodedUser.roles ?? [] });
+      setUser(decodedUser);
 
       return true;
     } catch (error) {
@@ -136,14 +156,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         loading,
-        roles,
-        isAdmin,
+        cargoId,
+        isDev,
         isGerenteProjeto,
-        isFinanceiro,
+        isAdmin,
         podeEditarProjeto,
         podeGerenciarProjetos,
-        hasRole,
-        hasAnyRole,
+        podeAcessarFinanceiro,
+        hasCargo,
+        hasAnyCargo,
         login,
         logout,
         getToken,

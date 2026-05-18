@@ -22,8 +22,11 @@ import SemAcesso from "../pages/SemAcesso";
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
 
-const adminRoles = ["ROLE_ADMIN"];
-const adminGerenteRoles = ["ROLE_ADMIN", "ROLE_GERENTE_PROJETO"];
+const CARGO_GERENTE = 2;
+const CARGO_ADMIN = 3;
+
+const adminCargos = [CARGO_ADMIN];
+const adminGerenteCargos = [CARGO_GERENTE, CARGO_ADMIN];
 
 const loading = <div className="flex min-h-screen items-center justify-center bg-[#1b1b1f] text-white">Loading...</div>;
 
@@ -83,7 +86,7 @@ const AppRoutes = createBrowserRouter([
           {
             path: "tarefas",
             element: (
-              <RoleRoute allowedRoles={adminGerenteRoles}>
+              <RoleRoute allowedCargos={adminGerenteCargos}>
                 <Suspense fallback={loading}>
                   <TarefasPorProjeto />
                 </Suspense>
@@ -95,7 +98,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "financeiro",
         element: (
-          <RoleRoute allowedRoles={adminRoles}>
+          <RoleRoute allowedCargos={adminCargos}>
             <Suspense fallback={loading}>
               <DashboardPage />
             </Suspense>
@@ -105,7 +108,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "profissionais",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <TelaListaProfissionais />
           </RoleRoute>
         ),
@@ -113,7 +116,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "profissionais/:id",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <TelaDetalhesProfissional />
           </RoleRoute>
         ),
@@ -121,7 +124,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "cadastro-profissionais",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <CadastroProfissional />
           </RoleRoute>
         ),
@@ -129,7 +132,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "associacoes",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <AssociacaoProfissionalProjeto />
           </RoleRoute>
         ),
@@ -137,7 +140,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "gestao-profissionais",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <GestaoProfissionais />
           </RoleRoute>
         ),
@@ -145,7 +148,7 @@ const AppRoutes = createBrowserRouter([
       {
         path: "tarefas",
         element: (
-          <RoleRoute allowedRoles={adminGerenteRoles}>
+          <RoleRoute allowedCargos={adminGerenteCargos}>
             <TelaProjetos />
           </RoleRoute>
         ),
