@@ -21,7 +21,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: ms-profissionais
       SERVER_PORT: 8081
-      DB_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_URL: jdbc:mysql://35.198.58.59:3306/profissionais?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       DB_USERNAME: chronosapi
       DB_PASSWORD: Bolsonaro#22
       DB_DRIVER: com.mysql.cj.jdbc.Driver
@@ -51,7 +51,7 @@ services:
     container_name: controle-horas-api
     environment:
       SPRING_APPLICATION_NAME: controle-horas
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/apontamento?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -76,7 +76,7 @@ services:
     container_name: controle-visualizar-horas-api
     environment:
       SPRING_APPLICATION_NAME: controle-visualizar-horas
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/apontamento?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -102,7 +102,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: login
       SERVER_PORT: 8083
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/profissionais?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
@@ -125,7 +125,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: projeto
       SERVER_PORT: 8084
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/projetos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -177,7 +177,7 @@ services:
       SPRING_APPLICATION_NAME: criarTarefas
       SERVER_PORT: 8089
       PROJETO_API_URL: http://projeto:8084/projetos
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/tarefas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
@@ -212,7 +212,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: visualizarTarefas
       SERVER_PORT: 8099
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/tarefas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
