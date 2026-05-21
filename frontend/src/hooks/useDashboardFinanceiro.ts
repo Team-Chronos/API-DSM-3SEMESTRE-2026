@@ -15,7 +15,10 @@ interface UseDashboardFinanceiroResult {
   recarregar: () => Promise<void>;
 }
 
-export function useDashboardFinanceiro(): UseDashboardFinanceiroResult {
+export function useDashboardFinanceiro(
+  ano: number,
+  mes: number,
+): UseDashboardFinanceiroResult {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [projetos, setProjetos] = useState<ProjetoFinanceiro[]>([]);
   const [profissionais, setProfissionais] = useState<ProfissionalGanhos[]>([]);
@@ -29,9 +32,9 @@ export function useDashboardFinanceiro(): UseDashboardFinanceiroResult {
 
       const [dashboardResponse, projetosResponse, profissionaisResponse] =
         await Promise.all([
-          apiFinanceiro.buscarDashboard(),
-          apiFinanceiro.buscarProjetos(),
-          apiFinanceiro.buscarProfissionais(),
+          apiFinanceiro.buscarDashboard(ano, mes),
+          apiFinanceiro.buscarProjetos(ano, mes),
+          apiFinanceiro.buscarProfissionais(ano, mes),
         ]);
 
       setDashboard(dashboardResponse);
@@ -44,7 +47,7 @@ export function useDashboardFinanceiro(): UseDashboardFinanceiroResult {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [ano, mes]);
 
   useEffect(() => {
     void carregar();

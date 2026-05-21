@@ -29,34 +29,67 @@ api.interceptors.response.use(
       window.location.href = "/login";
     }
     return Promise.reject(error);
-  }
+  },
 );
 
+function competenciaParams(ano: number, mes: number) {
+  return { ano, mes };
+}
+
 export const apiFinanceiro = {
-  async buscarDashboard(): Promise<DashboardData> {
-    const response = await api.get<DashboardData>("/financeiro/dashboard");
-    return response.data;
-  },
-
-  async buscarProjetos(): Promise<ProjetoFinanceiro[]> {
-    const response = await api.get<ProjetoFinanceiro[]>("/financeiro/projetos");
-    return response.data;
-  },
-
-  async buscarProfissionais(): Promise<ProfissionalGanhos[]> {
-    const response = await api.get<ProfissionalGanhos[]>("/financeiro/profissionais");
-    return response.data;
-  },
-
-  async buscarProfissionalPorId(usuarioId: number, bonus = 0): Promise<ProfissionalGanhos> {
-    const response = await api.get<ProfissionalGanhos>(`/financeiro/profissionais/${usuarioId}`, {
-      params: { bonus },
+  async buscarDashboard(ano: number, mes: number): Promise<DashboardData> {
+    const response = await api.get<DashboardData>("/financeiro/dashboard", {
+      params: competenciaParams(ano, mes),
     });
     return response.data;
   },
 
-  async buscarProjetoDetalhe(projetoId: number): Promise<ProjetoDetalhe> {
-    const response = await api.get<ProjetoDetalhe>(`/financeiro/projetos/${projetoId}/detalhes`);
+  async buscarProjetos(ano: number, mes: number): Promise<ProjetoFinanceiro[]> {
+    const response = await api.get<ProjetoFinanceiro[]>("/financeiro/projetos", {
+      params: competenciaParams(ano, mes),
+    });
+    return response.data;
+  },
+
+  async buscarProfissionais(
+    ano: number,
+    mes: number,
+  ): Promise<ProfissionalGanhos[]> {
+    const response = await api.get<ProfissionalGanhos[]>(
+      "/financeiro/profissionais",
+      {
+        params: competenciaParams(ano, mes),
+      },
+    );
+    return response.data;
+  },
+
+  async buscarProfissionalPorId(
+    usuarioId: number,
+    bonus = 0,
+    ano: number,
+    mes: number,
+  ): Promise<ProfissionalGanhos> {
+    const response = await api.get<ProfissionalGanhos>(
+      `/financeiro/profissionais/${usuarioId}`,
+      {
+        params: { bonus, ano, mes },
+      },
+    );
+    return response.data;
+  },
+
+  async buscarProjetoDetalhe(
+    projetoId: number,
+    ano: number,
+    mes: number,
+  ): Promise<ProjetoDetalhe> {
+    const response = await api.get<ProjetoDetalhe>(
+      `/financeiro/projetos/${projetoId}/detalhes`,
+      {
+        params: competenciaParams(ano, mes),
+      },
+    );
     return response.data;
   },
 };

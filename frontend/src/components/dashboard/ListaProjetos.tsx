@@ -7,6 +7,8 @@ import type { ProjetoDetalhe, ProjetoFinanceiro } from "../../types/financeiro";
 
 interface ListaProjetosProps {
   projetos: ProjetoFinanceiro[];
+  ano: number;
+  mes: number;
   buscaExterna?: string;
   onBuscaExternaChange?: (valor: string) => void;
 }
@@ -37,6 +39,8 @@ function formatarHoras(valor: number): string {
 
 function ListaProjetos({
   projetos,
+  ano,
+  mes,
   buscaExterna,
   onBuscaExternaChange,
 }: ListaProjetosProps) {
@@ -45,7 +49,7 @@ function ListaProjetos({
   const [projetoSelecionado, setProjetoSelecionado] =
     useState<ProjetoDetalhe | null>(null);
   const [carregandoProjetoId, setCarregandoProjetoId] = useState<number | null>(
-    null
+    null,
   );
   const [erroDetalhe, setErroDetalhe] = useState<string | null>(null);
 
@@ -73,7 +77,11 @@ function ListaProjetos({
       setErroDetalhe(null);
       setCarregandoProjetoId(projetoId);
 
-      const detalhe = await apiFinanceiro.buscarProjetoDetalhe(projetoId);
+      const detalhe = await apiFinanceiro.buscarProjetoDetalhe(
+        projetoId,
+        ano,
+        mes,
+      );
       setProjetoSelecionado(detalhe);
     } catch (err) {
       const mensagem =
@@ -157,7 +165,7 @@ function ListaProjetos({
             {projetosFiltrados.length === 0 ? (
               <SemConteudo
                 title="Nenhum projeto encontrado"
-                description="Tente outro filtro para localizar projetos."
+                description="Tente outro filtro ou selecione outro mês."
               />
             ) : (
               projetosFiltrados.map((projeto) => (
