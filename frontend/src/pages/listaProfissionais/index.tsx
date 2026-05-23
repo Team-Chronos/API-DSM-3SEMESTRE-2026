@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 export interface Projeto {
   projetoId: number;
@@ -71,6 +72,7 @@ function buildPageItems(pagina: number, totalPaginas: number): (number | "...")[
 
 function TelaListaProfissionais() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
@@ -127,10 +129,10 @@ function TelaListaProfissionais() {
   const pageItems = buildPageItems(pagina, totalPaginas);
 
   return (
-    <div className="p-6 text-white">
+    <div className="sm:p-6 @max-md:p-0 text-white">
       <div className="mx-auto max-w-6xl space-y-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-          <div>
+        <div className="@container w-full flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div className="p-6 @max-md:p-6 sm:p-0">
             <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">
               Profissionais
             </h1>
@@ -166,7 +168,7 @@ function TelaListaProfissionais() {
           </div>
         </div>
 
-        <div className="overflow-hidden rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+        <div className="overflow-hidden sm:rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
           <div className="relative border-b border-white/8 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
             <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-white/15" />
@@ -222,9 +224,9 @@ function TelaListaProfissionais() {
           </div>
 
           <div className="px-2 pb-2 sm:px-4">
-            <div className="grid grid-cols-[2fr_1fr_2fr_auto] gap-4 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
+            <div className="@container grid grid-cols-[2fr_2fr_auto] sm:grid-cols-[2fr_1fr_2fr_auto] gap-4 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-slate-500">
               <span>Nome</span>
-              <span>Cargo</span>
+              {!isMobile && <span className="hidden @md:inline">Cargo</span>}
               <span>Email</span>
               <span></span>
             </div>
@@ -238,13 +240,13 @@ function TelaListaProfissionais() {
                 Nenhum profissional encontrado.
               </div>
             ) : (
-              <div className="divide-y divide-white/5">
+              <div className="@container divide-y divide-white/5">
                 {paginaAtual.map((profissional) => {
                   const cargo = getCargo(profissional.cargoId);
                   return (
                     <div
                       key={profissional.id}
-                      className="grid grid-cols-[2fr_1fr_2fr_auto] items-center gap-4 rounded-xl px-4 py-3.5 transition hover:bg-white/5"
+                      className={`@container grid grid-cols-[2fr_2fr_auto] ${!isMobile && "@md:grid-cols-[2fr_1fr_2fr_auto]"} items-center gap-4 rounded-xl px-4 py-3.5 transition hover:bg-white/5`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
@@ -257,21 +259,23 @@ function TelaListaProfissionais() {
                         </span>
                       </div>
 
-                      <div>
-                        <span
-                          className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}
-                        >
-                          {cargo.label}
-                        </span>
-                      </div>
+                      {!isMobile && (
+                        <div className="hidden @md:inline">
+                          <span
+                            className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}
+                          >
+                            {cargo.label}
+                          </span>
+                        </div>
+                      )}
 
-                      <span className="truncate text-sm text-slate-400">{profissional.email}</span>
+                      <span className="truncate text-xs text-slate-400">{profissional.email}</span>
 
                       <button
                         onClick={() => navigate(`/profissionais/${profissional.id}`)}
-                        className="flex items-center gap-1 text-sm font-medium text-[#9d71f5] transition hover:text-white whitespace-nowrap"
+                        className="flex items-center gap-1 text-xs w-fit font-medium text-[#9d71f5] transition hover:text-white whitespace-nowrap"
                       >
-                        Ver detalhes
+                        <span className="hidden sm:inline">Ver detalhes</span>
                         <svg
                           width="16"
                           height="16"
@@ -293,7 +297,7 @@ function TelaListaProfissionais() {
             )}
           </div>
 
-          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/8 px-6 py-4 sm:flex-row sm:px-8">
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-white/8 px-6 py-4 md:flex-row sm:px-8">
             <span className="text-xs text-slate-500">
               Mostrando{" "}
               {filtrados.length === 0
@@ -303,7 +307,7 @@ function TelaListaProfissionais() {
               profissionais
             </span>
 
-            <div className="flex items-center gap-1 w-full">
+            <div className="flex items-center justify-center gap-1 w-full">
               <button
                 onClick={() => setPagina((p) => Math.max(1, p - 1))}
                 disabled={pagina === 1}
