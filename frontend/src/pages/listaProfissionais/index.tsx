@@ -100,9 +100,7 @@ function TelaListaProfissionais() {
     const termo = busca.toLowerCase().trim();
     if (!termo) return profissionais;
     return profissionais.filter(
-      (p) =>
-        p.nome.toLowerCase().includes(termo) ||
-        p.email.toLowerCase().includes(termo)
+      (p) => p.nome.toLowerCase().includes(termo) || p.email.toLowerCase().includes(termo),
     );
   }, [profissionais, busca]);
 
@@ -143,7 +141,16 @@ function TelaListaProfissionais() {
 
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#232329] px-4 py-3 shadow-lg">
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="white"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
                 <circle cx="9" cy="7" r="4" />
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
@@ -186,7 +193,17 @@ function TelaListaProfissionais() {
 
           <div className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
             <div className="relative w-full max-w-sm">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="11" cy="11" r="8" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
@@ -217,7 +234,9 @@ function TelaListaProfissionais() {
             ) : erro ? (
               <div className="py-16 text-center text-red-400 text-sm">{erro}</div>
             ) : paginaAtual.length === 0 ? (
-              <div className="py-16 text-center text-slate-400 text-sm">Nenhum profissional encontrado.</div>
+              <div className="py-16 text-center text-slate-400 text-sm">
+                Nenhum profissional encontrado.
+              </div>
             ) : (
               <div className="divide-y divide-white/5">
                 {paginaAtual.map((profissional) => {
@@ -228,7 +247,9 @@ function TelaListaProfissionais() {
                       className="grid grid-cols-[2fr_1fr_2fr_auto] items-center gap-4 rounded-xl px-4 py-3.5 transition hover:bg-white/5"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(profissional.id)} text-xs font-bold text-white shadow`}>
+                        <div
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(profissional.id)} text-xs font-bold text-white shadow`}
+                        >
                           {getInitials(profissional.nome)}
                         </div>
                         <span className="truncate font-medium text-white text-sm">
@@ -237,7 +258,9 @@ function TelaListaProfissionais() {
                       </div>
 
                       <div>
-                        <span className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}>
+                        <span
+                          className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${cargo.color}`}
+                        >
                           {cargo.label}
                         </span>
                       </div>
@@ -249,7 +272,16 @@ function TelaListaProfissionais() {
                         className="flex items-center gap-1 text-sm font-medium text-[#9d71f5] transition hover:text-white whitespace-nowrap"
                       >
                         Ver detalhes
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <line x1="5" y1="12" x2="19" y2="12" />
                           <polyline points="12 5 19 12 12 19" />
                         </svg>
@@ -267,17 +299,26 @@ function TelaListaProfissionais() {
               {filtrados.length === 0
                 ? 0
                 : Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, filtrados.length)}
-              –{Math.min(pagina * ITEMS_PER_PAGE, filtrados.length)} de{" "}
-              {filtrados.length} profissionais
+              –{Math.min(pagina * ITEMS_PER_PAGE, filtrados.length)} de {filtrados.length}{" "}
+              profissionais
             </span>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 w-full">
               <button
                 onClick={() => setPagina((p) => Math.max(1, p - 1))}
                 disabled={pagina === 1}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="15 18 9 12 15 6" />
                 </svg>
               </button>
@@ -302,7 +343,7 @@ function TelaListaProfissionais() {
                   >
                     {item}
                   </button>
-                )
+                ),
               )}
 
               <button
@@ -310,7 +351,16 @@ function TelaListaProfissionais() {
                 disabled={pagina === totalPaginas}
                 className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="9 18 15 12 9 6" />
                 </svg>
               </button>
@@ -408,21 +458,28 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export function listarProjetos(): Promise<ProjetoDisponivel[]> {
-  return request<ProjetoDisponivel[]>("/profissionais/api/profissionais/projetos", { method: "GET" });
+  return request<ProjetoDisponivel[]>("/profissionais/api/profissionais/projetos", {
+    method: "GET",
+  });
 }
 
 export function listarProfissionais(): Promise<ProfissionalResposta[]> {
   return request<ProfissionalResposta[]>("/profissionais/api/profissionais", { method: "GET" });
 }
 
-export function listarProjetosVinculados(profissionalId: number): Promise<ProjetoVinculadoResposta[]> {
-  return request<ProjetoVinculadoResposta[]>(`/profissionais/api/profissionais/${profissionalId}/projetos`, { method: "GET" });
+export function listarProjetosVinculados(
+  profissionalId: number,
+): Promise<ProjetoVinculadoResposta[]> {
+  return request<ProjetoVinculadoResposta[]>(
+    `/profissionais/api/profissionais/${profissionalId}/projetos`,
+    { method: "GET" },
+  );
 }
 
 export function vincularProjetoAoProfissional(
   profissionalId: number,
   projetoId: number,
-  valorHora: number
+  valorHora: number,
 ): Promise<void> {
   return request<void>(`/profissionais/api/profissionais/${profissionalId}/projetos/${projetoId}`, {
     method: "POST",
