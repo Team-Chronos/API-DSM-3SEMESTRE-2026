@@ -88,7 +88,8 @@ function Projetos() {
       ]);
 
       if (!resProjetos.ok) throw new Error(`Erro ao carregar projetos: ${resProjetos.status}`);
-      if (!resProfissionais.ok) throw new Error(`Erro ao carregar profissionais: ${resProfissionais.status}`);
+      if (!resProfissionais.ok)
+        throw new Error(`Erro ao carregar profissionais: ${resProfissionais.status}`);
 
       const dadosProjetos = await resProjetos.json();
       const dadosProfissionais = await resProfissionais.json();
@@ -100,10 +101,10 @@ function Projetos() {
         const idsProjetos = new Set(
           vinculos
             .map((v: any) => Number(v.projetoId ?? v.id))
-            .filter((id: number) => !Number.isNaN(id))
+            .filter((id: number) => !Number.isNaN(id)),
         );
         projetosPermitidos = projetosPermitidos.filter((projeto: Projeto) =>
-          idsProjetos.has(Number(projeto.id))
+          idsProjetos.has(Number(projeto.id)),
         );
       }
 
@@ -112,8 +113,8 @@ function Projetos() {
         new Map<number, string>(
           Array.isArray(dadosProfissionais)
             ? dadosProfissionais.map((p: Profissional) => [p.id, p.nome])
-            : []
-        )
+            : [],
+        ),
       );
     } catch (err) {
       console.error("Erro ao carregar dados:", err);
@@ -184,17 +185,25 @@ function Projetos() {
       const responsavelB = getNomeResponsavel(b.responsavelId);
 
       switch (ordenacao) {
-        case "NOME_DESC": return nomeB.localeCompare(nomeA);
-        case "CODIGO_ASC": return codigoA.localeCompare(codigoB);
-        case "CODIGO_DESC": return codigoB.localeCompare(codigoA);
-        case "RESPONSAVEL_ASC": return responsavelA.localeCompare(responsavelB);
-        case "TIPO_ASC": return getTipoLabel(a.tipoProjeto).localeCompare(getTipoLabel(b.tipoProjeto));
-        case "VALOR_DESC": return Number(b.valorHoraBase ?? 0) - Number(a.valorHoraBase ?? 0);
-        case "HORAS_DESC": return Number(b.horasContratadas ?? 0) - Number(a.horasContratadas ?? 0);
+        case "NOME_DESC":
+          return nomeB.localeCompare(nomeA);
+        case "CODIGO_ASC":
+          return codigoA.localeCompare(codigoB);
+        case "CODIGO_DESC":
+          return codigoB.localeCompare(codigoA);
+        case "RESPONSAVEL_ASC":
+          return responsavelA.localeCompare(responsavelB);
+        case "TIPO_ASC":
+          return getTipoLabel(a.tipoProjeto).localeCompare(getTipoLabel(b.tipoProjeto));
+        case "VALOR_DESC":
+          return Number(b.valorHoraBase ?? 0) - Number(a.valorHoraBase ?? 0);
+        case "HORAS_DESC":
+          return Number(b.horasContratadas ?? 0) - Number(a.horasContratadas ?? 0);
         case "DATA_INICIO_DESC":
           return new Date(b.dataInicio ?? "").getTime() - new Date(a.dataInicio ?? "").getTime();
         case "NOME_ASC":
-        default: return nomeA.localeCompare(nomeB);
+        default:
+          return nomeA.localeCompare(nomeB);
       }
     });
   }, [projetos, profissionais, busca, tipoFiltro, ordenacao]);
@@ -212,12 +221,15 @@ function Projetos() {
 
   const pageItems = buildPageItems(pagina, totalPaginas);
 
-  const estatisticas = useMemo(() => ({
-    totalProjetos: projetosFiltrados.length,
-    totalHoraFechada: projetosFiltrados.filter((p) => p.tipoProjeto === "HORA_FECHADA").length,
-    totalAlocacao: projetosFiltrados.filter((p) => p.tipoProjeto === "ALOCACAO").length,
-    totalHoras: projetosFiltrados.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0),
-  }), [projetosFiltrados]);
+  const estatisticas = useMemo(
+    () => ({
+      totalProjetos: projetosFiltrados.length,
+      totalHoraFechada: projetosFiltrados.filter((p) => p.tipoProjeto === "HORA_FECHADA").length,
+      totalAlocacao: projetosFiltrados.filter((p) => p.tipoProjeto === "ALOCACAO").length,
+      totalHoras: projetosFiltrados.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0),
+    }),
+    [projetosFiltrados],
+  );
 
   const limparFiltros = () => {
     setBusca("");
@@ -240,7 +252,8 @@ function Projetos() {
     doc.setTextColor("#d8d8d8");
     doc.text(
       `Gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`,
-      padding, y + 20
+      padding,
+      y + 20,
     );
 
     y = 145;
@@ -254,11 +267,20 @@ function Projetos() {
     doc.text("Horas contratadas", padding + 400, y);
     doc.setFontSize(18);
     doc.text(String(projetosRelatorio.length), padding + 20, y + 24);
-    doc.text(String(projetosRelatorio.filter((p) => p.tipoProjeto === "HORA_FECHADA").length), padding + 145, y + 24);
-    doc.text(String(projetosRelatorio.filter((p) => p.tipoProjeto === "ALOCACAO").length), padding + 290, y + 24);
+    doc.text(
+      String(projetosRelatorio.filter((p) => p.tipoProjeto === "HORA_FECHADA").length),
+      padding + 145,
+      y + 24,
+    );
+    doc.text(
+      String(projetosRelatorio.filter((p) => p.tipoProjeto === "ALOCACAO").length),
+      padding + 290,
+      y + 24,
+    );
     doc.text(
       `${projetosRelatorio.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0)}h`,
-      padding + 400, y + 24
+      padding + 400,
+      y + 24,
     );
 
     y += 80;
@@ -277,7 +299,10 @@ function Projetos() {
     y += 24;
 
     projetosRelatorio.forEach((projeto) => {
-      if (y > 760) { doc.addPage(); y = 50; }
+      if (y > 760) {
+        doc.addPage();
+        y = 50;
+      }
       doc.setTextColor("#111111");
       doc.setFontSize(9);
       doc.text(String(projeto.nome ?? "N/D").slice(0, 34), padding + 8, y);
@@ -295,13 +320,13 @@ function Projetos() {
 
   return (
     <div className="min-h-screen bg-[#1f1f1f] p-6 text-white">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-6">
+      <div className="mx-auto flex max-w-400 flex-col gap-6">
         <div className="overflow-hidden rounded-[22px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
-          <div className="relative border-b border-white/10 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#3b137b] px-6 py-7 sm:px-8">
+          <div className="relative border-b border-white/10 bg-linear-to-r from-[#6627cc] via-[#5b21b6] to-[#3b137b] px-6 py-7 sm:px-8">
             <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 left-24 h-40 w-40 rounded-full bg-purple-300/10 blur-3xl" />
 
-            <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="relative @container flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
                   {podeGerenciarProjetos ? "Gestão" : "Meus vínculos"}
@@ -310,11 +335,12 @@ function Projetos() {
                   {podeGerenciarProjetos ? "Projetos" : "Meus projetos"}
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-white/75 sm:text-base">
-                  Acompanhe os projetos cadastrados, responsáveis, tipos de contrato e horas contratadas em uma visão rápida e organizada.
+                  Acompanhe os projetos cadastrados, responsáveis, tipos de contrato e horas
+                  contratadas em uma visão rápida e organizada.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[620px]">
+              <div className="grid grid-cols-2 gap-3 @min-lg:grid-cols-4 w-full">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                   <p className="text-xs text-white/60">Projetos</p>
                   <p className="mt-1 text-2xl font-bold">{estatisticas.totalProjetos}</p>
@@ -337,7 +363,9 @@ function Projetos() {
 
           <div className="flex flex-col gap-4 px-6 py-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Listagem</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                Listagem
+              </p>
               <p className="mt-1 text-sm text-slate-400">
                 {projetosFiltrados.length} de {projetos.length} projeto(s) exibido(s)
               </p>
@@ -348,7 +376,16 @@ function Projetos() {
                 onClick={() => setPainelFiltrosAberto((prev) => !prev)}
                 className="relative inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:border-[#6627cc]/60 hover:bg-[#6627cc]/15"
               >
-                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  width="17"
+                  height="17"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                 </svg>
                 Filtros
@@ -357,7 +394,17 @@ function Projetos() {
                     {filtrosAtivos}
                   </span>
                 )}
-                <svg className={`transition ${painelFiltrosAberto ? "rotate-180" : ""}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  className={`transition ${painelFiltrosAberto ? "rotate-180" : ""}`}
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
@@ -368,7 +415,16 @@ function Projetos() {
                   disabled={loading || projetos.length === 0}
                   className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:border-[#6627cc]/60 hover:bg-[#6627cc]/15 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <svg
+                    width="17"
+                    height="17"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
                     <polyline points="14 2 14 8 20 8" />
                     <line x1="16" y1="13" x2="8" y2="13" />
@@ -382,7 +438,7 @@ function Projetos() {
               {podeGerenciarProjetos && (
                 <button
                   onClick={() => setModalAberto(true)}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7c3aed] to-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-purple-950/40 transition hover:brightness-110 active:scale-[0.98]"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-[#7c3aed] to-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-purple-950/40 transition hover:brightness-110 active:scale-[0.98]"
                 >
                   <span className="text-lg leading-none">+</span>
                   Novo projeto
@@ -396,7 +452,9 @@ function Projetos() {
           <section className="rounded-[22px] border border-[#6627cc]/25 bg-[#232329] p-5 shadow-lg shadow-purple-950/10">
             <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300/80">Filtros</p>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300/80">
+                  Filtros
+                </p>
                 <h2 className="mt-2 text-2xl font-bold text-white">Refinar projetos</h2>
               </div>
               {filtrosAtivos > 0 && (
@@ -411,7 +469,17 @@ function Projetos() {
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_260px_260px]">
               <div className="relative">
-                <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70"
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <circle cx="11" cy="11" r="8" />
                   <line x1="21" y1="21" x2="16.65" y2="16.65" />
                 </svg>
@@ -482,13 +550,25 @@ function Projetos() {
         {loading ? (
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
-              <div key={index} className="h-56 animate-pulse rounded-[22px] border border-white/10 bg-[#26262b]" />
+              <div
+                key={index}
+                className="h-56 animate-pulse rounded-[22px] border border-white/10 bg-[#26262b]"
+              />
             ))}
           </div>
         ) : projetosFiltrados.length === 0 ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center rounded-[22px] border border-white/10 bg-[#232329] p-8 text-center">
+          <div className="flex min-h-90 flex-col items-center justify-center rounded-[22px] border border-white/10 bg-[#232329] p-8 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6627cc]/15 text-[#a78bfa]">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                width="30"
+                height="30"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               </svg>
             </div>
@@ -520,12 +600,16 @@ function Projetos() {
                     <div>
                       <div className="mb-4 flex items-start justify-between gap-3">
                         <div className="min-w-0">
-                          <h2 className="line-clamp-2 text-lg font-bold leading-tight text-white">{projeto.nome}</h2>
+                          <h2 className="line-clamp-2 text-lg font-bold leading-tight text-white">
+                            {projeto.nome}
+                          </h2>
                           <p className="mt-1 text-xs font-medium uppercase tracking-[0.16em] text-slate-500">
                             {projeto.codigo || "Sem código"}
                           </p>
                         </div>
-                        <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}>
+                        <span
+                          className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}
+                        >
                           {getTipoLabel(projeto.tipoProjeto)}
                         </span>
                       </div>
@@ -533,26 +617,41 @@ function Projetos() {
                       <div className="space-y-3">
                         <div className="flex items-center gap-3 text-sm text-slate-300">
                           <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/5 text-slate-400">
-                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <svg
+                              width="17"
+                              height="17"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
                               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                               <circle cx="12" cy="7" r="4" />
                             </svg>
                           </div>
                           <div className="min-w-0">
                             <p className="text-xs text-slate-500">Responsável</p>
-                            <p className="truncate font-semibold text-white">{getNomeResponsavel(projeto.responsavelId)}</p>
+                            <p className="truncate font-semibold text-white">
+                              {getNomeResponsavel(projeto.responsavelId)}
+                            </p>
                           </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-3">
                             <p className="text-[11px] text-slate-500">Valor/hora</p>
-                            <p className="mt-1 truncate text-sm font-bold text-white">{formatarMoeda(projeto.valorHoraBase)}</p>
+                            <p className="mt-1 truncate text-sm font-bold text-white">
+                              {formatarMoeda(projeto.valorHoraBase)}
+                            </p>
                           </div>
                           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-3">
                             <p className="text-[11px] text-slate-500">Horas</p>
                             <p className="mt-1 text-sm font-bold text-white">
-                              {projeto.tipoProjeto === "HORA_FECHADA" ? `${projeto.horasContratadas ?? 0}h` : "Livre"}
+                              {projeto.tipoProjeto === "HORA_FECHADA"
+                                ? `${projeto.horasContratadas ?? 0}h`
+                                : "Livre"}
                             </p>
                           </div>
                         </div>
@@ -567,7 +666,16 @@ function Projetos() {
                       </div>
                       <div className="flex items-center gap-1 text-sm font-semibold text-[#a78bfa] transition group-hover:text-white">
                         Abrir
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <svg
+                          width="15"
+                          height="15"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
                           <line x1="5" y1="12" x2="19" y2="12" />
                           <polyline points="12 5 19 12 12 19" />
                         </svg>
@@ -581,26 +689,37 @@ function Projetos() {
             {totalPaginas > 1 && (
               <div className="flex flex-col items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-[#232329] px-6 py-4 sm:flex-row sm:px-8">
                 <span className="text-xs text-slate-500">
-                  Mostrando{" "}
-                  {Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, projetosFiltrados.length)}
-                  –{Math.min(pagina * ITEMS_PER_PAGE, projetosFiltrados.length)} de{" "}
+                  Mostrando {Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, projetosFiltrados.length)}–
+                  {Math.min(pagina * ITEMS_PER_PAGE, projetosFiltrados.length)} de{" "}
                   {projetosFiltrados.length} projetos
                 </span>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 w-full">
                   <button
                     onClick={() => setPagina((p) => Math.max(1, p - 1))}
                     disabled={pagina === 1}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="15 18 9 12 15 6" />
                     </svg>
                   </button>
 
                   {pageItems.map((item, idx) =>
                     item === "..." ? (
-                      <span key={`ellipsis-${idx}`} className="flex h-8 w-8 items-center justify-center text-slate-500 text-sm select-none">
+                      <span
+                        key={`ellipsis-${idx}`}
+                        className="flex h-8 w-8 items-center justify-center text-slate-500 text-sm select-none"
+                      >
                         ...
                       </span>
                     ) : (
@@ -615,7 +734,7 @@ function Projetos() {
                       >
                         {item}
                       </button>
-                    )
+                    ),
                   )}
 
                   <button
@@ -623,7 +742,16 @@ function Projetos() {
                     disabled={pagina === totalPaginas}
                     className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <polyline points="9 18 15 12 9 6" />
                     </svg>
                   </button>
