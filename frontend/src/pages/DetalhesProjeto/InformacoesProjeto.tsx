@@ -31,9 +31,9 @@ function formatarDataInput(valor: string) {
 }
 
 function getStatusLabel(status?: string) {
-  if (status === "INATIVO") return "Inativo"
-  if (status === "CONCLUIDO") return "Concluído"
-  return "Ativo"
+  if (status === "INATIVO") return "Tarefas pendentes"
+  if (status === "CONCLUIDO") return "Finalizado"
+  return "Em andamento"
 }
 
 function getStatusStyle(status?: string) {

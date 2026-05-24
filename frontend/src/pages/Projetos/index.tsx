@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
-import { toastError } from "../../utils/toastUtils";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 import jsPDF from "jspdf";
 
 interface Projeto {
@@ -73,6 +73,30 @@ function Projetos() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [pagina, setPagina] = useState(1);
+  const [updatingStatusIds, setUpdatingStatusIds] = useState<number[]>([]);
+
+  const mapLabelToBackend = (label: string) => {
+    if (label === "Em andamento" || label === "ATIVO") return "ATIVO";
+    if (label === "Tarefas pendentes" || label === "INATIVO") return "INATIVO";
+    if (label === "Finalizado" || label === "CONCLUIDO") return "CONCLUIDO";
+    return "ATIVO";
+  };
+
+  const handleAlterarStatus = async (id: number, novoLabel: string) => {
+    const novoStatus = mapLabelToBackend(novoLabel) as "ATIVO" | "INATIVO" | "CONCLUIDO";
+    try {
+      setUpdatingStatusIds((s) => Array.from(new Set([...s, id])));
+      const res = await projetoService.alterarStatus(id, novoStatus);
+      if (!res.ok) throw new Error(`Status update failed: ${res.status}`);
+      setProjetos((prev) => prev.map((p) => (p.id === id ? { ...p, status: novoStatus } : p)));
+      toastSuccess("Status atualizado com sucesso");
+    } catch (err) {
+      console.error(err);
+      toastError("Falha ao alterar status. Tente novamente.");
+    } finally {
+      setUpdatingStatusIds((s) => s.filter((x) => x !== id));
+    }
+  };
 
   const carregarDados = async () => {
     try {
@@ -154,10 +178,10 @@ function Projetos() {
   };
 
   const getStatusLabel = (status?: string) => {
-    if (status === "ATIVO") return "Ativo";
-    if (status === "INATIVO") return "Inativo";
-    if (status === "CONCLUIDO") return "Concluído";
-    return "Ativo";
+    if (status === "ATIVO") return "Em andamento";
+    if (status === "INATIVO") return "Tarefas pendentes";
+    if (status === "CONCLUIDO") return "Finalizado";
+    return "Em andamento";
   };
 
   const getStatusStyle = (status?: string) => {
@@ -502,9 +526,9 @@ function Projetos() {
                 className="h-12 rounded-2xl border border-white/10 bg-[#1a1a20] px-4 text-sm text-white outline-none transition focus:border-[#6627cc]/70 focus:ring-2 focus:ring-[#6627cc]/25"
               >
                 <option value="TODOS">Todos os status</option>
-                <option value="ATIVO">Ativos</option>
-                <option value="INATIVO">Inativos</option>
-                <option value="CONCLUIDO">Concluídos</option>
+                <option value="ATIVO">Em andamento</option>
+                <option value="INATIVO">Tarefas pendentes</option>
+                <option value="CONCLUIDO">Finalizados</option>
               </select>
 
               <select
@@ -655,6 +679,23 @@ function Projetos() {
                       </div>
 
                       <div className="flex items-center gap-2">
+                        {podeGerenciarProjetos && (
+                          <select
+                            value={getStatusLabel(projeto.status)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleAlterarStatus(projeto.id, e.target.value);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            disabled={updatingStatusIds.includes(projeto.id)}
+                            className="h-8 rounded-lg bg-[#1a1a20] text-sm text-white border border-white/10 px-2"
+                          >
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Tarefas pendentes">Tarefas pendentes</option>
+                            <option value="Finalizado">Finalizado</option>
+                          </select>
+                        )}
+
                         <div className="flex items-center gap-1 text-sm font-semibold text-[#a78bfa] transition group-hover:text-white">
                           Abrir
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -696,11 +737,10 @@ function Projetos() {
                       <button
                         key={item}
                         onClick={() => setPagina(item)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                          item === pagina
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${item === pagina
                             ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
                             : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
-                        }`}
+                          }`}
                       >
                         {item}
                       </button>
