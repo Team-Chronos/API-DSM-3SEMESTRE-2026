@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
-import { toastError } from "../../utils/toastUtils";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 import jsPDF from "jspdf";
 
 interface Projeto {
@@ -17,6 +17,7 @@ interface Projeto {
   dataInicio: string;
   dataFim: string;
   responsavelId: number;
+  status?: "ATIVO" | "INATIVO" | "CONCLUIDO";
 }
 
 interface Profissional {
@@ -25,6 +26,7 @@ interface Profissional {
 }
 
 type TipoFiltro = "TODOS" | "HORA_FECHADA" | "ALOCACAO";
+type StatusFiltro = "TODOS" | "ATIVO" | "INATIVO" | "CONCLUIDO";
 
 type Ordenacao =
   | "NOME_ASC"
@@ -58,7 +60,6 @@ function buildPageItems(pagina: number, totalPaginas: number): (number | "...")[
 
 function Projetos() {
   const { user, podeGerenciarProjetos } = useAuth();
-
   const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -67,10 +68,35 @@ function Projetos() {
   const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
   const [busca, setBusca] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState<TipoFiltro>("TODOS");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
   const [ordenacao, setOrdenacao] = useState<Ordenacao>("NOME_ASC");
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [pagina, setPagina] = useState(1);
+  const [updatingStatusIds, setUpdatingStatusIds] = useState<number[]>([]);
+
+  const mapLabelToBackend = (label: string) => {
+    if (label === "Em andamento" || label === "ATIVO") return "ATIVO";
+    if (label === "Tarefas pendentes" || label === "INATIVO") return "INATIVO";
+    if (label === "Finalizado" || label === "CONCLUIDO") return "CONCLUIDO";
+    return "ATIVO";
+  };
+
+  const handleAlterarStatus = async (id: number, novoLabel: string) => {
+    const novoStatus = mapLabelToBackend(novoLabel) as "ATIVO" | "INATIVO" | "CONCLUIDO";
+    try {
+      setUpdatingStatusIds((s) => Array.from(new Set([...s, id])));
+      const res = await projetoService.alterarStatus(id, novoStatus);
+      if (!res.ok) throw new Error(`Status update failed: ${res.status}`);
+      setProjetos((prev) => prev.map((p) => (p.id === id ? { ...p, status: novoStatus } : p)));
+      toastSuccess("Status atualizado com sucesso");
+    } catch (err) {
+      console.error(err);
+      toastError("Falha ao alterar status. Tente novamente.");
+    } finally {
+      setUpdatingStatusIds((s) => s.filter((x) => x !== id));
+    }
+  };
 
   const carregarDados = async () => {
     try {
@@ -88,6 +114,8 @@ function Projetos() {
       const dadosProjetos = await resProjetos.json();
       const dadosProfissionais = await resProfissionais.json();
 
+      console.log(dadosProjetos)
+
       let projetosPermitidos = Array.isArray(dadosProjetos) ? dadosProjetos : [];
 
       if (!podeGerenciarProjetos && user?.id) {
@@ -97,6 +125,7 @@ function Projetos() {
             .map((v: any) => Number(v.projetoId ?? v.id))
             .filter((id: number) => !Number.isNaN(id))
         );
+
         projetosPermitidos = projetosPermitidos.filter((projeto: Projeto) =>
           idsProjetos.has(Number(projeto.id))
         );
@@ -148,13 +177,33 @@ function Projetos() {
     return "border-white/10 bg-white/5 text-slate-300";
   };
 
+  const getStatusLabel = (status?: string) => {
+    if (status === "ATIVO") return "Em andamento";
+    if (status === "INATIVO") return "Tarefas pendentes";
+    if (status === "CONCLUIDO") return "Finalizado";
+    return "Em andamento";
+  };
+
+  const getStatusStyle = (status?: string) => {
+    if (status === "INATIVO") return "border-orange-500/30 bg-orange-500/10 text-orange-300";
+    if (status === "CONCLUIDO") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+    return "border-green-500/30 bg-green-500/10 text-green-300";
+  };
+
+  const getStatusDot = (status?: string) => {
+    if (status === "INATIVO") return "bg-orange-400";
+    if (status === "CONCLUIDO") return "bg-emerald-400";
+    return "bg-green-400";
+  };
+
   const filtrosAtivos = useMemo(() => {
     let total = 0;
     if (busca.trim()) total += 1;
     if (tipoFiltro !== "TODOS") total += 1;
+    if (statusFiltro !== "TODOS") total += 1;
     if (ordenacao !== "NOME_ASC") total += 1;
     return total;
-  }, [busca, tipoFiltro, ordenacao]);
+  }, [busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const projetosFiltrados = useMemo(() => {
     const termo = busca.toLowerCase().trim();
@@ -166,8 +215,12 @@ function Projetos() {
         projeto.nome?.toLowerCase().includes(termo) ||
         projeto.codigo?.toLowerCase().includes(termo) ||
         nomeResponsavel.toLowerCase().includes(termo);
+
       const bateTipo = tipoFiltro === "TODOS" || projeto.tipoProjeto === tipoFiltro;
-      return bateTexto && bateTipo;
+      const statusReal = projeto.status ?? "ATIVO";
+      const bateStatus = statusFiltro === "TODOS" || statusReal === statusFiltro;
+
+      return bateTexto && bateTipo && bateStatus;
     });
 
     return [...filtrados].sort((a, b) => {
@@ -179,20 +232,28 @@ function Projetos() {
       const responsavelB = getNomeResponsavel(b.responsavelId);
 
       switch (ordenacao) {
-        case "NOME_DESC": return nomeB.localeCompare(nomeA);
-        case "CODIGO_ASC": return codigoA.localeCompare(codigoB);
-        case "CODIGO_DESC": return codigoB.localeCompare(codigoA);
-        case "RESPONSAVEL_ASC": return responsavelA.localeCompare(responsavelB);
-        case "TIPO_ASC": return getTipoLabel(a.tipoProjeto).localeCompare(getTipoLabel(b.tipoProjeto));
-        case "VALOR_DESC": return Number(b.valorHoraBase ?? 0) - Number(a.valorHoraBase ?? 0);
-        case "HORAS_DESC": return Number(b.horasContratadas ?? 0) - Number(a.horasContratadas ?? 0);
+        case "NOME_DESC":
+          return nomeB.localeCompare(nomeA);
+        case "CODIGO_ASC":
+          return codigoA.localeCompare(codigoB);
+        case "CODIGO_DESC":
+          return codigoB.localeCompare(codigoA);
+        case "RESPONSAVEL_ASC":
+          return responsavelA.localeCompare(responsavelB);
+        case "TIPO_ASC":
+          return getTipoLabel(a.tipoProjeto).localeCompare(getTipoLabel(b.tipoProjeto));
+        case "VALOR_DESC":
+          return Number(b.valorHoraBase ?? 0) - Number(a.valorHoraBase ?? 0);
+        case "HORAS_DESC":
+          return Number(b.horasContratadas ?? 0) - Number(a.horasContratadas ?? 0);
         case "DATA_INICIO_DESC":
           return new Date(b.dataInicio ?? "").getTime() - new Date(a.dataInicio ?? "").getTime();
         case "NOME_ASC":
-        default: return nomeA.localeCompare(nomeB);
+        default:
+          return nomeA.localeCompare(nomeB);
       }
     });
-  }, [projetos, profissionais, busca, tipoFiltro, ordenacao]);
+  }, [projetos, profissionais, busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const totalPaginas = Math.max(1, Math.ceil(projetosFiltrados.length / ITEMS_PER_PAGE));
 
@@ -203,20 +264,24 @@ function Projetos() {
 
   useEffect(() => {
     setPagina(1);
-  }, [busca, tipoFiltro, ordenacao]);
+  }, [busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const pageItems = buildPageItems(pagina, totalPaginas);
 
-  const estatisticas = useMemo(() => ({
-    totalProjetos: projetosFiltrados.length,
-    totalHoraFechada: projetosFiltrados.filter((p) => p.tipoProjeto === "HORA_FECHADA").length,
-    totalAlocacao: projetosFiltrados.filter((p) => p.tipoProjeto === "ALOCACAO").length,
-    totalHoras: projetosFiltrados.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0),
-  }), [projetosFiltrados]);
+  const estatisticas = useMemo(
+    () => ({
+      totalProjetos: projetosFiltrados.length,
+      totalAtivos: projetosFiltrados.filter((p) => (p.status ?? "ATIVO") === "ATIVO").length,
+      totalInativos: projetosFiltrados.filter((p) => p.status === "INATIVO").length,
+      totalConcluidos: projetosFiltrados.filter((p) => p.status === "CONCLUIDO").length,
+    }),
+    [projetosFiltrados]
+  );
 
   const limparFiltros = () => {
     setBusca("");
     setTipoFiltro("TODOS");
+    setStatusFiltro("TODOS");
     setOrdenacao("NOME_ASC");
   };
 
@@ -235,7 +300,8 @@ function Projetos() {
     doc.setTextColor("#d8d8d8");
     doc.text(
       `Gerado em ${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`,
-      padding, y + 20
+      padding,
+      y + 20
     );
 
     y = 145;
@@ -243,17 +309,26 @@ function Projetos() {
     doc.roundedRect(padding, y - 28, 515, 72, 10, 10, "F");
     doc.setTextColor("#6627cc");
     doc.setFontSize(10);
-    doc.text("Projetos", padding + 20, y);
-    doc.text("Hora fechada", padding + 145, y);
-    doc.text("Alocação", padding + 290, y);
-    doc.text("Horas contratadas", padding + 400, y);
+    doc.text("Total", padding + 20, y);
+    doc.text("Ativos", padding + 145, y);
+    doc.text("Inativos", padding + 290, y);
+    doc.text("Concluídos", padding + 420, y);
     doc.setFontSize(18);
     doc.text(String(projetosRelatorio.length), padding + 20, y + 24);
-    doc.text(String(projetosRelatorio.filter((p) => p.tipoProjeto === "HORA_FECHADA").length), padding + 145, y + 24);
-    doc.text(String(projetosRelatorio.filter((p) => p.tipoProjeto === "ALOCACAO").length), padding + 290, y + 24);
     doc.text(
-      `${projetosRelatorio.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0)}h`,
-      padding + 400, y + 24
+      String(projetosRelatorio.filter((p) => (p.status ?? "ATIVO") === "ATIVO").length),
+      padding + 145,
+      y + 24
+    );
+    doc.text(
+      String(projetosRelatorio.filter((p) => p.status === "INATIVO").length),
+      padding + 290,
+      y + 24
+    );
+    doc.text(
+      String(projetosRelatorio.filter((p) => p.status === "CONCLUIDO").length),
+      padding + 420,
+      y + 24
     );
 
     y += 80;
@@ -261,24 +336,29 @@ function Projetos() {
     doc.setFontSize(14);
     doc.text("Projetos", padding, y);
     y += 24;
+
     doc.setFillColor("#6627cc");
     doc.rect(padding, y - 14, 515, 22, "F");
     doc.setTextColor("#ffffff");
     doc.setFontSize(9);
     doc.text("Projeto", padding + 8, y);
-    doc.text("Tipo", padding + 215, y);
-    doc.text("Responsável", padding + 315, y);
-    doc.text("Horas", padding + 455, y);
+    doc.text("Tipo", padding + 200, y);
+    doc.text("Status", padding + 310, y);
+    doc.text("Responsável", padding + 400, y);
     y += 24;
 
     projetosRelatorio.forEach((projeto) => {
-      if (y > 760) { doc.addPage(); y = 50; }
+      if (y > 760) {
+        doc.addPage();
+        y = 50;
+      }
+
       doc.setTextColor("#111111");
       doc.setFontSize(9);
-      doc.text(String(projeto.nome ?? "N/D").slice(0, 34), padding + 8, y);
-      doc.text(getTipoLabel(projeto.tipoProjeto), padding + 215, y);
-      doc.text(getNomeResponsavel(projeto.responsavelId).slice(0, 22), padding + 315, y);
-      doc.text(`${projeto.horasContratadas ?? 0}h`, padding + 455, y);
+      doc.text(String(projeto.nome ?? "N/D").slice(0, 30), padding + 8, y);
+      doc.text(getTipoLabel(projeto.tipoProjeto), padding + 200, y);
+      doc.text(getStatusLabel(projeto.status), padding + 310, y);
+      doc.text(getNomeResponsavel(projeto.responsavelId).slice(0, 18), padding + 400, y);
       y += 18;
       doc.setDrawColor("#e8ddff");
       doc.line(padding, y, 555, y);
@@ -305,26 +385,26 @@ function Projetos() {
                   {podeGerenciarProjetos ? "Projetos" : "Meus projetos"}
                 </h1>
                 <p className="mt-2 max-w-2xl text-sm text-white/75 sm:text-base">
-                  Acompanhe os projetos cadastrados, responsáveis, tipos de contrato e horas contratadas em uma visão rápida e organizada.
+                  Acompanhe os projetos cadastrados, responsáveis, tipos de contrato e status em uma visão rápida e organizada.
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[620px]">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Projetos</p>
+                  <p className="text-xs text-white/60">Total</p>
                   <p className="mt-1 text-2xl font-bold">{estatisticas.totalProjetos}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Hora fechada</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoraFechada}</p>
+                  <p className="text-xs text-green-300/80">Ativos</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalAtivos}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Alocação</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalAlocacao}</p>
+                  <p className="text-xs text-orange-300/80">Inativos</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalInativos}</p>
                 </div>
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Horas</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoras}h</p>
+                  <p className="text-xs text-emerald-300/80">Concluídos</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalConcluidos}</p>
                 </div>
               </div>
             </div>
@@ -352,7 +432,17 @@ function Projetos() {
                     {filtrosAtivos}
                   </span>
                 )}
-                <svg className={`transition ${painelFiltrosAberto ? "rotate-180" : ""}`} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <svg
+                  className={`transition ${painelFiltrosAberto ? "rotate-180" : ""}`}
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </button>
@@ -394,6 +484,7 @@ function Projetos() {
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300/80">Filtros</p>
                 <h2 className="mt-2 text-2xl font-bold text-white">Refinar projetos</h2>
               </div>
+
               {filtrosAtivos > 0 && (
                 <button
                   onClick={limparFiltros}
@@ -404,7 +495,7 @@ function Projetos() {
               )}
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_260px_260px]">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_220px_220px_220px]">
               <div className="relative">
                 <svg className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="11" cy="11" r="8" />
@@ -430,6 +521,17 @@ function Projetos() {
               </select>
 
               <select
+                value={statusFiltro}
+                onChange={(e) => setStatusFiltro(e.target.value as StatusFiltro)}
+                className="h-12 rounded-2xl border border-white/10 bg-[#1a1a20] px-4 text-sm text-white outline-none transition focus:border-[#6627cc]/70 focus:ring-2 focus:ring-[#6627cc]/25"
+              >
+                <option value="TODOS">Todos os status</option>
+                <option value="ATIVO">Em andamento</option>
+                <option value="INATIVO">Tarefas pendentes</option>
+                <option value="CONCLUIDO">Finalizados</option>
+              </select>
+
+              <select
                 value={ordenacao}
                 onChange={(e) => setOrdenacao(e.target.value as Ordenacao)}
                 className="h-12 rounded-2xl border border-white/10 bg-[#1a1a20] px-4 text-sm text-white outline-none transition focus:border-[#6627cc]/70 focus:ring-2 focus:ring-[#6627cc]/25"
@@ -452,6 +554,9 @@ function Projetos() {
               </span>
               <span className="rounded-full border border-[#6627cc]/20 bg-[#6627cc]/10 px-3 py-1 text-violet-200">
                 Tipo: {tipoFiltro === "TODOS" ? "todos" : getTipoLabel(tipoFiltro)}
+              </span>
+              <span className="rounded-full border border-[#6627cc]/20 bg-[#6627cc]/10 px-3 py-1 text-violet-200">
+                Status: {statusFiltro === "TODOS" ? "todos" : getStatusLabel(statusFiltro)}
               </span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
                 Exibindo {projetosFiltrados.length} de {projetos.length}
@@ -520,9 +625,16 @@ function Projetos() {
                             {projeto.codigo || "Sem código"}
                           </p>
                         </div>
-                        <span className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}>
-                          {getTipoLabel(projeto.tipoProjeto)}
-                        </span>
+
+                        <div className="flex shrink-0 flex-col items-end gap-1.5">
+                          <span className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}>
+                            {getTipoLabel(projeto.tipoProjeto)}
+                          </span>
+                          <span className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getStatusStyle(projeto.status)}`}>
+                            <span className={`inline-block h-1.5 w-1.5 rounded-full ${getStatusDot(projeto.status)}`} />
+                            {getStatusLabel(projeto.status)}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="space-y-3">
@@ -542,12 +654,17 @@ function Projetos() {
                         <div className="grid grid-cols-2 gap-3">
                           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-3">
                             <p className="text-[11px] text-slate-500">Valor/hora</p>
-                            <p className="mt-1 truncate text-sm font-bold text-white">{formatarMoeda(projeto.valorHoraBase)}</p>
+                            <p className="mt-1 truncate text-sm font-bold text-white">
+                              {formatarMoeda(projeto.valorHoraBase)}
+                            </p>
                           </div>
+
                           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-3">
                             <p className="text-[11px] text-slate-500">Horas</p>
                             <p className="mt-1 text-sm font-bold text-white">
-                              {projeto.tipoProjeto === "HORA_FECHADA" ? `${projeto.horasContratadas ?? 0}h` : "Livre"}
+                              {projeto.tipoProjeto === "HORA_FECHADA"
+                                ? `${projeto.horasContratadas ?? 0}h`
+                                : "Livre"}
                             </p>
                           </div>
                         </div>
@@ -560,12 +677,32 @@ function Projetos() {
                         <span className="mx-1">—</span>
                         <span>{formatarData(projeto.dataFim)}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-sm font-semibold text-[#a78bfa] transition group-hover:text-white">
-                        Abrir
-                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                          <polyline points="12 5 19 12 12 19" />
-                        </svg>
+
+                      <div className="flex items-center gap-2">
+                        {podeGerenciarProjetos && (
+                          <select
+                            value={getStatusLabel(projeto.status)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleAlterarStatus(projeto.id, e.target.value);
+                            }}
+                            onClick={(e) => e.stopPropagation()}
+                            disabled={updatingStatusIds.includes(projeto.id)}
+                            className="h-8 rounded-lg bg-[#1a1a20] text-sm text-white border border-white/10 px-2"
+                          >
+                            <option value="Em andamento">Em andamento</option>
+                            <option value="Tarefas pendentes">Tarefas pendentes</option>
+                            <option value="Finalizado">Finalizado</option>
+                          </select>
+                        )}
+
+                        <div className="flex items-center gap-1 text-sm font-semibold text-[#a78bfa] transition group-hover:text-white">
+                          Abrir
+                          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -576,17 +713,15 @@ function Projetos() {
             {totalPaginas > 1 && (
               <div className="flex flex-col items-center justify-between gap-3 rounded-[22px] border border-white/10 bg-[#232329] px-6 py-4 sm:flex-row sm:px-8">
                 <span className="text-xs text-slate-500">
-                  Mostrando{" "}
-                  {Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, projetosFiltrados.length)}
-                  –{Math.min(pagina * ITEMS_PER_PAGE, projetosFiltrados.length)} de{" "}
-                  {projetosFiltrados.length} projetos
+                  Mostrando {Math.min((pagina - 1) * ITEMS_PER_PAGE + 1, projetosFiltrados.length)}
+                  –{Math.min(pagina * ITEMS_PER_PAGE, projetosFiltrados.length)} de {projetosFiltrados.length} projetos
                 </span>
 
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => setPagina((p) => Math.max(1, p - 1))}
                     disabled={pagina === 1}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="15 18 9 12 15 6" />
@@ -595,18 +730,17 @@ function Projetos() {
 
                   {pageItems.map((item, idx) =>
                     item === "..." ? (
-                      <span key={`ellipsis-${idx}`} className="flex h-8 w-8 items-center justify-center text-slate-500 text-sm select-none">
+                      <span key={`ellipsis-${idx}`} className="select-none text-sm text-slate-500 flex h-8 w-8 items-center justify-center">
                         ...
                       </span>
                     ) : (
                       <button
                         key={item}
                         onClick={() => setPagina(item)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                          item === pagina
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${item === pagina
                             ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
                             : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
-                        }`}
+                          }`}
                       >
                         {item}
                       </button>
@@ -616,7 +750,7 @@ function Projetos() {
                   <button
                     onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                     disabled={pagina === totalPaginas}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6" />
