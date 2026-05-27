@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
-import { toastError, toastSuccess } from "../../utils/toastUtils";
+import { toastError } from "../../utils/toastUtils";
 import jsPDF from "jspdf";
 
 interface Projeto {
@@ -73,30 +73,6 @@ function Projetos() {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [pagina, setPagina] = useState(1);
-  const [updatingStatusIds, setUpdatingStatusIds] = useState<number[]>([]);
-
-  const mapLabelToBackend = (label: string) => {
-    if (label === "Em andamento" || label === "ATIVO") return "ATIVO";
-    if (label === "Tarefas pendentes" || label === "INATIVO") return "INATIVO";
-    if (label === "Finalizado" || label === "CONCLUIDO") return "CONCLUIDO";
-    return "ATIVO";
-  };
-
-  const handleAlterarStatus = async (id: number, novoLabel: string) => {
-    const novoStatus = mapLabelToBackend(novoLabel) as "ATIVO" | "INATIVO" | "CONCLUIDO";
-    try {
-      setUpdatingStatusIds((s) => Array.from(new Set([...s, id])));
-      const res = await projetoService.alterarStatus(id, novoStatus);
-      if (!res.ok) throw new Error(`Status update failed: ${res.status}`);
-      setProjetos((prev) => prev.map((p) => (p.id === id ? { ...p, status: novoStatus } : p)));
-      toastSuccess("Status atualizado com sucesso");
-    } catch (err) {
-      console.error(err);
-      toastError("Falha ao alterar status. Tente novamente.");
-    } finally {
-      setUpdatingStatusIds((s) => s.filter((x) => x !== id));
-    }
-  };
 
   const carregarDados = async () => {
     try {
@@ -114,8 +90,6 @@ function Projetos() {
 
       const dadosProjetos = await resProjetos.json();
       const dadosProfissionais = await resProfissionais.json();
-
-      console.log(dadosProjetos)
 
       let projetosPermitidos = Array.isArray(dadosProjetos) ? dadosProjetos : [];
 
@@ -275,6 +249,9 @@ function Projetos() {
       totalHoraFechada: projetosFiltrados.filter((p) => p.tipoProjeto === "HORA_FECHADA").length,
       totalAlocacao: projetosFiltrados.filter((p) => p.tipoProjeto === "ALOCACAO").length,
       totalHoras: projetosFiltrados.reduce((t, p) => t + Number(p.horasContratadas ?? 0), 0),
+      totalAtivos: projetosFiltrados.filter((p) => (p.status ?? "ATIVO") === "ATIVO").length,
+      totalInativos: projetosFiltrados.filter((p) => p.status === "INATIVO").length,
+      totalConcluidos: projetosFiltrados.filter((p) => p.status === "CONCLUIDO").length,
     }),
     [projetosFiltrados],
   );
@@ -310,10 +287,10 @@ function Projetos() {
     doc.roundedRect(padding, y - 28, 515, 72, 10, 10, "F");
     doc.setTextColor("#6627cc");
     doc.setFontSize(10);
-    doc.text("Total", padding + 20, y);
-    doc.text("Ativos", padding + 145, y);
-    doc.text("Inativos", padding + 290, y);
-    doc.text("Concluídos", padding + 420, y);
+    doc.text("Projetos", padding + 20, y);
+    doc.text("Hora fechada", padding + 145, y);
+    doc.text("Alocação", padding + 290, y);
+    doc.text("Horas contratadas", padding + 400, y);
     doc.setFontSize(18);
     doc.text(String(projetosRelatorio.length), padding + 20, y + 24);
     doc.text(
@@ -392,8 +369,20 @@ function Projetos() {
 
               <div className="grid grid-cols-2 gap-3 @min-lg:grid-cols-4 w-full">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Total</p>
+                  <p className="text-xs text-white/60">Projetos</p>
                   <p className="mt-1 text-2xl font-bold">{estatisticas.totalProjetos}</p>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
+                  <p className="text-xs text-white/60">Hora fechada</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoraFechada}</p>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
+                  <p className="text-xs text-white/60">Alocação</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalAlocacao}</p>
+                </div>
+                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
+                  <p className="text-xs text-white/60">Horas</p>
+                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoras}h</p>
                 </div>
               </div>
             </div>
@@ -642,6 +631,10 @@ function Projetos() {
           <>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
               {projetosPagina.map((projeto) => (
+                (() => {
+                  const statusReal = projeto.status ?? "ATIVO";
+
+                  return (
                 <button
                   key={projeto.id}
                   onClick={() => navigate(`/projetos/${projeto.id}`)}
@@ -660,11 +653,19 @@ function Projetos() {
                             {projeto.codigo || "Sem código"}
                           </p>
                         </div>
-                        <span
-                          className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}
-                        >
-                          {getTipoLabel(projeto.tipoProjeto)}
-                        </span>
+                        <div className="flex shrink-0 flex-col items-end gap-2">
+                          <span
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-bold ${getTipoStyle(projeto.tipoProjeto)}`}
+                          >
+                            {getTipoLabel(projeto.tipoProjeto)}
+                          </span>
+                          <span
+                            className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-[11px] font-bold ${getStatusStyle(statusReal)}`}
+                          >
+                            <span className={`h-2 w-2 rounded-full ${getStatusDot(statusReal)}`} />
+                            {getStatusLabel(statusReal)}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="space-y-3">
@@ -737,6 +738,8 @@ function Projetos() {
                     </div>
                   </div>
                 </button>
+                  );
+                })()
               ))}
             </div>
 
