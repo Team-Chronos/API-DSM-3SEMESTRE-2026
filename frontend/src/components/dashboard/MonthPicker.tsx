@@ -71,7 +71,7 @@ export default function MonthPicker({
       <button
         type="button"
         onClick={alternarCalendario}
-        className="group flex h-10 w-full min-w-[10.5rem] max-w-[10.5rem] items-center justify-center gap-2.5 rounded-xl px-4 text-sm font-semibold text-white transition-all duration-200 hover:border-white/35 hover:bg-white/20 sm:w-auto"
+        className="group flex h-10 w-full min-w-[12.5rem] items-center justify-between gap-2.5 rounded-xl px-4 text-sm font-semibold text-white transition-all duration-200 hover:border-white/35 hover:bg-white/20 sm:w-auto"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -94,21 +94,6 @@ export default function MonthPicker({
         <span className="capitalize">{NOMES_MESES[competencia.mes - 1]}</span>
 
         <span className="text-white/60">{competencia.ano}</span>
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="13"
-          height="13"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          className={`ml-0.5 opacity-60 transition-transform duration-200 ${aberto ? "rotate-180" : ""}`}
-        >
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
       </button>
 
       {aberto && (
