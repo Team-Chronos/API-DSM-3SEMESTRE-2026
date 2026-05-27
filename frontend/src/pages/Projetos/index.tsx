@@ -370,13 +370,13 @@ function Projetos() {
 
   return (
     <div className="min-h-screen bg-[#1f1f1f] p-6 text-white">
-      <div className="mx-auto flex max-w-[1600px] flex-col gap-6">
+      <div className="mx-auto flex max-w-400 flex-col gap-6">
         <div className="overflow-hidden rounded-[22px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.35)]">
-          <div className="relative border-b border-white/10 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#3b137b] px-6 py-7 sm:px-8">
+          <div className="relative border-b border-white/10 bg-linear-to-r from-[#6627cc] via-[#5b21b6] to-[#3b137b] px-6 py-7 sm:px-8">
             <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 left-24 h-40 w-40 rounded-full bg-purple-300/10 blur-3xl" />
 
-            <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="relative @container flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
                   {podeGerenciarProjetos ? "Gestão" : "Meus vínculos"}
@@ -389,7 +389,7 @@ function Projetos() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-[620px]">
+              <div className="grid grid-cols-2 gap-3 @min-lg:grid-cols-4 w-full">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                   <p className="text-xs text-white/60">Total</p>
                   <p className="mt-1 text-2xl font-bold">{estatisticas.totalProjetos}</p>
@@ -467,7 +467,7 @@ function Projetos() {
               {podeGerenciarProjetos && (
                 <button
                   onClick={() => setModalAberto(true)}
-                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#7c3aed] to-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-purple-950/40 transition hover:brightness-110 active:scale-[0.98]"
+                  className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-[#7c3aed] to-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-purple-950/40 transition hover:brightness-110 active:scale-[0.98]"
                 >
                   <span className="text-lg leading-none">+</span>
                   Novo projeto
@@ -580,13 +580,13 @@ function Projetos() {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
               <div key={index} className="h-56 animate-pulse rounded-[22px] border border-white/10 bg-[#26262b]" />
             ))}
           </div>
         ) : projetosFiltrados.length === 0 ? (
-          <div className="flex min-h-[360px] flex-col items-center justify-center rounded-[22px] border border-white/10 bg-[#232329] p-8 text-center">
+          <div className="flex min-h-90 flex-col items-center justify-center rounded-[22px] border border-white/10 bg-[#232329] p-8 text-center">
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6627cc]/15 text-[#a78bfa]">
               <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
@@ -717,7 +717,7 @@ function Projetos() {
                   –{Math.min(pagina * ITEMS_PER_PAGE, projetosFiltrados.length)} de {projetosFiltrados.length} projetos
                 </span>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 w-full">
                   <button
                     onClick={() => setPagina((p) => Math.max(1, p - 1))}
                     disabled={pagina === 1}
