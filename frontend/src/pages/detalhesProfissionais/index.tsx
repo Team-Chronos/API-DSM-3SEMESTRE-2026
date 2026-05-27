@@ -266,7 +266,7 @@ function TelaDetalhesProfissional() {
           )}
 
           <div className="overflow-hidden rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
-            <div className="relative border-b border-white/8 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
+            <div className="relative border-b border-white/8 bg-linear-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
               <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
               <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-white/15" />
 
@@ -537,9 +537,9 @@ function TelaDetalhesProfissional() {
                   {profissional.projetos.map((proj) => (
                     <div
                       key={proj.projetoId}
-                      className="flex items-center justify-between rounded-xl border border-white/8 bg-[#1a1a20] px-4 py-3 transition hover:border-[#6627cc]/30"
+                      className="flex flex-col gap-3 rounded-xl border border-white/8 bg-[#1a1a20] px-4 py-3 transition hover:border-[#6627cc]/30 sm:flex-row sm:items-center sm:justify-between"
                     >
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium text-white">
                           {proj.nomeProjeto}
                         </p>
@@ -548,7 +548,7 @@ function TelaDetalhesProfissional() {
                         </p>
                       </div>
 
-                      <span className="ml-3 shrink-0 rounded-lg bg-[#2d1f6e]/60 px-2.5 py-1 text-xs font-semibold text-[#a78bfa] border border-[#6627cc]/20">
+                      <span className="inline-flex w-fit shrink-0 rounded-lg border border-[#6627cc]/20 bg-[#2d1f6e]/60 px-2.5 py-1 text-xs font-semibold text-[#a78bfa] sm:ml-3">
                         R$ {proj.valorHora.toFixed(2)}/h
                       </span>
                     </div>

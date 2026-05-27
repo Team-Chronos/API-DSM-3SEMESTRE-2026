@@ -46,7 +46,7 @@ export default function TarefasPorProjeto() {
   if (isLoading) {
     return (
       <div
-        className="min-h-screen flex items-center justify-center"
+        className="flex min-h-screen items-center justify-center bg-[#1f1f1f] p-6"
         style={{ backgroundColor: "#1f1f1f" }}
       >
         <div className="text-white text-center">
@@ -59,74 +59,91 @@ export default function TarefasPorProjeto() {
 
   if (!projeto) {
     return (
-      <div className="min-h-screen p-6" style={{ backgroundColor: "#1f1f1f" }}>
-        <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
-          <strong>Erro:</strong> Projeto não encontrado
+      <div className="min-h-screen bg-[#1f1f1f] p-4 text-white sm:p-6">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 rounded-[20px] border border-white/10 bg-[#232329] p-5 shadow-[0_20px_60px_rgba(0,0,0,0.35)]">
+          <div className="rounded-2xl border border-red-500/30 bg-red-500/10 p-4 text-red-100">
+            <strong>Erro:</strong> Projeto não encontrado
+          </div>
+          <button
+            onClick={() => navigate(`/projetos`)}
+            className="inline-flex h-11 w-full items-center justify-center rounded-2xl bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/15 sm:w-auto"
+          >
+            Voltar para projetos
+          </button>
         </div>
-        <button
-          onClick={() => navigate(`/projetos/${projeto!.id}`)}
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-        >
-          Voltar para projetos
-        </button>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#1f1f1f" }}>
-      <div className="p-6">
-        <div className="mb-6">
-          <button
-            onClick={() => navigate(`/projetos/${projeto!.id}`)}
-            className="text-gray-400 hover:text-white mb-4 flex items-center gap-2 transition-colors"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              />
-            </svg>
-            Voltar
-          </button>
-
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-2xl font-bold text-white">{projeto.nome}</h1>
-              {projeto.codigo && (
-                <p className="text-gray-500 text-sm mt-1">Código: {projeto.codigo}</p>
-              )}
-              <p className="text-gray-500 text-sm mt-1">Responsável: {nomeResponsavel}</p>
-            </div>
-
-            {podeGerenciarTodasTarefas && (
-              <button
-                onClick={() => setModalTarefaAberto(true)}
-                className="text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
-                style={{ backgroundColor: "#3e3e3e" }}
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
+    <div className="min-h-screen bg-[#1f1f1f] p-4 text-white sm:p-6">
+      <div className="mx-auto flex max-w-7xl flex-col gap-5">
+        <section className="overflow-hidden rounded-[22px] border border-white/10 bg-[#232329] shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
+          <div className="border-b border-white/10 bg-[#26262b] px-6 py-6 sm:px-8">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div className="min-w-0">
+                <button
+                  onClick={() => navigate(`/projetos/${projeto!.id}`)}
+                  className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-300 transition hover:bg-white/10 hover:text-white"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4v16m8-8H4"
-                  />
-                </svg>
-                Nova Tarefa
-              </button>
-            )}
-          </div>
-        </div>
+                  >
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                  Voltar
+                </button>
 
-        <DragDropTarefas
-          key={refreshKey}
-          projetoId={Number(projeto.id)}
-          onAbrirModalItem={podeGerenciarTodasTarefas ? abrirModalItem : undefined}
-          refreshKey={refreshKey}
-        />
+                <h1 className="text-2xl font-bold text-white sm:text-3xl">
+                  {projeto.nome}
+                </h1>
+                {projeto.codigo && (
+                  <p className="mt-1 text-sm text-slate-500">Código: {projeto.codigo}</p>
+                )}
+                <p className="mt-1 text-sm text-slate-500">
+                  Responsável: {nomeResponsavel}
+                </p>
+              </div>
+
+              {podeGerenciarTodasTarefas && (
+                <button
+                  onClick={() => setModalTarefaAberto(true)}
+                  className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#3e3e3e] px-4 text-sm font-semibold text-white transition hover:bg-[#4a4a4a]"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 4v16m8-8H4" />
+                  </svg>
+                  Nova Tarefa
+                </button>
+              )}
+            </div>
+          </div>
+        </section>
+
+        <section className="overflow-hidden rounded-[22px] border border-white/10 bg-[#232329] shadow-[0_18px_60px_rgba(0,0,0,0.25)]">
+          <DragDropTarefas
+            key={refreshKey}
+            projetoId={Number(projeto.id)}
+            onAbrirModalItem={podeGerenciarTodasTarefas ? abrirModalItem : undefined}
+            refreshKey={refreshKey}
+          />
+        </section>
 
         {podeGerenciarTodasTarefas && (
           <ModalCadastroItem
