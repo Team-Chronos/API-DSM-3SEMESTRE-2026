@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type ForwardRefExoticComponent, type RefAttributes, type SetStateAction } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -39,29 +39,52 @@ const ALL_NAV_ITEMS = [
 ];
 
 export default function Sidebar() {
-  const { user, logout } = useAuth();
+  const { user, logout, cargoId, loading } = useAuth();
   const isMobile = useIsMobile();
 
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+
+  const rolesByCargo = useMemo(() => {
+    if (cargoId === 3) {
+      return ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO", "ROLE_USER"];
+    }
+
+    if (cargoId === 2) {
+      return ["ROLE_GERENTE_PROJETO", "ROLE_USER"];
+    }
+
+    if (cargoId === 1) {
+      return ["ROLE_USER"];
+    }
+
+    return [];
+  }, [cargoId]);
 
   useEffect(() => {
-    if (user?.roles) {
-      setUserRoles(user.roles);
-    } else {
-      const token = localStorage.getItem("token");
-      if (token) {
-        try {
-          const decoded = jwtDecode<{ roles?: string[] }>(token);
-          setUserRoles(decoded.roles || []);
-        } catch (e) {
-          setUserRoles([]);
-        }
-      }
-    }
-  }, [user]);
+    const token = localStorage.getItem("token");
 
-  if (userRoles.length === 0 && !user) {
+    if (!token) {
+      setUserRoles(rolesByCargo);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode<{ roles?: string[] }>(token);
+
+      if (decoded.roles?.length) {
+        setUserRoles(decoded.roles);
+        return;
+      }
+
+      setUserRoles(rolesByCargo);
+    } catch {
+      setUserRoles(rolesByCargo);
+    }
+  }, [rolesByCargo, cargoId]);
+
+  if ((loading || userRoles.length === 0) && !user) {
     return (
       <aside className="w-16 bg-[#151519] h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
@@ -145,14 +168,12 @@ export default function Sidebar() {
 
 interface AsideProps {
   expanded: boolean;
-  setConfirmLogout: React.Dispatch<React.SetStateAction<boolean>>;
-  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+  setConfirmLogout: Dispatch<SetStateAction<boolean>>;
+  setExpanded: Dispatch<SetStateAction<boolean>>;
   user: User | undefined;
   visibleNavItems: {
     to: string;
-    icon: React.ForwardRefExoticComponent<
-      Omit<LucideProps, "ref"> & React.RefAttributes<SVGSVGElement>
-    >;
+    icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
     label: string;
     allowedRoles: string[];
   }[];

@@ -1,6 +1,6 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useIsMobile } from "../../hooks/useIsMobile";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar";
 
 export default function AppLayout() {
