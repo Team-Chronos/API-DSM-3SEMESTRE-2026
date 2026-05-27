@@ -216,9 +216,9 @@ export default function ModalCadastroTarefa({
 
   if (carregandoDados) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center z-50">
+      <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
         <div className="absolute inset-0 bg-black opacity-50" />
-        <div className="relative p-6 rounded shadow-lg w-full max-w-lg z-10" style={{ backgroundColor: "#252525", border: "1px solid #3e3e3e" }}>
+        <div className="relative z-10 my-2 w-full max-w-[min(96vw,520px)] rounded shadow-lg p-4 sm:my-0 sm:p-6" style={{ backgroundColor: "#252525", border: "1px solid #3e3e3e" }}>
           <div className="flex justify-center items-center h-32">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white" />
             <p className="text-white ml-2">Carregando dados...</p>
@@ -229,9 +229,9 @@ export default function ModalCadastroTarefa({
   }
 
   return (
-    <div className="fixed inset-0 flex justify-center z-50">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-black opacity-50" onClick={handleClose} />
-      <div className="relative p-6 rounded overflow-y-auto shadow-lg w-full max-w-lg z-10" style={{ backgroundColor: "#252525", border: "1px solid #3e3e3e" }}>
+      <div className="relative z-10 my-2 w-full max-w-[min(96vw,520px)] max-h-[94vh] overflow-y-auto rounded p-4 shadow-lg sm:my-0 sm:p-6" style={{ backgroundColor: "#252525", border: "1px solid #3e3e3e" }}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-white">
             {modoEdicao ? "Editar Tarefa" : "Cadastrar Tarefa"}
@@ -364,11 +364,11 @@ export default function ModalCadastroTarefa({
             </select>
           </div>
 
-          <div className="flex justify-end gap-2 mt-4">
+          <div className="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 rounded transition-colors text-white"
+              className="h-10 rounded px-4 transition-colors text-white"
               style={{ backgroundColor: "#3e3e3e" }}
               disabled={carregando}
             >
@@ -376,7 +376,7 @@ export default function ModalCadastroTarefa({
             </button>
             <button
               type="submit"
-              className="px-4 py-2 rounded text-white transition-colors flex items-center gap-2"
+              className="h-10 rounded px-4 text-white transition-colors flex items-center justify-center gap-2"
               style={{ backgroundColor: "#3e3e3e" }}
               disabled={carregando}
             >

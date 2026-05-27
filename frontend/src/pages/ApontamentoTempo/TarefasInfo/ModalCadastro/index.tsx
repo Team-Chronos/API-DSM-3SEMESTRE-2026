@@ -191,8 +191,8 @@ function ModalCadastro({
 
   return (
     <Modal open={open} onClose={onClose}>
-      <div className="w-[min(92vw,520px)] text-white">
-        <div className="pr-8">
+      <div className="max-h-[90vh] w-[min(92vw,520px)] overflow-y-auto pr-1 text-white sm:pr-0">
+        <div className="pr-8 sm:pr-0">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300/80">
             Apontamento
           </p>
@@ -202,7 +202,7 @@ function ModalCadastro({
           </p>
         </div>
 
-        <div className="my-5 grid grid-cols-2 gap-3">
+        <div className="my-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-4">
             <p className="text-xs text-slate-500">Tempo máximo</p>
             <p className="mt-1 text-lg font-bold text-white">
@@ -280,11 +280,11 @@ function ModalCadastro({
           </div>
         </form>
 
-        <div className="mt-6 flex justify-end gap-3 border-t border-white/10 pt-4">
+        <div className="mt-6 flex flex-col gap-3 border-t border-white/10 pt-4 sm:flex-row sm:justify-end">
           <button
             type="button"
             onClick={onClose}
-            className="h-11 rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
+            className="h-11 rounded-2xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white transition hover:bg-white/10 sm:w-auto"
           >
             Cancelar
           </button>
@@ -293,7 +293,7 @@ function ModalCadastro({
             type="submit"
             form="formRegistroHoras"
             disabled={!podeEnviar}
-            className="h-11 rounded-2xl bg-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-black/20 transition hover:bg-[#7634dd] disabled:pointer-events-none disabled:select-none disabled:opacity-60"
+            className="h-11 rounded-2xl bg-[#6627cc] px-5 text-sm font-bold text-white shadow-lg shadow-black/20 transition hover:bg-[#7634dd] disabled:pointer-events-none disabled:select-none disabled:opacity-60 sm:w-auto"
           >
             {enviando ? "Enviando..." : "Enviar"}
           </button>

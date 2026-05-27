@@ -142,7 +142,7 @@ function TelaListaProfissionais() {
           </div>
 
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#232329] px-4 py-3 shadow-lg">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
               <svg
                 width="22"
                 height="22"
@@ -169,7 +169,7 @@ function TelaListaProfissionais() {
         </div>
 
         <div className="overflow-hidden sm:rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
-          <div className="relative border-b border-white/8 bg-linear-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
+          <div className="relative border-b border-white/8 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
             <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-white/15" />
 
@@ -250,7 +250,7 @@ function TelaListaProfissionais() {
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <div
-                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-linear-to-br ${getAvatarColor(profissional.id)} text-xs font-bold text-white shadow`}
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br ${getAvatarColor(profissional.id)} text-xs font-bold text-white shadow`}
                         >
                           {getInitials(profissional.nome)}
                         </div>
@@ -339,11 +339,10 @@ function TelaListaProfissionais() {
                   <button
                     key={item}
                     onClick={() => setPagina(item)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                      item === pagina
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${item === pagina
                         ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
                         : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
-                    }`}
+                      }`}
                   >
                     {item}
                   </button>
@@ -449,7 +448,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     try {
       const errorBody = await response.json();
       errorMessage = errorBody.erro || errorBody.message || errorMessage;
-    } catch {}
+    } catch { }
     throw new Error(errorMessage);
   }
 

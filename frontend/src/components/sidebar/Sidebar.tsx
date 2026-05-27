@@ -1,29 +1,100 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState, type Dispatch, type ForwardRefExoticComponent, type RefAttributes, type SetStateAction } from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, FolderKanban, Users, ChevronLeft, Link, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Users,
+  ChevronLeft,
+  Link,
+  LogOut,
+  type LucideProps,
+} from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
 import logoMetade from "../../assets/metade.png";
 import { useAuth } from "../../contexts/AuthContext";
+import { jwtDecode } from "jwt-decode";
+import type { User } from "../../types/usuario";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 const ALL_NAV_ITEMS = [
-  { to: "/financeiro", icon: LayoutDashboard, label: "Financeiro", allowedCargos: [3] },
-  { to: "/projetos", icon: FolderKanban, label: "Projetos" },
-  { to: "/profissionais", icon: Users, label: "Profissionais", allowedCargos: [2, 3] },
-  { to: "/associacoes", icon: Link, label: "Associações", allowedCargos: [2, 3] },
+  { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["ROLE_FINANCE"] },
+  {
+    to: "/projetos",
+    icon: FolderKanban,
+    label: "Projetos",
+    allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO", "ROLE_USER"],
+  },
+  {
+    to: "/profissionais",
+    icon: Users,
+    label: "Profissionais",
+    allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO"],
+  },
+  {
+    to: "/associacoes",
+    icon: Link,
+    label: "Associações",
+    allowedRoles: ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO"],
+  },
 ];
 
 export default function Sidebar() {
-  const { user, logout, hasAnyCargo } = useAuth();
+  const { user, logout, cargoId, loading } = useAuth();
   const isMobile = useIsMobile();
 
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
 
-  const visibleNavItems = ALL_NAV_ITEMS.filter((item) => {
-    if (!item.allowedCargos) return true;
-    return hasAnyCargo(item.allowedCargos);
-  });
+  const rolesByCargo = useMemo(() => {
+    if (cargoId === 3) {
+      return ["ROLE_FINANCE", "ROLE_GERENTE_PROJETO", "ROLE_USER"];
+    }
+
+    if (cargoId === 2) {
+      return ["ROLE_GERENTE_PROJETO", "ROLE_USER"];
+    }
+
+    if (cargoId === 1) {
+      return ["ROLE_USER"];
+    }
+
+    return [];
+  }, [cargoId]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setUserRoles(rolesByCargo);
+      return;
+    }
+
+    try {
+      const decoded = jwtDecode<{ roles?: string[] }>(token);
+
+      if (decoded.roles?.length) {
+        setUserRoles(decoded.roles);
+        return;
+      }
+
+      setUserRoles(rolesByCargo);
+    } catch {
+      setUserRoles(rolesByCargo);
+    }
+  }, [rolesByCargo, cargoId]);
+
+  if ((loading || userRoles.length === 0) && !user) {
+    return (
+      <aside className="w-16 bg-[#151519] h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+      </aside>
+    );
+  }
+
+  const visibleNavItems = ALL_NAV_ITEMS.filter((item) =>
+    item.allowedRoles.some((role) => userRoles.includes(role)),
+  );
 
   function handleLogout() {
     setConfirmLogout(false);
@@ -34,21 +105,19 @@ export default function Sidebar() {
     <>
       {confirmLogout && (
         <div className="fixed inset-0 z-101 flex items-center justify-center bg-black/50">
-          <div className="w-80 rounded-2xl border border-white/10 bg-[#1b1b1f] p-6 text-white shadow-2xl">
-            <h2 className="mb-1 text-base font-semibold">Sair da conta</h2>
-            <p className="mb-6 text-sm text-white/50">Tem certeza que deseja sair?</p>
+          <div className="bg-[#1b1b1f] border border-white/10 rounded-2xl shadow-2xl p-6 w-80 text-white">
+            <h2 className="text-base font-semibold mb-1">Sair da conta</h2>
+            <p className="text-sm text-white/50 mb-6">Tem certeza que deseja sair?</p>
             <div className="flex gap-3">
               <button
-                type="button"
                 onClick={() => setConfirmLogout(false)}
-                className="flex-1 rounded-lg bg-white/10 py-2 text-sm hover:bg-white/15"
+                className="flex-1 py-2 rounded-lg text-sm bg-white/10 hover:bg-white/15"
               >
                 Cancelar
               </button>
               <button
-                type="button"
                 onClick={handleLogout}
-                className="flex-1 rounded-lg bg-red-500 py-2 text-sm font-medium hover:bg-red-600"
+                className="flex-1 py-2 rounded-lg text-sm bg-red-500 hover:bg-red-600 font-medium"
               >
                 Sair
               </button>
@@ -85,82 +154,96 @@ export default function Sidebar() {
           </div>
         </div>
       ) : (
-        <aside
-          className={`relative flex h-screen shrink-0 flex-col border-r border-white/5 bg-[#151519] text-white transition-all duration-300 ease-in-out ${
-            expanded ? "w-60" : "w-16"
-          }`}
-        >
-          <div className="flex h-16 items-center justify-between border-b border-white/10 px-3">
-            {expanded ? (
-              <img src={logoInteiro} alt="Logo" className="h-9 object-contain" />
-            ) : (
-              <img src={logoMetade} alt="Logo" className="mx-auto h-8 w-8 object-contain" />
-            )}
-
-            {expanded && (
-              <button
-                type="button"
-                onClick={() => setExpanded(false)}
-                className="ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg hover:bg-white/10"
-              >
-                <ChevronLeft size={18} />
-              </button>
-            )}
-
-            {!expanded && (
-              <button
-                type="button"
-                aria-label="Expandir menu"
-                onClick={() => setExpanded(true)}
-                className="absolute inset-0 h-16 w-full cursor-e-resize"
-              />
-            )}
-          </div>
-
-          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-2 py-4">
-            {visibleNavItems.map(({ to, icon: Icon, label }) => (
-              <NavLink
-                key={to}
-                to={to}
-                title={!expanded ? label : undefined}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors duration-150 ${
-                    isActive
-                      ? "bg-white/15 font-medium text-white"
-                      : "text-white/60 hover:bg-white/10 hover:text-white"
-                  }`
-                }
-              >
-                <Icon size={20} className="shrink-0" />
-                {expanded && <span className="truncate text-sm">{label}</span>}
-              </NavLink>
-            ))}
-          </nav>
-
-          <div className="border-t border-white/10 px-2 py-3">
-            <div className="flex items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-white/10">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-indigo-500 text-sm font-bold">
-                {user?.nome?.slice(0, 1).toUpperCase() || "U"}
-              </div>
-
-              {expanded && (
-                <>
-                  <div className="min-w-0 flex-1 text-left">
-                    <p className="truncate text-sm font-medium">{user?.nome || "Usuário"}</p>
-                    <p className="truncate text-xs text-white/50">{user?.sub || ""}</p>
-                  </div>
-                  <button type="button" onClick={() => setConfirmLogout(true)} aria-label="Sair">
-                    <LogOut
-                      size={16}
-                      className="text-white/40 transition-colors hover:text-red-400"
-                    />
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </aside>
+        <Aside
+          expanded={expanded}
+          setConfirmLogout={setConfirmLogout}
+          setExpanded={setExpanded}
+          user={user}
+          visibleNavItems={visibleNavItems}
+        />
       )}
     </>
+  );
+}
+
+interface AsideProps {
+  expanded: boolean;
+  setConfirmLogout: Dispatch<SetStateAction<boolean>>;
+  setExpanded: Dispatch<SetStateAction<boolean>>;
+  user: User | undefined;
+  visibleNavItems: {
+    to: string;
+    icon: ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>;
+    label: string;
+    allowedRoles: string[];
+  }[];
+}
+
+function Aside({ expanded, setConfirmLogout, setExpanded, user, visibleNavItems }: AsideProps) {
+  return (
+    <aside
+      className={`relative z-100 flex flex-col h-screen bg-[#151519] text-white border-r border-white/5 transition-all duration-300 ease-in-out shrink-0 ${expanded ? "w-60" : "w-16"}`}
+    >
+      <div className="flex items-center justify-between h-16 px-3 border-b border-white/10">
+        {expanded ? (
+          <img src={logoInteiro} alt="GSW Logo" className="h-9 object-contain" />
+        ) : (
+          <img src={logoMetade} alt="GSW Icon" className="h-8 w-8 object-contain mx-auto" />
+        )}
+        {expanded && (
+          <button
+            onClick={() => setExpanded(false)}
+            className="flex items-center justify-center w-9 h-9 rounded-lg hover:bg-white/10 shrink-0 ml-2"
+          >
+            <ChevronLeft size={18} />
+          </button>
+        )}
+        {!expanded && (
+          <button
+            onClick={() => setExpanded(true)}
+            className="absolute inset-0 w-full h-16 cursor-e-resize"
+          />
+        )}
+      </div>
+
+      <nav className="flex flex-col gap-1 flex-1 px-2 py-4 overflow-y-auto">
+        {visibleNavItems.length === 0 && (
+          <div className="text-white/40 text-sm px-2 py-2">Nenhum item disponível</div>
+        )}
+        {visibleNavItems.map(({ to, icon: Icon, label }) => (
+          <NavLink
+            key={to}
+            to={to}
+            title={!expanded ? label : undefined}
+            className={({ isActive }) => `
+                flex items-center gap-3 px-2 py-2.5 rounded-lg transition-colors duration-150
+                ${isActive ? "bg-white/15 text-white font-medium" : "text-white/60 hover:bg-white/10 hover:text-white"}
+              `}
+          >
+            <Icon size={20} className="shrink-0" />
+            {expanded && <span className="text-sm truncate">{label}</span>}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="px-2 py-3 border-t border-white/10">
+        <div className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-white/10 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-sm font-bold shrink-0">
+            {user?.nome?.slice(0, 1).toUpperCase() || "U"}
+          </div>
+          {expanded && (
+            <>
+              <div className="min-w-0 flex-1 text-left">
+                <p className="text-sm font-medium truncate">{user?.nome || "Usuário"}</p>
+                <p className="text-xs text-white/50 truncate">{user?.sub || ""}</p>
+              </div>
+              <button onClick={() => setConfirmLogout(true)} aria-label="Sair">
+                <LogOut size={16} className="text-white/40 hover:text-red-400 transition-colors" />
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    </aside>
   );
 }

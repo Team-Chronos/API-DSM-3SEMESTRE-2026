@@ -53,9 +53,9 @@ export default function ModalCadastroItem({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-[70]">
+    <div className="fixed inset-0 z-[70] flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-black/70" onClick={onFechar} />
-      <div className="relative p-6 rounded-lg shadow-2xl w-full max-w-md z-10 border border-[#3e3e3e]" style={{ backgroundColor: "#252525" }}>
+      <div className="relative z-10 my-2 w-full max-w-[min(96vw,420px)] max-h-[94vh] overflow-y-auto rounded-lg border border-[#3e3e3e] p-4 shadow-2xl sm:my-0 sm:p-6" style={{ backgroundColor: "#252525" }}>
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white italic">
             {itemParaEditar ? "Editar Item" : "Adicionar Item"}
@@ -84,11 +84,11 @@ export default function ModalCadastroItem({
             />
           </div>
         </div>
-        <div className="flex justify-end gap-2 mt-6">
-          <button onClick={onFechar} className="px-4 py-2 rounded text-sm text-gray-400 hover:text-white" disabled={salvando}>
+        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          <button onClick={onFechar} className="h-10 rounded px-4 text-sm text-gray-400 hover:text-white" disabled={salvando}>
             Cancelar
           </button>
-          <button onClick={handleSalvar} className="px-4 py-2 rounded text-sm bg-blue-600 text-white hover:bg-blue-700" disabled={salvando}>
+          <button onClick={handleSalvar} className="h-10 rounded px-4 text-sm bg-blue-600 text-white hover:bg-blue-700" disabled={salvando}>
             {salvando ? "Salvando..." : "Salvar"}
           </button>
         </div>

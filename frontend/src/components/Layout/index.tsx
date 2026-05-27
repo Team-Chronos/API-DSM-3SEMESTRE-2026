@@ -1,9 +1,16 @@
+import { useAuth } from "../../contexts/AuthContext";
 import { useIsMobile } from "../../hooks/useIsMobile";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar";
 
 export default function AppLayout() {
-  const isMobile = useIsMobile();
+  const { user } = useAuth()
+  const isMobile = useIsMobile()
+
+  if (!user) {
+    return <Navigate to={"/login"} replace />
+  }
+
   return (
     <div className="flex relative h-screen overflow-hidden bg-[#0f1020]">
       <Sidebar />

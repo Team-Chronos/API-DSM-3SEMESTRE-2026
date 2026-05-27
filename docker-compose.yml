@@ -21,10 +21,13 @@ services:
     environment:
       SPRING_APPLICATION_NAME: ms-profissionais
       SERVER_PORT: 8081
-      DB_URL: jdbc:mysql://35.198.58.59:3306/profissionais?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      DB_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       DB_USERNAME: chronosapi
       DB_PASSWORD: Bolsonaro#22
+      DB_DRIVER: com.mysql.cj.jdbc.Driver
       JPA_DDL_AUTO: update
+      SPRING_JPA_OPEN_IN_VIEW: "false"
+      SPRING_JPA_SHOW_SQL: "true"
       SPRING_DATA_REDIS_HOST: redis-cache
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_CACHE_TYPE: redis
@@ -44,36 +47,11 @@ services:
     container_name: controle-horas-api
     environment:
       SPRING_APPLICATION_NAME: controle-horas
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/apontamento?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
       SERVER_PORT: 8082
-      SPRING_DATA_REDIS_HOST: redis-cache
-      SPRING_DATA_REDIS_PORT: 6379
-      SPRING_CACHE_TYPE: redis
-      SERVER_COMPRESSION_ENABLED: "true"
-      SERVER_COMPRESSION_MIME_TYPES: application/json
-      TAREFAS_API_URL: http://tarefas-api:8089/tarefas
-    depends_on:
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - app-network
-
-  controle-visualizar-horas:
-    build:
-      context: ./services/controle-horas/controle-horas
-      dockerfile: Dockerfile
-    container_name: controle-visualizar-horas-api
-    environment:
-      SPRING_APPLICATION_NAME: controle-visualizar-horas
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/apontamento?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      SPRING_DATASOURCE_USERNAME: chronosapi
-      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-      SERVER_PORT: 8092
       SPRING_DATA_REDIS_HOST: redis-cache
       SPRING_DATA_REDIS_PORT: 6379
       SPRING_CACHE_TYPE: redis
@@ -95,11 +73,12 @@ services:
     environment:
       SPRING_APPLICATION_NAME: login
       SERVER_PORT: 8083
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/profissionais?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: "true"
       JWT_SECRET: rnssz0A37Cdr7Cw89GZowLRpSWVLuOliGAC0sy+gDZzvL9Xk3OPn4fp3CZcufV75
       APP_CORS_ALLOWED_ORIGINS: http://localhost,http://localhost:5173,https://*.app.github.dev
     depends_on:
@@ -117,7 +96,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: projeto
       SERVER_PORT: 8084
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/projetos?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
@@ -169,7 +148,7 @@ services:
       SPRING_APPLICATION_NAME: criarTarefas
       SERVER_PORT: 8089
       PROJETO_API_URL: http://projeto:8084/projetos
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/tarefas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
@@ -204,7 +183,7 @@ services:
     environment:
       SPRING_APPLICATION_NAME: visualizarTarefas
       SERVER_PORT: 8099
-      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/tarefas?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: chronosapi
       SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
       SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
@@ -248,12 +227,10 @@ services:
       LOGIN_API_URL: http://login-api:8083
       PROFISSIONAIS_API_URL: http://ms-profissionais:8081
       CONTROLE_HORAS_API_URL: http://controle-horas:8082
-      CONTROLE_HORAS_GET_API_URL: http://controle-visualizar-horas:8092
       PROJETO_API_URL: http://projeto:8084
       FINANCEIRO_API_URL: http://financeiro:8085
       TAREFAS_API_URL: http://tarefas-api:8089
       TAREFAS_GET_API_URL: http://tarefas-get-api:8099
-
     depends_on:
       redis:
         condition: service_healthy

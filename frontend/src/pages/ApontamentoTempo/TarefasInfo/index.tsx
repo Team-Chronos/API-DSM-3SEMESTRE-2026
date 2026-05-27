@@ -105,7 +105,7 @@ function TarefasInfo({
     <>
       <div className="flex h-full flex-col">
         <div className="border-b border-white/10 p-5">
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div className="min-w-0">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-[#6627cc]/30 bg-[#6627cc]/10 px-3 py-1 text-xs font-semibold text-violet-200">
@@ -128,7 +128,7 @@ function TarefasInfo({
             </div>
 
             <button
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white"
+              className="flex h-10 w-10 shrink-0 items-center justify-center self-end rounded-xl border border-white/10 bg-white/5 text-slate-400 transition hover:bg-white/10 hover:text-white sm:self-auto"
               onClick={handleFechar}
             >
               ✕
@@ -136,9 +136,9 @@ function TarefasInfo({
           </div>
         </div>
 
-        <div className="grid flex-1 gap-5 p-5 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="grid flex-1 gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:gap-5">
           <section className="min-w-0 rounded-2xl border border-white/10 bg-[#1f1f24] p-5">
-            <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                   Histórico
@@ -193,7 +193,7 @@ function TarefasInfo({
             </div>
           </section>
 
-          <aside className="flex min-w-0 flex-col gap-5">
+          <aside className="flex min-w-0 flex-col gap-4 sm:gap-5">
             <section className="rounded-2xl border border-white/10 bg-[#1f1f24] p-5">
               <div className="mb-5">
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
@@ -206,7 +206,7 @@ function TarefasInfo({
 
               <div className="mb-4 h-3 overflow-hidden rounded-full bg-black/30">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[#7c3aed] to-[#6627cc] transition-all duration-500"
+                  className="h-full rounded-full bg-linear-to-r from-[#7c3aed] to-[#6627cc] transition-all duration-500"
                   style={{ width: `${porcentagemTempo * 100}%` }}
                 />
               </div>
@@ -220,7 +220,7 @@ function TarefasInfo({
                 </span>
               </div>
 
-              <div className="grid gap-3">
+              <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
                 {metricas.map((metrica) => (
                   <div
                     key={metrica.label}
@@ -242,7 +242,7 @@ function TarefasInfo({
                 Informações
               </p>
 
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                 <div className="rounded-2xl border border-white/10 bg-[#26262b] p-4">
                   <p className="text-xs text-slate-500">Item</p>
                   <p className="mt-1 text-sm font-bold text-white">
