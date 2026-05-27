@@ -27,9 +27,14 @@
 	path = services/gestao-tarefas
 	url = https://github.com/Team-Chronos/API3-servico-gestao-tarefas.git
 	branch = main
+	
 [submodule "auth/gateway"]
 	path = services/gateway
 	url = https://github.com/Team-Chronos/API3-servico-auth-gateway.git
+	
 [submodule "services/visualizar-tarefas"]
 	path = services/visualizar-tarefas
 	url = https://github.com/Team-Chronos/API3-servico-visualizar-tarefas.git
+[submodule "services/visualizar-horas"]
+	path = services/visualizar-horas
+	url = https://github.com/Team-Chronos/API3-servico-visualizar-horas

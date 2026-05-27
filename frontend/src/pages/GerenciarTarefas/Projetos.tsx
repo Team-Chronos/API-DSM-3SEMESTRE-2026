@@ -8,10 +8,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import { toastError } from "../../utils/toastUtils";
 
 export default function TelaProjetos() {
-  const { user } = useAuth();
-  const roles = user?.roles ?? [];
-  const podeGerenciarProjetos =
-    roles.includes("ROLE_FINANCE") || roles.includes("ROLE_GERENTE_PROJETO");
+  const { user, podeGerenciarProjetos } = useAuth();
   const navigate = useNavigate();
   const [projetos, setProjetos] = useState<Projeto1[]>([]);
   const [responsaveis, setResponsaveis] = useState<Map<number, string>>(

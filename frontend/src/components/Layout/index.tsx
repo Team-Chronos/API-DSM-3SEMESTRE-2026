@@ -1,14 +1,14 @@
 import { useAuth } from "../../contexts/AuthContext";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import { Outlet } from "react-router-dom";
 import Sidebar from "../sidebar/Sidebar";
-import { Navigate, Outlet } from "react-router-dom";
 
 export default function AppLayout() {
   const { user } = useAuth()
   const isMobile = useIsMobile()
 
-  if (!user){
-    return <Navigate to={"/login"} replace/>
+  if (!user) {
+    return <Navigate to={"/login"} replace />
   }
 
   return (

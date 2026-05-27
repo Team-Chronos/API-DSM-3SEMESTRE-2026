@@ -339,11 +339,10 @@ function TelaListaProfissionais() {
                   <button
                     key={item}
                     onClick={() => setPagina(item)}
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                      item === pagina
+                    className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${item === pagina
                         ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
                         : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
-                    }`}
+                      }`}
                   >
                     {item}
                   </button>
@@ -449,7 +448,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     try {
       const errorBody = await response.json();
       errorMessage = errorBody.erro || errorBody.message || errorMessage;
-    } catch {}
+    } catch { }
     throw new Error(errorMessage);
   }
 

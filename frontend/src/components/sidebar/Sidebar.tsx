@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -44,7 +44,6 @@ export default function Sidebar() {
 
   const [expanded, setExpanded] = useState(true);
   const [confirmLogout, setConfirmLogout] = useState(false);
-  const [userRoles, setUserRoles] = useState<string[]>([]);
 
   useEffect(() => {
     if (user?.roles) {

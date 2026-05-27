@@ -3,5 +3,6 @@ export type User = {
   nome: string;
   sub: string;
   cargo_id: number;
-  roles: string[];
+  cargoId?: number;
+  id_cargo?: number;
 };

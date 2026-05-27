@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { projetoService, profissionaisService } from "../../services/gateway";
 import profissionalService from "../../types/profissionalService";
 import { useAuth } from "../../contexts/AuthContext";
-import { toastError } from "../../utils/toastUtils";
+import { toastError, toastSuccess } from "../../utils/toastUtils";
 import jsPDF from "jspdf";
 
 interface Projeto {
@@ -17,6 +17,7 @@ interface Projeto {
   dataInicio: string;
   dataFim: string;
   responsavelId: number;
+  status?: "ATIVO" | "INATIVO" | "CONCLUIDO";
 }
 
 interface Profissional {
@@ -25,6 +26,7 @@ interface Profissional {
 }
 
 type TipoFiltro = "TODOS" | "HORA_FECHADA" | "ALOCACAO";
+type StatusFiltro = "TODOS" | "ATIVO" | "INATIVO" | "CONCLUIDO";
 
 type Ordenacao =
   | "NOME_ASC"
@@ -57,13 +59,7 @@ function buildPageItems(pagina: number, totalPaginas: number): (number | "...")[
 }
 
 function Projetos() {
-  const { user } = useAuth();
-  const roles = user?.roles ?? [];
-  const podeGerenciarProjetos =
-    roles.includes("ROLE_FINANCE") ||
-    roles.includes("ROLE_GERENTE_PROJETO") ||
-    roles.includes("ROLE_ADMIN");
-
+  const { user, podeGerenciarProjetos } = useAuth();
   const navigate = useNavigate();
 
   const [modalAberto, setModalAberto] = useState(false);
@@ -72,10 +68,35 @@ function Projetos() {
   const [profissionais, setProfissionais] = useState<Map<number, string>>(new Map());
   const [busca, setBusca] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState<TipoFiltro>("TODOS");
+  const [statusFiltro, setStatusFiltro] = useState<StatusFiltro>("TODOS");
   const [ordenacao, setOrdenacao] = useState<Ordenacao>("NOME_ASC");
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
   const [pagina, setPagina] = useState(1);
+  const [updatingStatusIds, setUpdatingStatusIds] = useState<number[]>([]);
+
+  const mapLabelToBackend = (label: string) => {
+    if (label === "Em andamento" || label === "ATIVO") return "ATIVO";
+    if (label === "Tarefas pendentes" || label === "INATIVO") return "INATIVO";
+    if (label === "Finalizado" || label === "CONCLUIDO") return "CONCLUIDO";
+    return "ATIVO";
+  };
+
+  const handleAlterarStatus = async (id: number, novoLabel: string) => {
+    const novoStatus = mapLabelToBackend(novoLabel) as "ATIVO" | "INATIVO" | "CONCLUIDO";
+    try {
+      setUpdatingStatusIds((s) => Array.from(new Set([...s, id])));
+      const res = await projetoService.alterarStatus(id, novoStatus);
+      if (!res.ok) throw new Error(`Status update failed: ${res.status}`);
+      setProjetos((prev) => prev.map((p) => (p.id === id ? { ...p, status: novoStatus } : p)));
+      toastSuccess("Status atualizado com sucesso");
+    } catch (err) {
+      console.error(err);
+      toastError("Falha ao alterar status. Tente novamente.");
+    } finally {
+      setUpdatingStatusIds((s) => s.filter((x) => x !== id));
+    }
+  };
 
   const carregarDados = async () => {
     try {
@@ -94,6 +115,8 @@ function Projetos() {
       const dadosProjetos = await resProjetos.json();
       const dadosProfissionais = await resProfissionais.json();
 
+      console.log(dadosProjetos)
+
       let projetosPermitidos = Array.isArray(dadosProjetos) ? dadosProjetos : [];
 
       if (!podeGerenciarProjetos && user?.id) {
@@ -103,6 +126,7 @@ function Projetos() {
             .map((v: any) => Number(v.projetoId ?? v.id))
             .filter((id: number) => !Number.isNaN(id)),
         );
+
         projetosPermitidos = projetosPermitidos.filter((projeto: Projeto) =>
           idsProjetos.has(Number(projeto.id)),
         );
@@ -154,13 +178,33 @@ function Projetos() {
     return "border-white/10 bg-white/5 text-slate-300";
   };
 
+  const getStatusLabel = (status?: string) => {
+    if (status === "ATIVO") return "Em andamento";
+    if (status === "INATIVO") return "Tarefas pendentes";
+    if (status === "CONCLUIDO") return "Finalizado";
+    return "Em andamento";
+  };
+
+  const getStatusStyle = (status?: string) => {
+    if (status === "INATIVO") return "border-orange-500/30 bg-orange-500/10 text-orange-300";
+    if (status === "CONCLUIDO") return "border-emerald-500/30 bg-emerald-500/10 text-emerald-300";
+    return "border-green-500/30 bg-green-500/10 text-green-300";
+  };
+
+  const getStatusDot = (status?: string) => {
+    if (status === "INATIVO") return "bg-orange-400";
+    if (status === "CONCLUIDO") return "bg-emerald-400";
+    return "bg-green-400";
+  };
+
   const filtrosAtivos = useMemo(() => {
     let total = 0;
     if (busca.trim()) total += 1;
     if (tipoFiltro !== "TODOS") total += 1;
+    if (statusFiltro !== "TODOS") total += 1;
     if (ordenacao !== "NOME_ASC") total += 1;
     return total;
-  }, [busca, tipoFiltro, ordenacao]);
+  }, [busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const projetosFiltrados = useMemo(() => {
     const termo = busca.toLowerCase().trim();
@@ -172,8 +216,12 @@ function Projetos() {
         projeto.nome?.toLowerCase().includes(termo) ||
         projeto.codigo?.toLowerCase().includes(termo) ||
         nomeResponsavel.toLowerCase().includes(termo);
+
       const bateTipo = tipoFiltro === "TODOS" || projeto.tipoProjeto === tipoFiltro;
-      return bateTexto && bateTipo;
+      const statusReal = projeto.status ?? "ATIVO";
+      const bateStatus = statusFiltro === "TODOS" || statusReal === statusFiltro;
+
+      return bateTexto && bateTipo && bateStatus;
     });
 
     return [...filtrados].sort((a, b) => {
@@ -206,7 +254,7 @@ function Projetos() {
           return nomeA.localeCompare(nomeB);
       }
     });
-  }, [projetos, profissionais, busca, tipoFiltro, ordenacao]);
+  }, [projetos, profissionais, busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const totalPaginas = Math.max(1, Math.ceil(projetosFiltrados.length / ITEMS_PER_PAGE));
 
@@ -217,7 +265,7 @@ function Projetos() {
 
   useEffect(() => {
     setPagina(1);
-  }, [busca, tipoFiltro, ordenacao]);
+  }, [busca, tipoFiltro, statusFiltro, ordenacao]);
 
   const pageItems = buildPageItems(pagina, totalPaginas);
 
@@ -234,6 +282,7 @@ function Projetos() {
   const limparFiltros = () => {
     setBusca("");
     setTipoFiltro("TODOS");
+    setStatusFiltro("TODOS");
     setOrdenacao("NOME_ASC");
   };
 
@@ -261,10 +310,10 @@ function Projetos() {
     doc.roundedRect(padding, y - 28, 515, 72, 10, 10, "F");
     doc.setTextColor("#6627cc");
     doc.setFontSize(10);
-    doc.text("Projetos", padding + 20, y);
-    doc.text("Hora fechada", padding + 145, y);
-    doc.text("Alocação", padding + 290, y);
-    doc.text("Horas contratadas", padding + 400, y);
+    doc.text("Total", padding + 20, y);
+    doc.text("Ativos", padding + 145, y);
+    doc.text("Inativos", padding + 290, y);
+    doc.text("Concluídos", padding + 420, y);
     doc.setFontSize(18);
     doc.text(String(projetosRelatorio.length), padding + 20, y + 24);
     doc.text(
@@ -288,14 +337,15 @@ function Projetos() {
     doc.setFontSize(14);
     doc.text("Projetos", padding, y);
     y += 24;
+
     doc.setFillColor("#6627cc");
     doc.rect(padding, y - 14, 515, 22, "F");
     doc.setTextColor("#ffffff");
     doc.setFontSize(9);
     doc.text("Projeto", padding + 8, y);
-    doc.text("Tipo", padding + 215, y);
-    doc.text("Responsável", padding + 315, y);
-    doc.text("Horas", padding + 455, y);
+    doc.text("Tipo", padding + 200, y);
+    doc.text("Status", padding + 310, y);
+    doc.text("Responsável", padding + 400, y);
     y += 24;
 
     projetosRelatorio.forEach((projeto) => {
@@ -305,10 +355,10 @@ function Projetos() {
       }
       doc.setTextColor("#111111");
       doc.setFontSize(9);
-      doc.text(String(projeto.nome ?? "N/D").slice(0, 34), padding + 8, y);
-      doc.text(getTipoLabel(projeto.tipoProjeto), padding + 215, y);
-      doc.text(getNomeResponsavel(projeto.responsavelId).slice(0, 22), padding + 315, y);
-      doc.text(`${projeto.horasContratadas ?? 0}h`, padding + 455, y);
+      doc.text(String(projeto.nome ?? "N/D").slice(0, 30), padding + 8, y);
+      doc.text(getTipoLabel(projeto.tipoProjeto), padding + 200, y);
+      doc.text(getStatusLabel(projeto.status), padding + 310, y);
+      doc.text(getNomeResponsavel(projeto.responsavelId).slice(0, 18), padding + 400, y);
       y += 18;
       doc.setDrawColor("#e8ddff");
       doc.line(padding, y, 555, y);
@@ -342,20 +392,8 @@ function Projetos() {
 
               <div className="grid grid-cols-2 gap-3 @min-lg:grid-cols-4 w-full">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Projetos</p>
+                  <p className="text-xs text-white/60">Total</p>
                   <p className="mt-1 text-2xl font-bold">{estatisticas.totalProjetos}</p>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Hora fechada</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoraFechada}</p>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Alocação</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalAlocacao}</p>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Horas</p>
-                  <p className="mt-1 text-2xl font-bold">{estatisticas.totalHoras}h</p>
                 </div>
               </div>
             </div>
@@ -457,6 +495,7 @@ function Projetos() {
                 </p>
                 <h2 className="mt-2 text-2xl font-bold text-white">Refinar projetos</h2>
               </div>
+
               {filtrosAtivos > 0 && (
                 <button
                   onClick={limparFiltros}
@@ -467,7 +506,7 @@ function Projetos() {
               )}
             </div>
 
-            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_260px_260px]">
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_220px_220px_220px]">
               <div className="relative">
                 <svg
                   className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-violet-300/70"
@@ -503,6 +542,17 @@ function Projetos() {
               </select>
 
               <select
+                value={statusFiltro}
+                onChange={(e) => setStatusFiltro(e.target.value as StatusFiltro)}
+                className="h-12 rounded-2xl border border-white/10 bg-[#1a1a20] px-4 text-sm text-white outline-none transition focus:border-[#6627cc]/70 focus:ring-2 focus:ring-[#6627cc]/25"
+              >
+                <option value="TODOS">Todos os status</option>
+                <option value="ATIVO">Em andamento</option>
+                <option value="INATIVO">Tarefas pendentes</option>
+                <option value="CONCLUIDO">Finalizados</option>
+              </select>
+
+              <select
                 value={ordenacao}
                 onChange={(e) => setOrdenacao(e.target.value as Ordenacao)}
                 className="h-12 rounded-2xl border border-white/10 bg-[#1a1a20] px-4 text-sm text-white outline-none transition focus:border-[#6627cc]/70 focus:ring-2 focus:ring-[#6627cc]/25"
@@ -526,6 +576,9 @@ function Projetos() {
               <span className="rounded-full border border-[#6627cc]/20 bg-[#6627cc]/10 px-3 py-1 text-violet-200">
                 Tipo: {tipoFiltro === "TODOS" ? "todos" : getTipoLabel(tipoFiltro)}
               </span>
+              <span className="rounded-full border border-[#6627cc]/20 bg-[#6627cc]/10 px-3 py-1 text-violet-200">
+                Status: {statusFiltro === "TODOS" ? "todos" : getStatusLabel(statusFiltro)}
+              </span>
               <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
                 Exibindo {projetosFiltrados.length} de {projetos.length}
               </span>
@@ -548,7 +601,7 @@ function Projetos() {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3 3xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
               <div
                 key={index}
@@ -646,6 +699,7 @@ function Projetos() {
                               {formatarMoeda(projeto.valorHoraBase)}
                             </p>
                           </div>
+
                           <div className="rounded-2xl border border-white/10 bg-[#1f1f24] p-3">
                             <p className="text-[11px] text-slate-500">Horas</p>
                             <p className="mt-1 text-sm font-bold text-white">
@@ -698,7 +752,7 @@ function Projetos() {
                   <button
                     onClick={() => setPagina((p) => Math.max(1, p - 1))}
                     disabled={pagina === 1}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <svg
                       width="14"
@@ -726,11 +780,10 @@ function Projetos() {
                       <button
                         key={item}
                         onClick={() => setPagina(item)}
-                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${
-                          item === pagina
-                            ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
-                            : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
-                        }`}
+                        className={`flex h-8 w-8 items-center justify-center rounded-lg text-sm font-semibold transition ${item === pagina
+                          ? "bg-[#6627cc] text-white shadow shadow-purple-900/40"
+                          : "border border-white/10 bg-[#1a1a20] text-slate-400 hover:border-[#6627cc]/50 hover:text-white"
+                          }`}
                       >
                         {item}
                       </button>
@@ -740,7 +793,7 @@ function Projetos() {
                   <button
                     onClick={() => setPagina((p) => Math.min(totalPaginas, p + 1))}
                     disabled={pagina === totalPaginas}
-                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-[#1a1a20] text-slate-400 transition hover:border-[#6627cc]/50 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <svg
                       width="14"
