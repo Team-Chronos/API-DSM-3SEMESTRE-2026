@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import ModalConfirmarExclusao from "../../components/detalhesProfissionais/modalExcluir";
 import { type Profissional, getInitials } from "../listaProfissionais";
 
+import { ApiProfissionais } from "../../service/servicoApi";
 const CARGOS = [
   {
     id: 1,
@@ -45,18 +46,15 @@ function TelaDetalhesProfissional() {
     mensagem: string;
   } | null>(null);
 
-  useEffect(() => {
+ useEffect(() => {
     if (!id) return;
 
     setLoading(true);
     setErro(null);
 
-    fetch(`/api/profissionais/api/profissionais/${id}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Profissional não encontrado");
-        return res.json();
-      })
-      .then((data: Profissional) => {
+    ApiProfissionais.get<Profissional>(`/profissionais/api/profissionais/${id}`)
+      .then((res: { data: Profissional }) => {
+        const data = res.data;
         setProfissional(data);
         setForm({
           nome: data.nome,
@@ -66,8 +64,10 @@ function TelaDetalhesProfissional() {
         });
         setLoading(false);
       })
-      .catch((err) => {
-        setErro(err.message);
+      .catch((err: { response?: { data?: { erro?: string } } }) => {
+       
+        const mensagem = err.response?.data?.erro || "Erro ao buscar profissional";
+        setErro(mensagem);
         setLoading(false);
       });
   }, [id]);
@@ -92,22 +92,13 @@ function TelaDetalhesProfissional() {
     setFeedback(null);
 
     try {
-      const res = await fetch(`/api/profissionais/api/profissionais/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...profissional, ...form }),
+     
+      const res = await ApiProfissionais.put(`/profissionais/api/profissionais/${id}`, {
+        ...profissional,
+        ...form
       });
 
-      if (!res.ok) {
-        let mensagem = "Erro ao salvar alterações";
-        try {
-          const body = await res.json();
-          mensagem = body.erro || body.message || mensagem;
-        } catch {}
-        throw new Error(mensagem);
-      }
-
-      const atualizado: Profissional = await res.json();
+      const atualizado = res.data;
 
       setProfissional(atualizado);
       setForm({
@@ -122,34 +113,24 @@ function TelaDetalhesProfissional() {
         mensagem: "Profissional atualizado com sucesso!",
       });
     } catch (err: any) {
-      setFeedback({ tipo: "erro", mensagem: err.message });
+      const mensagem = err.response?.data?.erro || "Erro ao salvar alterações";
+      setFeedback({ tipo: "erro", mensagem: mensagem });
     } finally {
       setSalvando(false);
     }
   }
 
-  async function handleExcluir() {
+ async function handleExcluir() {
     if (!profissional || !id) return;
 
     setExcluindo(true);
 
     try {
-      const res = await fetch(`/api/profissionais/api/profissionais/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!res.ok) {
-        let mensagem = "Erro ao excluir profissional";
-        try {
-          const body = await res.json();
-          mensagem = body.erro || body.message || mensagem;
-        } catch {}
-        throw new Error(mensagem);
-      }
-
+      await ApiProfissionais.delete(`/profissionais/api/profissionais/${id}`);
       navigate("/profissionais");
     } catch (err: any) {
-      setFeedback({ tipo: "erro", mensagem: err.message });
+      const mensagem = err.response?.data?.erro || "Erro ao excluir profissional";
+      setFeedback({ tipo: "erro", mensagem: mensagem });
       setModalExcluir(false);
     } finally {
       setExcluindo(false);
