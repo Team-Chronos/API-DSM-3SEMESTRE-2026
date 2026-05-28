@@ -18,6 +18,7 @@ export interface OpcoesExportacaoFinanceiro {
   dashboard: DashboardData;
   projetos: ProjetoFinanceiro[];
   profissionais: ProfissionalGanhos[];
+  competenciaLabel: string;
 }
 
 function formatarDataArquivo(data = new Date()): string {
@@ -28,6 +29,15 @@ function formatarDataArquivo(data = new Date()): string {
   const mi = String(data.getMinutes()).padStart(2, "0");
 
   return `${yyyy}${mm}${dd}-${hh}${mi}`;
+}
+
+function normalizarTextoArquivo(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 function formatarMoeda(valor: number): string {
@@ -73,26 +83,38 @@ function baixarBlob(blob: Blob, nomeArquivo: string) {
 
 function gerarNomeArquivo(opcoes: OpcoesExportacaoFinanceiro): string {
   const sufixoFiltro = opcoes.apenasFiltrados ? "-filtrado" : "-completo";
-  return `relatorio-financeiro${sufixoFiltro}-${formatarDataArquivo()}`;
+  const competencia = normalizarTextoArquivo(opcoes.competenciaLabel);
+  return `relatorio-financeiro-${competencia}${sufixoFiltro}-${formatarDataArquivo()}`;
 }
 
 function exportarCsv(opcoes: OpcoesExportacaoFinanceiro) {
   const linhas: string[] = [];
 
   linhas.push("RELATÓRIO FINANCEIRO");
+  linhas.push(`Competência;${opcoes.competenciaLabel}`);
   linhas.push("");
 
   if (opcoes.incluirIndicadores) {
     linhas.push("INDICADORES");
     linhas.push("Metrica;Valor");
     linhas.push(
-      `Horas Trabalhadas;${formatarNumero(opcoes.dashboard.totalHoras)}`
+      `Horas Trabalhadas;${formatarNumero(opcoes.dashboard.totalHoras)}`,
     );
-    linhas.push(`Task Concluidas;${formatarNumero(opcoes.dashboard.tarefasConcluidas)}`);
-    linhas.push(`Projetos em Andamento;${formatarNumero(opcoes.dashboard.totalProjetos)}`);
-    linhas.push(`Desenvolvedores;${formatarNumero(opcoes.dashboard.totalDesenvolvedores)}`);
-    linhas.push(`Custo Total Projetos;${formatarMoeda(opcoes.dashboard.custoTotal)}`);
-    linhas.push(`Projetos Concluidos;${formatarNumero(opcoes.dashboard.projetosConcluidos)}`);
+    linhas.push(
+      `Task Concluidas;${formatarNumero(opcoes.dashboard.tarefasConcluidas)}`,
+    );
+    linhas.push(
+      `Projetos em Andamento;${formatarNumero(opcoes.dashboard.totalProjetos)}`,
+    );
+    linhas.push(
+      `Desenvolvedores;${formatarNumero(opcoes.dashboard.totalDesenvolvedores)}`,
+    );
+    linhas.push(
+      `Custo Total Projetos;${formatarMoeda(opcoes.dashboard.custoTotal)}`,
+    );
+    linhas.push(
+      `Projetos Concluidos;${formatarNumero(opcoes.dashboard.projetosConcluidos)}`,
+    );
     linhas.push("");
   }
 
@@ -107,7 +129,7 @@ function exportarCsv(opcoes: OpcoesExportacaoFinanceiro) {
           projeto.tipoProjeto,
           formatarHoras(projeto.totalHoras),
           formatarMoeda(projeto.custoTotal),
-        ].join(";")
+        ].join(";"),
       );
     });
     linhas.push("");
@@ -125,7 +147,7 @@ function exportarCsv(opcoes: OpcoesExportacaoFinanceiro) {
           formatarMoeda(profissional.totalSemBonus),
           formatarMoeda(profissional.bonusAplicado),
           formatarMoeda(profissional.totalComBonus),
-        ].join(";")
+        ].join(";"),
       );
     });
   }
@@ -140,6 +162,7 @@ function exportarXlsx(opcoes: OpcoesExportacaoFinanceiro) {
 
   if (opcoes.incluirIndicadores) {
     const indicadores = [
+      { metrica: "Competência", valor: opcoes.competenciaLabel },
       { metrica: "Horas Trabalhadas", valor: opcoes.dashboard.totalHoras },
       { metrica: "Task Concluidas", valor: opcoes.dashboard.tarefasConcluidas },
       { metrica: "Projetos em Andamento", valor: opcoes.dashboard.totalProjetos },
@@ -189,16 +212,17 @@ function exportarPdf(opcoes: OpcoesExportacaoFinanceiro) {
   doc.text("Relatório Financeiro", 40, 40);
 
   doc.setFontSize(10);
+  doc.text(`Competência: ${opcoes.competenciaLabel}`, 40, 58);
   doc.text(
     `Gerado em ${new Intl.DateTimeFormat("pt-BR", {
       dateStyle: "short",
       timeStyle: "short",
     }).format(new Date())}`,
     40,
-    58
+    74,
   );
 
-  let cursorY = 80;
+  let cursorY = 96;
 
   if (opcoes.incluirIndicadores) {
     doc.setFontSize(13);

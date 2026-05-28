@@ -73,7 +73,7 @@ function CardMetrica({
   titulo,
   valor,
   destaque = false,
-  valorClasse = "text-3xl",
+  valorClasse = "text-2xl",
 }: {
   titulo: string;
   valor: string;
@@ -179,7 +179,7 @@ export default function ModalDetalheProjeto({
               <CardMetrica
                 titulo="Tipo"
                 valor={projeto.tipoProjeto}
-                valorClasse="text-2xl"
+                valorClasse="text-1xl"
               />
 
               <CardMetrica
