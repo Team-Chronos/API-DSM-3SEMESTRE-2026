@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   Link,
   LogOut,
+  ClipboardList,
   type LucideProps,
 } from "lucide-react";
 import logoInteiro from "../../assets/inteiro.png";
@@ -18,6 +19,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 
 const ALL_NAV_ITEMS = [
   { to: "/financeiro", icon: LayoutDashboard, label: "Dashboard", allowedRoles: ["ROLE_FINANCE"] },
+  { to: "/auditoria", icon: ClipboardList, label: "Auditoria", allowedRoles: ["ROLE_FINANCE"] },
   {
     to: "/projetos",
     icon: FolderKanban,

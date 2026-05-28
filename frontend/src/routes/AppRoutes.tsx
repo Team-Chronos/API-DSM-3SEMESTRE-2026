@@ -21,6 +21,7 @@ import SemAcesso from "../pages/SemAcesso";
 
 const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
+const AuditoriaPage = lazy(() => import("../pages/Auditoria"));
 
 const CARGO_GERENTE = 2;
 const CARGO_ADMIN = 3;
@@ -101,6 +102,16 @@ const AppRoutes = createBrowserRouter([
           <RoleRoute allowedCargos={adminCargos}>
             <Suspense fallback={loading}>
               <DashboardPage />
+            </Suspense>
+          </RoleRoute>
+        ),
+      },
+      {
+        path: "auditoria",
+        element: (
+          <RoleRoute allowedCargos={adminCargos}>
+            <Suspense fallback={loading}>
+              <AuditoriaPage />
             </Suspense>
           </RoleRoute>
         ),
