@@ -206,6 +206,33 @@ services:
     networks:
       - app-network
 
+
+
+  auditoria:
+    build:
+      context: ./services/auditoria/auditoria
+      dockerfile: Dockerfile
+    container_name: auditoria-api
+    environment:
+      SPRING_APPLICATION_NAME: auditoria
+      SPRING_DATASOURCE_URL: jdbc:mysql://35.198.58.59:3306/gsw_database?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: chronosapi
+      SPRING_DATASOURCE_PASSWORD: Bolsonaro#22
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SERVER_PORT: 8090
+      SPRING_DATA_REDIS_HOST: redis-cache
+      SPRING_DATA_REDIS_PORT: 6379
+      SPRING_CACHE_TYPE: redis
+      SERVER_COMPRESSION_ENABLED: "true"
+      SERVER_COMPRESSION_MIME_TYPES: application/json
+      AUDITORIA_API_URL: http://auditoria-api:8090/auditoria
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - app-network
+
   auth-gateway:
     build:
       context: ./services/gateway/gateway
@@ -231,6 +258,8 @@ services:
       FINANCEIRO_API_URL: http://financeiro:8085
       TAREFAS_API_URL: http://tarefas-api:8089
       TAREFAS_GET_API_URL: http://tarefas-get-api:8099
+      AUDITORIA_API_URL: http://auditoria-api:8090/auditoria
+
     depends_on:
       redis:
         condition: service_healthy
@@ -247,6 +276,8 @@ services:
       tarefas-api:
         condition: service_started
       tarefas-get-api:
+        condition: service_started
+      auditoria:
         condition: service_started
     restart: unless-stopped
     networks:
