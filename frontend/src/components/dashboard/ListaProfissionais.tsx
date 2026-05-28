@@ -149,9 +149,9 @@ function ListaProfissionais({
                     className="block w-full rounded-[15px] bg-[#54545a] p-6 text-left transition hover:bg-[#5c5c63]"
                     onClick={() => setProfissionalSelecionado(profissional)}
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex justify-between gap-4">
                       <div className="min-w-0">
-                        <p className="truncate text-[22px] font-semibold text-white">
+                        <p className="text-wrap text-[22px] font-semibold text-white">
                           {profissional.usuarioNome}
                         </p>
                         <p className="mt-2 text-[15px] text-white/70">

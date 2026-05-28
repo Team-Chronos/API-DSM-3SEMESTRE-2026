@@ -42,7 +42,7 @@ export default function ModalBase({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-6 sm:py-6">
+    <div className="fixed inset-0 z-1000 flex items-start justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-6 sm:py-6">
       <button
         type="button"
         aria-label="Fechar modal"

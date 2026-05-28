@@ -129,7 +129,7 @@ function TelaListaProfissionais() {
   const pageItems = buildPageItems(pagina, totalPaginas);
 
   return (
-    <div className="sm:p-6 @max-md:p-0 text-white">
+    <div className="sm:p-6 @max-md:p-2 text-white">
       <div className="mx-auto max-w-6xl space-y-5">
         <div className="@container w-full flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="p-6 @max-md:p-6 sm:p-0">
@@ -142,7 +142,7 @@ function TelaListaProfissionais() {
           </div>
 
           <div className="flex items-center gap-3 rounded-2xl border border-white/10 bg-[#232329] px-4 py-3 shadow-lg">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linear-to-br from-[#6627cc] to-[#4a1898] shadow-lg shadow-purple-900/30">
               <svg
                 width="22"
                 height="22"
@@ -168,8 +168,8 @@ function TelaListaProfissionais() {
           </div>
         </div>
 
-        <div className="overflow-hidden sm:rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
-          <div className="relative border-b border-white/8 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
+        <div className="overflow-hidden rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+          <div className="relative border-b border-white/8 bg-linear-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
             <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <div className="pointer-events-none absolute bottom-0 left-0 h-px w-full bg-white/15" />
 

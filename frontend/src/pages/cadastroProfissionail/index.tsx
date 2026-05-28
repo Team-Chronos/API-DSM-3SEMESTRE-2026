@@ -127,7 +127,7 @@ function CadastroProfissional() {
   };
 
   return (
-    <div className="p-6 text-white">
+    <div className="p-2 sm:p-6 text-white">
       <div className="mx-auto max-w-6xl space-y-5">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
@@ -307,7 +307,7 @@ function CadastroProfissional() {
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-white/8 p-5 shadow-inner shadow-black/20 lg:col-span-5">
+                <div className="rounded-2xl border border-white/8 p-2.5 sm:p-5 shadow-inner shadow-black/20 lg:col-span-5">
                   <div className="mb-5 flex items-center gap-3">
                     <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/5">
                       <BriefcaseBusiness size={18} className="text-white/85" />
@@ -375,7 +375,7 @@ function CadastroProfissional() {
                                 type="checkbox"
                                 checked={selecionado}
                                 onChange={() => toggleProjeto(projeto.id)}
-                                className="mt-1 h-4 w-4 rounded border-white/20 bg-transparent text-violet-500 focus:ring-violet-500"
+                                className="hidden"
                               />
 
                               <div className="min-w-0 flex-1">

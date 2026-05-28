@@ -176,9 +176,9 @@ function ListaProjetos({
                   onClick={() => void abrirDetalheProjeto(projeto.projetoId)}
                   disabled={carregandoProjetoId === projeto.projetoId}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex flex-col items-start justify-between gap-4">
                     <div className="min-w-0">
-                      <p className="truncate text-[22px] font-semibold text-white">
+                      <p className="text-wrap text-[22px] font-semibold text-white">
                         {projeto.nomeProjeto}
                       </p>
                       <p className="mt-2 text-[15px] uppercase text-white/70">
