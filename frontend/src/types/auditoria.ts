@@ -1,12 +1,6 @@
 export type AuditoriaModulo = "todos" | "profissionais" | "projetos" | "tarefas";
-export type AuditoriaModuloRegistro = "profissionais" | "projetos" | "tarefas" | "sistema";
-export type AuditoriaTipoEvento = "todos" | "login" | "criacao" | "atualizacao" | "remocao";
-
-export interface AuditoriaResponsavel {
-  id: number | null;
-  nome: string;
-  email: string;
-}
+export type AuditoriaModuloRegistro = "profissionais" | "projetos" | "tarefas";
+export type AuditoriaTipoEvento = "todos" | "criacao" | "atualizacao" | "remocao";
 
 export interface AuditoriaRegistro {
   id: string;
@@ -18,14 +12,17 @@ export interface AuditoriaRegistro {
   valorAnterior: string;
   novoValor: string;
   dataHora: string;
-  responsavel: AuditoriaResponsavel;
+  usuarioAutor: number | null;
+  autorNome?: string | null;
+  autorEmail?: string | null;
+  autorCargoId?: number | null;
   descricao: string;
   entidadeId: number | null;
   tabela: string;
-  origem: string;
+  origem: AuditoriaModuloRegistro;
 }
 
-export interface AuditoriaTarefaApiRegistro {
+export interface AuditoriaApiRegistro {
   id: number;
   usuarioAutor: number | null;
   nomeTabelaModificada: string | null;

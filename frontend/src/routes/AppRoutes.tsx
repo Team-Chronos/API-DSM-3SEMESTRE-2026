@@ -23,11 +23,13 @@ const Layout = lazy(() => import("../components/Layout"));
 const DashboardPage = lazy(() => import("../pages/Financeiro/FinanceiroPage"));
 const AuditoriaPage = lazy(() => import("../pages/Auditoria"));
 
+const CARGO_DEV = 1;
 const CARGO_GERENTE = 2;
 const CARGO_ADMIN = 3;
 
 const adminCargos = [CARGO_ADMIN];
 const adminGerenteCargos = [CARGO_GERENTE, CARGO_ADMIN];
+const projetoTarefasCargos = [CARGO_DEV, CARGO_GERENTE, CARGO_ADMIN];
 
 const loading = <div className="flex min-h-screen items-center justify-center bg-[#1b1b1f] text-white">Loading...</div>;
 
@@ -87,7 +89,7 @@ const AppRoutes = createBrowserRouter([
           {
             path: "tarefas",
             element: (
-              <RoleRoute allowedCargos={adminGerenteCargos}>
+              <RoleRoute allowedCargos={projetoTarefasCargos}>
                 <Suspense fallback={loading}>
                   <TarefasPorProjeto />
                 </Suspense>

@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalBaseProps {
   aberto: boolean;
@@ -41,12 +42,12 @@ export default function ModalBase({
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-6 sm:py-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-6 sm:py-6">
       <button
         type="button"
         aria-label="Fechar modal"
-        className="absolute inset-0 bg-black/65 backdrop-blur-[4px]"
+        className="fixed inset-0 bg-black/65 backdrop-blur-[4px]"
         onClick={onFechar}
       />
 
@@ -102,6 +103,7 @@ export default function ModalBase({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,8 +1,9 @@
-import axios from "axios";
+import axios, { type InternalAxiosRequestConfig } from "axios";
+import { ApiProfissionais } from "../service/servicoApi";
 import type {
+  AuditoriaApiRegistro,
   AuditoriaModuloRegistro,
   AuditoriaRegistro,
-  AuditoriaTarefaApiRegistro,
 } from "../types/auditoria";
 
 const API_BASE = "/api/auditoria";
@@ -12,7 +13,7 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-api.interceptors.request.use((config) => {
+function aplicarToken(config: InternalAxiosRequestConfig) {
   const token = localStorage.getItem("token");
 
   if (token) {
@@ -20,19 +21,38 @@ api.interceptors.request.use((config) => {
   }
 
   return config;
-});
+}
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
+function tratarErroAutenticacao(error: unknown) {
+  if (axios.isAxiosError(error) && error.response?.status === 401) {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }
 
-    return Promise.reject(error);
-  },
-);
+  return Promise.reject(error);
+}
+
+api.interceptors.request.use(aplicarToken);
+api.interceptors.response.use((response) => response, tratarErroAutenticacao);
+
+type AuditoriaRespostaTodas = Partial<Record<AuditoriaModuloRegistro, unknown>>;
+
+interface ProfissionalAutorApi {
+  id?: number | string | null;
+  usuarioId?: number | string | null;
+  nome?: string | null;
+  email?: string | null;
+  cargoId?: number | string | null;
+}
+
+interface AutorResolvido {
+  id: number;
+  nome: string | null;
+  email: string | null;
+  cargoId: number | null;
+}
+
+const autoresCache = new Map<number, AutorResolvido | null>();
 
 function valorOuPadrao(valor: unknown, padrao = "Não informado"): string {
   if (valor === null || valor === undefined || valor === "") {
@@ -49,13 +69,6 @@ function removerAcentos(valor: string): string {
 function normalizarOperacao(operacao: string | null | undefined): string {
   const operacaoNormalizada = removerAcentos(valorOuPadrao(operacao).trim().toUpperCase());
 
-  if (["LOGIN", "SIGN_IN", "SIGNIN", "AUTH", "AUTENTICACAO"].includes(operacaoNormalizada)) {
-    return "Login";
-  }
-
-  if (["CREATE", "INSERT", "POST", "CRIACAO", "CADASTRO"].includes(operacaoNormalizada)) {
-    return "Criação";
-  }
 
   if (["UPDATE", "PUT", "PATCH", "ALTERACAO", "ATUALIZACAO", "EDICAO"].includes(operacaoNormalizada)) {
     return "Atualização";
@@ -68,17 +81,11 @@ function normalizarOperacao(operacao: string | null | undefined): string {
   return valorOuPadrao(operacao);
 }
 
-function inferirModuloPorTabela(tabela: string): AuditoriaModuloRegistro {
+function normalizarModuloPorTabela(
+  tabela: string,
+  origemFallback: AuditoriaModuloRegistro,
+): AuditoriaModuloRegistro {
   const tabelaNormalizada = removerAcentos(tabela.trim().toLowerCase());
-
-  if (
-    tabelaNormalizada.includes("auth") ||
-    tabelaNormalizada.includes("login") ||
-    tabelaNormalizada.includes("sessao") ||
-    tabelaNormalizada.includes("session")
-  ) {
-    return "sistema";
-  }
 
   if (tabelaNormalizada.includes("profissional")) {
     return "profissionais";
@@ -88,7 +95,39 @@ function inferirModuloPorTabela(tabela: string): AuditoriaModuloRegistro {
     return "projetos";
   }
 
-  return "tarefas";
+  if (tabelaNormalizada.includes("tarefa") || tabelaNormalizada.includes("item")) {
+    return "tarefas";
+  }
+
+  return origemFallback;
+}
+
+function normalizarCampo(campo: string | null | undefined, operacao: string): string {
+  const campoTratado = valorOuPadrao(campo, "Registro").trim();
+
+  if (!campoTratado || campoTratado === "*") {
+    return operacao === "Atualização" ? "Registro" : "Registro completo";
+  }
+
+  return campoTratado;
+}
+
+function formatarValorPorOperacao(
+  valor: string | null | undefined,
+  operacao: string,
+  tipo: "anterior" | "novo",
+): string {
+  const valorTratado = valorOuPadrao(valor, "").trim();
+
+  if (valorTratado) {
+    return valorTratado;
+  }
+
+  if (operacao === "Remoção") {
+    return tipo === "anterior" ? "Dados anteriores não informados" : "Registro removido";
+  }
+
+  return "Não informado";
 }
 
 function criarDescricaoAuditoria({
@@ -104,14 +143,6 @@ function criarDescricaoAuditoria({
 }): string {
   const registro = entidadeId ? ` #${entidadeId}` : "";
 
-  if (operacao === "Login") {
-    return "Usuário realizou login no sistema.";
-  }
-
-  if (operacao === "Criação") {
-    return `Registro criado em ${tabela}${registro}.`;
-  }
-
   if (operacao === "Atualização") {
     return `Campo "${campo}" alterado em ${tabela}${registro}.`;
   }
@@ -123,31 +154,64 @@ function criarDescricaoAuditoria({
   return `Evento registrado em ${tabela}${registro}.`;
 }
 
-function normalizarRegistroTarefa(
-  registro: AuditoriaTarefaApiRegistro,
+function extrairListaAuditoria(resposta: unknown): AuditoriaApiRegistro[] {
+  if (Array.isArray(resposta)) {
+    return resposta as AuditoriaApiRegistro[];
+  }
+
+  if (resposta && typeof resposta === "object") {
+    const respostaComum = resposta as {
+      content?: unknown;
+      data?: unknown;
+      dados?: unknown;
+      registros?: unknown;
+    };
+
+    if (Array.isArray(respostaComum.content)) {
+      return respostaComum.content as AuditoriaApiRegistro[];
+    }
+
+    if (Array.isArray(respostaComum.data)) {
+      return respostaComum.data as AuditoriaApiRegistro[];
+    }
+
+    if (Array.isArray(respostaComum.dados)) {
+      return respostaComum.dados as AuditoriaApiRegistro[];
+    }
+
+    if (Array.isArray(respostaComum.registros)) {
+      return respostaComum.registros as AuditoriaApiRegistro[];
+    }
+  }
+
+  return [];
+}
+
+function normalizarRegistroAuditoria(
+  registro: AuditoriaApiRegistro,
+  origemFallback: AuditoriaModuloRegistro,
 ): AuditoriaRegistro {
-  const tabela = valorOuPadrao(registro.nomeTabelaModificada, "Tarefa");
+  const tabela = valorOuPadrao(registro.nomeTabelaModificada, "Registro");
   const entidadeId = registro.entidadeId ?? null;
-  const usuarioAutor = registro.usuarioAutor ?? null;
-  const campo = valorOuPadrao(registro.campoAlterado);
   const operacao = normalizarOperacao(registro.tipoOperacao);
-  const modulo = inferirModuloPorTabela(tabela);
+  const campo = normalizarCampo(registro.campoAlterado, operacao);
+  const modulo = normalizarModuloPorTabela(tabela, origemFallback);
+  const registroAfetado = entidadeId ? `Registro #${entidadeId}` : "Registro";
 
   return {
-    id: `${modulo}-${registro.id}`,
+    id: `${modulo}-${registro.id}-${tabela}-${entidadeId ?? "sem-id"}-${campo}-${registro.dataAlteracao ?? "sem-data"}`,
     codigo: String(registro.id),
     modulo,
-    local: entidadeId ? `${tabela} / Registro #${entidadeId}` : `${tabela} / Registro`,
+    local: `${tabela} / ${registroAfetado}`,
     acao: operacao,
     campo,
-    valorAnterior: valorOuPadrao(registro.valorAnterior),
-    novoValor: valorOuPadrao(registro.novoValor),
+    valorAnterior: formatarValorPorOperacao(registro.valorAnterior, operacao, "anterior"),
+    novoValor: formatarValorPorOperacao(registro.novoValor, operacao, "novo"),
     dataHora: valorOuPadrao(registro.dataAlteracao, ""),
-    responsavel: {
-      id: usuarioAutor,
-      nome: usuarioAutor ? `Usuário #${usuarioAutor}` : "Sistema",
-      email: "E-mail não informado",
-    },
+    usuarioAutor: registro.usuarioAutor ?? null,
+    autorNome: null,
+    autorEmail: null,
+    autorCargoId: null,
     descricao: criarDescricaoAuditoria({
       operacao,
       tabela,
@@ -160,9 +224,31 @@ function normalizarRegistroTarefa(
   };
 }
 
-function ordenarPorDataMaisRecente(
-  registros: AuditoriaRegistro[],
-): AuditoriaRegistro[] {
+function removerDuplicados(registros: AuditoriaRegistro[]): AuditoriaRegistro[] {
+  const mapa = new Map<string, AuditoriaRegistro>();
+
+  registros.forEach((registro) => {
+    const chave = [
+      registro.modulo,
+      registro.codigo,
+      registro.tabela,
+      registro.entidadeId ?? "",
+      registro.acao,
+      registro.campo,
+      registro.valorAnterior,
+      registro.novoValor,
+      registro.dataHora,
+    ].join("|");
+
+    if (!mapa.has(chave)) {
+      mapa.set(chave, registro);
+    }
+  });
+
+  return Array.from(mapa.values());
+}
+
+function ordenarPorDataMaisRecente(registros: AuditoriaRegistro[]): AuditoriaRegistro[] {
   return [...registros].sort((a, b) => {
     const dataA = new Date(a.dataHora).getTime();
     const dataB = new Date(b.dataHora).getTime();
@@ -183,12 +269,103 @@ function ordenarPorDataMaisRecente(
   });
 }
 
-export const apiAuditoria = {
-  async listarTarefas(): Promise<AuditoriaRegistro[]> {
-    const response = await api.get<AuditoriaTarefaApiRegistro[]>("/auditoria");
+function normalizarRespostaTodas(data: unknown): AuditoriaRegistro[] {
+  if (Array.isArray(data)) {
+    return data.map((registro) => normalizarRegistroAuditoria(registro, "tarefas"));
+  }
 
-    return ordenarPorDataMaisRecente(
-      response.data.map(normalizarRegistroTarefa),
+  const resposta = data as AuditoriaRespostaTodas;
+  const grupos: AuditoriaModuloRegistro[] = ["tarefas", "projetos", "profissionais"];
+
+  return grupos.flatMap((origem) =>
+    extrairListaAuditoria(resposta?.[origem]).map((registro) =>
+      normalizarRegistroAuditoria(registro, origem),
+    ),
+  );
+}
+
+function normalizarCargoId(cargoId: number | string | null | undefined): number | null {
+  if (cargoId === null || cargoId === undefined || cargoId === "") {
+    return null;
+  }
+
+  const numero = Number(cargoId);
+  return Number.isNaN(numero) ? null : numero;
+}
+
+async function buscarAutorPorId(id: number): Promise<AutorResolvido | null> {
+  if (autoresCache.has(id)) {
+    return autoresCache.get(id) ?? null;
+  }
+
+  try {
+    const response = await ApiProfissionais.get<ProfissionalAutorApi>(
+      `/profissionais/api/profissionais/${id}`,
     );
+
+    const profissional = response.data;
+    const autor: AutorResolvido = {
+      id,
+      nome: profissional?.nome ? String(profissional.nome) : null,
+      email: profissional?.email ? String(profissional.email) : null,
+      cargoId: normalizarCargoId(profissional?.cargoId),
+    };
+
+    autoresCache.set(id, autor);
+    return autor;
+  } catch (error) {
+    console.warn(`Não foi possível resolver o autor ${id} no serviço de profissionais.`, error);
+    autoresCache.set(id, null);
+    return null;
+  }
+}
+
+async function enriquecerAutores(registros: AuditoriaRegistro[]): Promise<AuditoriaRegistro[]> {
+  const idsUnicos = Array.from(
+    new Set(
+      registros
+        .map((registro) => registro.usuarioAutor)
+        .filter((id): id is number => typeof id === "number"),
+    ),
+  );
+
+  if (idsUnicos.length === 0) {
+    return registros;
+  }
+
+  const autores = await Promise.all(
+    idsUnicos.map(async (id) => [id, await buscarAutorPorId(id)] as const),
+  );
+
+  const autoresPorId = new Map<number, AutorResolvido | null>(autores);
+
+  return registros.map((registro) => {
+    if (registro.usuarioAutor === null) {
+      return registro;
+    }
+
+    const autor = autoresPorId.get(registro.usuarioAutor);
+
+    if (!autor) {
+      return registro;
+    }
+
+    return {
+      ...registro,
+      autorNome: autor.nome,
+      autorEmail: autor.email,
+      autorCargoId: autor.cargoId,
+    };
+  });
+}
+
+export const apiAuditoria = {
+  async listarTodas(): Promise<AuditoriaRegistro[]> {
+    const response = await api.get<unknown>("/todas");
+    const registros = ordenarPorDataMaisRecente(
+      removerDuplicados(normalizarRespostaTodas(response.data)),
+    );
+
+    return enriquecerAutores(registros);
   },
 };

@@ -61,6 +61,7 @@ export default function DragDropTarefas({
   const { user, loading: authLoading, podeGerenciarProjetos } = useAuth();
 
   const podeGerenciarTodasTarefas = podeGerenciarProjetos;
+  const modoMinhasTarefas = !podeGerenciarTodasTarefas;
 
   const [colunas, setColunas] = useState<Coluna[]>([
     { id: "pendente", titulo: "Pendente", status: "PENDENTE", tarefas: [] },
@@ -115,7 +116,7 @@ export default function DragDropTarefas({
       );
       setProfissionais(profissionaisMap);
 
-      const tarefas: Tarefa[] = tarefasData.map((t: any) => ({
+      const tarefasNormalizadas: Tarefa[] = tarefasData.map((t: any) => ({
         id: t.id,
         titulo: t.titulo,
         descricao: t.descricao,
@@ -125,6 +126,12 @@ export default function DragDropTarefas({
         tipoTarefaId: t.tipoTarefaId,
         tempoMaximoMinutos: t.tempoMaximoMinutos,
       }));
+
+      const tarefas = podeGerenciarTodasTarefas
+        ? tarefasNormalizadas
+        : tarefasNormalizadas.filter(
+            (tarefa) => Number(tarefa.responsavelId) === Number(user.id),
+          );
 
       setColunas(prev =>
         prev.map(col => ({
@@ -223,9 +230,19 @@ export default function DragDropTarefas({
     );
   }
 
+  const totalTarefas = colunas.reduce((total, coluna) => total + coluna.tarefas.length, 0);
+
   return (
     <>
       <div className="p-6">
+        {totalTarefas === 0 && (
+          <div className="mb-5 rounded-2xl border border-white/10 bg-[#1f1f1f] px-5 py-6 text-center text-sm text-slate-400">
+            {modoMinhasTarefas
+              ? "Nenhuma tarefa atribuída a você neste projeto."
+              : "Nenhuma tarefa cadastrada neste projeto."}
+          </div>
+        )}
+
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
@@ -242,7 +259,7 @@ export default function DragDropTarefas({
                 <div className="space-y-2">
                   {coluna.tarefas.length === 0 ? (
                     <div className="text-gray-500 text-center py-8 text-sm italic bg-[#1f1f1f] rounded-lg">
-                      Nenhuma tarefa
+                      {modoMinhasTarefas ? "Nenhuma tarefa sua nesta coluna" : "Nenhuma tarefa"}
                     </div>
                   ) : (
                     coluna.tarefas.map(tarefa => (

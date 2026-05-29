@@ -54,8 +54,6 @@ const ABAS_AUDITORIA: AbaAuditoria[] = [
 
 const FILTROS_EVENTO: { id: AuditoriaTipoEvento; label: string }[] = [
   { id: "todos", label: "Todos" },
-  { id: "login", label: "Login" },
-  { id: "criacao", label: "Criação" },
   { id: "atualizacao", label: "Atualização" },
   { id: "remocao", label: "Remoção" },
 ];
@@ -72,21 +70,11 @@ function identificarTipoEvento(acao: string): AuditoriaTipoEvento {
   const acaoNormalizada = normalizarTexto(acao);
 
   if (
-    acaoNormalizada.includes("login") ||
-    acaoNormalizada.includes("sign in") ||
-    acaoNormalizada.includes("signin") ||
-    acaoNormalizada.includes("autenticacao")
-  ) {
-    return "login";
-  }
-
-  if (
     acaoNormalizada.includes("criacao") ||
     acaoNormalizada.includes("create") ||
     acaoNormalizada.includes("insert") ||
     acaoNormalizada.includes("post") ||
-    acaoNormalizada.includes("cadastro") ||
-    acaoNormalizada.includes("associacao")
+    acaoNormalizada.includes("cadastro")
   ) {
     return "criacao";
   }
@@ -94,7 +82,6 @@ function identificarTipoEvento(acao: string): AuditoriaTipoEvento {
   if (
     acaoNormalizada.includes("atualizacao") ||
     acaoNormalizada.includes("alteracao") ||
-    acaoNormalizada.includes("atualizado") ||
     acaoNormalizada.includes("update") ||
     acaoNormalizada.includes("put") ||
     acaoNormalizada.includes("patch") ||
@@ -127,15 +114,19 @@ export default function AuditoriaPage() {
     carregandoInicial,
     atualizando,
     error,
-    indisponivel,
-    mensagemIndisponivel,
     recarregar,
-  } = useAuditoria(abaAtiva);
+  } = useAuditoria();
 
   const registrosFiltrados = useMemo(() => {
     const termo = normalizarTexto(busca);
 
     return registros.filter((registro) => {
+      const bateAba = abaAtiva === "todos" || registro.modulo === abaAtiva;
+
+      if (!bateAba) {
+        return false;
+      }
+
       const tipoRegistro = identificarTipoEvento(registro.acao);
       const bateTipoEvento = tipoEvento === "todos" || tipoRegistro === tipoEvento;
 
@@ -149,8 +140,9 @@ export default function AuditoriaPage() {
 
       return [
         registro.codigo,
-        registro.responsavel.nome,
-        registro.responsavel.email,
+        String(registro.usuarioAutor ?? ""),
+        registro.autorNome ?? "",
+        registro.autorEmail ?? "",
         registro.local,
         registro.acao,
         registro.campo,
@@ -165,7 +157,7 @@ export default function AuditoriaPage() {
         .replace(/[\u0300-\u036f]/g, "")
         .includes(termo);
     });
-  }, [busca, registros, tipoEvento]);
+  }, [abaAtiva, busca, registros, tipoEvento]);
 
   const totaisPorModulo = useMemo(() => {
     return registros.reduce(
@@ -177,7 +169,6 @@ export default function AuditoriaPage() {
         profissionais: 0,
         projetos: 0,
         tarefas: 0,
-        sistema: 0,
       },
     );
   }, [registros]);
@@ -196,11 +187,11 @@ export default function AuditoriaPage() {
                 </p>
                 <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">Tela de Auditoria</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
-                  Acompanhe eventos de login, criação, atualização e remoção em profissionais, projetos e tarefas.
+                  Acompanhe eventos de atualização e remoção em profissionais, projetos e tarefas.
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 lg:min-w-[520px] xl:grid-cols-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 lg:min-w-[520px]">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                   <p className="text-xs text-white/60">Profissionais</p>
                   <p className="mt-1 text-2xl font-semibold text-white">{totaisPorModulo.profissionais}</p>
@@ -212,10 +203,6 @@ export default function AuditoriaPage() {
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                   <p className="text-xs text-white/60">Tarefas</p>
                   <p className="mt-1 text-2xl font-semibold text-white">{totaisPorModulo.tarefas}</p>
-                </div>
-                <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
-                  <p className="text-xs text-white/60">Sistema</p>
-                  <p className="mt-1 text-2xl font-semibold text-white">{totaisPorModulo.sistema}</p>
                 </div>
               </div>
             </div>
@@ -290,7 +277,7 @@ export default function AuditoriaPage() {
                 <button
                   type="button"
                   onClick={() => void recarregar()}
-                  disabled={loading || indisponivel}
+                  disabled={loading}
                   className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-medium text-white/80 transition hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <RefreshCcw size={16} className={atualizando ? "animate-spin" : ""} />
@@ -316,7 +303,7 @@ export default function AuditoriaPage() {
             </div>
 
             {atualizando && <p className="text-sm text-white/45">Atualizando dados...</p>}
-            {!atualizando && !indisponivel && <p className="text-sm text-white/45">Clique em um registro para abrir os detalhes.</p>}
+            {!atualizando && <p className="text-sm text-white/45">Clique em um registro para abrir os detalhes.</p>}
           </div>
 
           {carregandoInicial && (
@@ -341,15 +328,7 @@ export default function AuditoriaPage() {
             </div>
           )}
 
-          {!carregandoInicial && !error && indisponivel && (
-            <div className="rounded-[15px] border border-amber-400/20 bg-amber-500/10 px-5 py-8 text-center">
-              <AlertTriangle className="mx-auto text-amber-200" size={28} />
-              <p className="mt-4 text-base font-semibold text-white">Módulo ainda não integrado</p>
-              <p className="mt-2 text-sm text-white/60">{mensagemIndisponivel}</p>
-            </div>
-          )}
-
-          {!carregandoInicial && !error && !indisponivel && registrosFiltrados.length === 0 && (
+          {!carregandoInicial && !error && registrosFiltrados.length === 0 && (
             <div className="rounded-[15px] border border-white/10 bg-black/20 px-5 py-10 text-center">
               <p className="text-base font-semibold text-white">Nenhum registro encontrado</p>
               <p className="mt-2 text-sm text-white/50">
@@ -358,7 +337,7 @@ export default function AuditoriaPage() {
             </div>
           )}
 
-          {!carregandoInicial && !error && !indisponivel && registrosFiltrados.length > 0 && (
+          {!carregandoInicial && !error && registrosFiltrados.length > 0 && (
             <ListaAuditoria registros={registrosFiltrados} onSelecionar={setAuditoriaSelecionada} />
           )}
         </section>

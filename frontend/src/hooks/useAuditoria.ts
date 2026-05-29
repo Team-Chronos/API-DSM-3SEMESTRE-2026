@@ -1,7 +1,7 @@
+import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
-// import { apiAuditoria } from "../lib/apiAuditoria";
-import { auditoriaMock } from "../mocks/auditoriaMock";
-import type { AuditoriaModulo, AuditoriaRegistro } from "../types/auditoria";
+import { apiAuditoria } from "../lib/apiAuditoria";
+import type { AuditoriaRegistro } from "../types/auditoria";
 
 interface UseAuditoriaResult {
   registros: AuditoriaRegistro[];
@@ -9,45 +9,28 @@ interface UseAuditoriaResult {
   carregandoInicial: boolean;
   atualizando: boolean;
   error: string | null;
-  indisponivel: boolean;
-  mensagemIndisponivel: string | null;
   recarregar: () => Promise<void>;
 }
 
-function aguardarMock(ms = 250): Promise<void> {
-  return new Promise((resolve) => window.setTimeout(resolve, ms));
-}
+function extrairMensagemErro(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const resposta = error.response?.data as { message?: string; erro?: string } | string | undefined;
 
-function ordenarPorDataMaisRecente(registros: AuditoriaRegistro[]): AuditoriaRegistro[] {
-  return [...registros].sort((a, b) => {
-    const dataA = new Date(a.dataHora).getTime();
-    const dataB = new Date(b.dataHora).getTime();
-
-    if (Number.isNaN(dataA) && Number.isNaN(dataB)) {
-      return Number(b.codigo) - Number(a.codigo);
+    if (typeof resposta === "string") {
+      return resposta;
     }
 
-    if (Number.isNaN(dataA)) {
-      return 1;
-    }
+    return resposta?.message || resposta?.erro || error.message || "Erro ao carregar auditoria";
+  }
 
-    if (Number.isNaN(dataB)) {
-      return -1;
-    }
+  if (error instanceof Error) {
+    return error.message;
+  }
 
-    return dataB - dataA;
-  });
+  return "Erro ao carregar auditoria";
 }
 
-function filtrarMockPorModulo(modulo: AuditoriaModulo): AuditoriaRegistro[] {
-  const registros = modulo === "todos"
-    ? auditoriaMock
-    : auditoriaMock.filter((registro) => registro.modulo === modulo);
-
-  return ordenarPorDataMaisRecente(registros);
-}
-
-export function useAuditoria(modulo: AuditoriaModulo): UseAuditoriaResult {
+export function useAuditoria(): UseAuditoriaResult {
   const [registros, setRegistros] = useState<AuditoriaRegistro[]>([]);
   const [loading, setLoading] = useState(true);
   const [carregandoInicial, setCarregandoInicial] = useState(true);
@@ -61,22 +44,17 @@ export function useAuditoria(modulo: AuditoriaModulo): UseAuditoriaResult {
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
 
-    const possuiDados = possuiDadosRef.current;
-
     try {
       setLoading(true);
       setError(null);
 
-      if (possuiDados) {
+      if (possuiDadosRef.current) {
         setAtualizando(true);
       } else {
         setCarregandoInicial(true);
       }
 
-      await aguardarMock();
-
-      const response = filtrarMockPorModulo(modulo);
-      // const response = await apiAuditoria.listarTarefas();
+      const response = await apiAuditoria.listarTodas();
 
       if (requestId !== requestIdRef.current) {
         return;
@@ -90,7 +68,7 @@ export function useAuditoria(modulo: AuditoriaModulo): UseAuditoriaResult {
       }
 
       setRegistros([]);
-      setError(err instanceof Error ? err.message : "Erro ao carregar auditoria");
+      setError(extrairMensagemErro(err));
     } finally {
       if (requestId !== requestIdRef.current) {
         return;
@@ -100,7 +78,7 @@ export function useAuditoria(modulo: AuditoriaModulo): UseAuditoriaResult {
       setCarregandoInicial(false);
       setAtualizando(false);
     }
-  }, [modulo]);
+  }, []);
 
   useEffect(() => {
     void carregar();
@@ -112,8 +90,6 @@ export function useAuditoria(modulo: AuditoriaModulo): UseAuditoriaResult {
     carregandoInicial,
     atualizando,
     error,
-    indisponivel: false,
-    mensagemIndisponivel: null,
     recarregar: carregar,
   };
 }

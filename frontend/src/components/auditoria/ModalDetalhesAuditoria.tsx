@@ -23,15 +23,110 @@ function formatarDataHora(dataHora: string): string {
   });
 }
 
+function normalizarTexto(valor: string): string {
+  return valor.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
+
+function getAutorPrincipal(auditoria: AuditoriaRegistro): string {
+  if (auditoria.autorNome) {
+    return auditoria.autorNome;
+  }
+
+  if (auditoria.usuarioAutor !== null) {
+    return String(auditoria.usuarioAutor);
+  }
+
+  return "Não informado";
+}
+
+function getAutorSecundario(auditoria: AuditoriaRegistro): string | null {
+  if (auditoria.autorEmail) {
+    return auditoria.autorEmail;
+  }
+
+  if (auditoria.autorNome && auditoria.usuarioAutor !== null) {
+    return String(auditoria.usuarioAutor);
+  }
+
+  return null;
+}
+
 function getModuloLabel(modulo: AuditoriaRegistro["modulo"]): string {
   const labels: Record<AuditoriaRegistro["modulo"], string> = {
     profissionais: "Profissionais",
     projetos: "Projetos",
     tarefas: "Tarefas",
-    sistema: "Sistema",
   };
 
   return labels[modulo];
+}
+
+function isRemocao(auditoria: AuditoriaRegistro): boolean {
+  const acao = normalizarTexto(auditoria.acao);
+  return acao.includes("remocao") || acao.includes("exclusao");
+}
+
+function isCriacao(auditoria: AuditoriaRegistro): boolean {
+  const acao = normalizarTexto(auditoria.acao);
+  return acao.includes("criacao") || acao.includes("cadastro");
+}
+
+function getRotuloCampo(auditoria: AuditoriaRegistro): string {
+  if (isRemocao(auditoria)) {
+    return "Escopo afetado";
+  }
+
+  if (isCriacao(auditoria)) {
+    return "Campo inicial";
+  }
+
+  return "Campo afetado";
+}
+
+function getRotuloValorAnterior(auditoria: AuditoriaRegistro): string {
+  if (isRemocao(auditoria)) {
+    return "Antes / removido";
+  }
+
+  if (isCriacao(auditoria)) {
+    return "Antes";
+  }
+
+  return "Antes";
+}
+
+function getRotuloNovoValor(auditoria: AuditoriaRegistro): string {
+  if (isRemocao(auditoria)) {
+    return "Depois / resultado";
+  }
+
+  if (isCriacao(auditoria)) {
+    return "Depois / criado";
+  }
+
+  return "Depois";
+}
+
+function formatarValorDetalhado(valor: string): string {
+  const valorTratado = valor.trim();
+
+  if (!valorTratado) {
+    return "Não informado";
+  }
+
+  const pareceObjeto = valorTratado.startsWith("{") && valorTratado.endsWith("}");
+
+  if (!pareceObjeto) {
+    return valorTratado;
+  }
+
+  return valorTratado
+    .slice(1, -1)
+    .split(/,\s*(?=\w+\s*:)/g)
+    .map((parte) => parte.trim().replace(/^([\wÀ-ÿ]+)\s*:/, "$1: "))
+    .map((parte) => parte.replace(/^([^:]+):\s*'(.*)'$/, "$1: $2"))
+    .join("\n");
 }
 
 function DetalheLinha({ titulo, valor }: { titulo: string; valor: string }) {
@@ -41,6 +136,31 @@ function DetalheLinha({ titulo, valor }: { titulo: string; valor: string }) {
         {titulo}
       </p>
       <p className="mt-2 break-words text-sm font-medium text-white">{valor}</p>
+    </div>
+  );
+}
+
+function ValorAuditoriaCard({
+  titulo,
+  valor,
+  variante,
+}: {
+  titulo: string;
+  valor: string;
+  variante: "anterior" | "novo";
+}) {
+  const classes = variante === "anterior"
+    ? "border-red-400/15 bg-red-500/10 text-red-200/70"
+    : "border-emerald-400/15 bg-emerald-500/10 text-emerald-200/70";
+
+  return (
+    <div className={`rounded-[15px] border p-5 ${classes}`}>
+      <p className="text-xs font-semibold uppercase tracking-[0.16em]">
+        {titulo}
+      </p>
+      <pre className="mt-3 whitespace-pre-wrap break-words font-sans text-base font-semibold leading-7 text-white sm:text-lg">
+        {formatarValorDetalhado(valor)}
+      </pre>
     </div>
   );
 }
@@ -82,37 +202,42 @@ export default function ModalDetalhesAuditoria({
         </section>
 
         <section className="grid gap-4 md:grid-cols-2">
-          <DetalheLinha titulo="Responsável" valor={auditoria.responsavel.nome} />
-          <DetalheLinha titulo="E-mail" valor={auditoria.responsavel.email} />
+          <DetalheLinha titulo="Autor" valor={getAutorPrincipal(auditoria)} />
+          {getAutorSecundario(auditoria) && (
+            <DetalheLinha
+              titulo={auditoria.autorEmail ? "E-mail" : "usuarioAutor"}
+              valor={getAutorSecundario(auditoria) ?? ""}
+            />
+          )}
+          {!getAutorSecundario(auditoria) && (
+            <DetalheLinha
+              titulo="usuarioAutor"
+              valor={auditoria.usuarioAutor === null ? "Não informado" : String(auditoria.usuarioAutor)}
+            />
+          )}
           <DetalheLinha titulo="Módulo / Local" valor={auditoria.local} />
           <DetalheLinha titulo="Ação realizada" valor={auditoria.acao} />
-          <DetalheLinha titulo="Campo afetado" valor={auditoria.campo} />
+          <DetalheLinha titulo={getRotuloCampo(auditoria)} valor={auditoria.campo} />
           <DetalheLinha titulo="Data e hora" valor={formatarDataHora(auditoria.dataHora)} />
           <DetalheLinha titulo="Tabela" valor={auditoria.tabela} />
           <DetalheLinha
-            titulo="Registro afetado"
-            valor={auditoria.entidadeId ? `#${auditoria.entidadeId}` : "Não informado"}
+            titulo="entidadeId"
+            valor={auditoria.entidadeId === null ? "Não informado" : String(auditoria.entidadeId)}
           />
         </section>
 
         <section className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-[15px] border border-red-400/15 bg-red-500/10 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-red-200/70">
-              Valor anterior
-            </p>
-            <p className="mt-3 break-words text-base font-semibold text-white sm:text-lg">
-              {auditoria.valorAnterior}
-            </p>
-          </div>
+          <ValorAuditoriaCard
+            titulo={getRotuloValorAnterior(auditoria)}
+            valor={auditoria.valorAnterior}
+            variante="anterior"
+          />
 
-          <div className="rounded-[15px] border border-emerald-400/15 bg-emerald-500/10 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-200/70">
-              Novo valor
-            </p>
-            <p className="mt-3 break-words text-base font-semibold text-white sm:text-lg">
-              {auditoria.novoValor}
-            </p>
-          </div>
+          <ValorAuditoriaCard
+            titulo={getRotuloNovoValor(auditoria)}
+            valor={auditoria.novoValor}
+            variante="novo"
+          />
         </section>
 
         <section className="rounded-[15px] border border-white/10 bg-black/20 p-5">

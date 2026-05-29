@@ -38,3 +38,6 @@
 [submodule "services/visualizar-horas"]
 	path = services/visualizar-horas
 	url = https://github.com/Team-Chronos/API3-servico-visualizar-horas
+[submodule "services/auditoria"]
+	path = services/auditoria
+	url = https://github.com/Team-Chronos/API3-servico-auditoria

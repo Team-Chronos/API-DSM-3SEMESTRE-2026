@@ -22,26 +22,22 @@ function formatarDataHora(dataHora: string): string {
   });
 }
 
+function normalizarTexto(valor: string): string {
+  return valor.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+}
+
 function getModuloLabel(modulo: AuditoriaRegistro["modulo"]): string {
   const labels: Record<AuditoriaRegistro["modulo"], string> = {
     profissionais: "Profissionais",
     projetos: "Projetos",
     tarefas: "Tarefas",
-    sistema: "Sistema",
   };
 
   return labels[modulo];
 }
 
 function getAcaoClasses(acao: string): string {
-  const acaoNormalizada = acao
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-
-  if (acaoNormalizada.includes("login")) {
-    return "border-blue-400/20 bg-blue-500/10 text-blue-200";
-  }
+  const acaoNormalizada = normalizarTexto(acao);
 
   if (acaoNormalizada.includes("criacao") || acaoNormalizada.includes("cadastro")) {
     return "border-emerald-400/20 bg-emerald-500/10 text-emerald-200";
@@ -54,6 +50,48 @@ function getAcaoClasses(acao: string): string {
   return "border-violet-400/20 bg-violet-500/10 text-violet-200";
 }
 
+function isRemocao(registro: AuditoriaRegistro): boolean {
+  const acao = normalizarTexto(registro.acao);
+  return acao.includes("remocao") || acao.includes("exclusao");
+}
+
+function isCriacao(registro: AuditoriaRegistro): boolean {
+  const acao = normalizarTexto(registro.acao);
+  return acao.includes("criacao") || acao.includes("cadastro");
+}
+
+function getRotuloValorAnterior(registro: AuditoriaRegistro): string {
+  if (isRemocao(registro)) {
+    return "Antes / removido";
+  }
+
+  if (isCriacao(registro)) {
+    return "Antes";
+  }
+
+  return "Antes";
+}
+
+function getRotuloNovoValor(registro: AuditoriaRegistro): string {
+  if (isRemocao(registro)) {
+    return "Depois / resultado";
+  }
+
+  if (isCriacao(registro)) {
+    return "Depois / criado";
+  }
+
+  return "Depois";
+}
+
+function resumirValor(valor: string): string {
+  if (!valor || valor === "Não informado") {
+    return "Não informado";
+  }
+
+  return valor;
+}
+
 function TextoLimitado({ children, destaque = false }: { children: string; destaque?: boolean }) {
   return (
     <p
@@ -64,6 +102,39 @@ function TextoLimitado({ children, destaque = false }: { children: string; desta
     >
       {children}
     </p>
+  );
+}
+
+function getAutorPrincipal(registro: AuditoriaRegistro): string {
+  if (registro.autorNome) {
+    return registro.autorNome;
+  }
+
+  if (registro.usuarioAutor !== null) {
+    return String(registro.usuarioAutor);
+  }
+
+  return "Não informado";
+}
+
+function getAutorSecundario(registro: AuditoriaRegistro): string {
+  if (registro.autorEmail) {
+    return registro.autorEmail;
+  }
+
+  if (registro.autorNome && registro.usuarioAutor !== null) {
+    return `ID: ${registro.usuarioAutor}`;
+  }
+
+  return "usuarioAutor";
+}
+
+function AutorResumo({ registro }: { registro: AuditoriaRegistro }) {
+  return (
+    <div className="min-w-0">
+      <TextoLimitado destaque>{getAutorPrincipal(registro)}</TextoLimitado>
+      <p className="mt-1 truncate text-xs text-white/45">{getAutorSecundario(registro)}</p>
+    </div>
   );
 }
 
@@ -84,8 +155,9 @@ function CardMobile({
         <div className="min-w-0">
           <p className="text-sm font-semibold text-white">#{registro.codigo}</p>
           <p className="mt-1 truncate text-base font-semibold text-white">
-            {registro.responsavel.nome}
+            {getAutorPrincipal(registro)}
           </p>
+          <p className="mt-1 truncate text-xs text-white/45">{getAutorSecundario(registro)}</p>
         </div>
 
         <span className={`shrink-0 rounded-full border px-3 py-1 text-xs font-semibold ${getAcaoClasses(registro.acao)}`}>
@@ -106,13 +178,13 @@ function CardMobile({
 
       <div className="mt-4 grid gap-3">
         <div className="rounded-xl bg-black/20 p-3">
-          <p className="text-xs text-white/40">Valor anterior</p>
-          <p className="mt-1 text-sm text-white/75">{registro.valorAnterior}</p>
+          <p className="text-xs text-white/40">{getRotuloValorAnterior(registro)}</p>
+          <p className="mt-1 break-words text-sm text-white/75">{resumirValor(registro.valorAnterior)}</p>
         </div>
 
         <div className="rounded-xl bg-black/20 p-3">
-          <p className="text-xs text-white/40">Novo valor</p>
-          <p className="mt-1 text-sm font-medium text-white">{registro.novoValor}</p>
+          <p className="text-xs text-white/40">{getRotuloNovoValor(registro)}</p>
+          <p className="mt-1 break-words text-sm font-medium text-white">{resumirValor(registro.novoValor)}</p>
         </div>
       </div>
 
@@ -146,8 +218,10 @@ function CardCompacto({
             </span>
           </div>
 
-          <p className="mt-2 text-sm font-semibold text-white">{registro.responsavel.nome}</p>
-          <p className="mt-1 break-all text-xs text-white/45">{registro.responsavel.email}</p>
+          <p className="mt-2 text-sm font-semibold text-white">
+            {getAutorPrincipal(registro)}
+          </p>
+          <p className="mt-1 truncate text-xs text-white/45">{getAutorSecundario(registro)}</p>
         </div>
 
         <p className="shrink-0 text-xs text-white/45">{formatarDataHora(registro.dataHora)}</p>
@@ -170,16 +244,16 @@ function CardCompacto({
 
         <div className="rounded-xl bg-black/20 p-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/35">
-            Valor anterior
+            {getRotuloValorAnterior(registro)}
           </p>
-          <p className="mt-1 break-words text-sm text-white/75">{registro.valorAnterior}</p>
+          <p className="mt-1 break-words text-sm text-white/75">{resumirValor(registro.valorAnterior)}</p>
         </div>
 
         <div className="rounded-xl bg-black/20 p-3">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/35">
-            Novo valor
+            {getRotuloNovoValor(registro)}
           </p>
-          <p className="mt-1 break-words text-sm font-semibold text-white">{registro.novoValor}</p>
+          <p className="mt-1 break-words text-sm font-semibold text-white">{resumirValor(registro.novoValor)}</p>
         </div>
       </div>
     </button>
@@ -219,25 +293,15 @@ export default function ListaAuditoria({ registros, onSelecionar }: ListaAuditor
 
       <div className="hidden xl:block">
         <table className="w-full table-fixed border-collapse text-left">
-          <colgroup>
-            <col className="w-[10%]" />
-            <col className="w-[10%]" />
-            <col className="w-[18%]" />
-            <col className="w-[20%]" />
-            <col className="w-[14%]" />
-            <col className="w-[14%]" />
-            <col className="w-[14%]" />
-          </colgroup>
-
           <thead className="bg-white/[0.03] text-xs uppercase tracking-[0.14em] text-white/45">
             <tr>
-              <th className="px-4 py-4 font-semibold">Código / ID</th>
-              <th className="px-4 py-4 font-semibold">Evento</th>
-              <th className="px-4 py-4 font-semibold">Responsável</th>
-              <th className="px-4 py-4 font-semibold">Módulo / Local</th>
-              <th className="px-4 py-4 font-semibold">Valor Anterior</th>
-              <th className="px-4 py-4 font-semibold">Novo Valor</th>
-              <th className="px-4 py-4 font-semibold">Data e Hora</th>
+              <th className="w-[10%] px-4 py-4 font-semibold">Código / ID</th>
+              <th className="w-[10%] px-4 py-4 font-semibold">Evento</th>
+              <th className="w-[15%] px-4 py-4 font-semibold">Autor</th>
+              <th className="w-[20%] px-4 py-4 font-semibold">Módulo / Local</th>
+              <th className="w-[14%] px-4 py-4 font-semibold">Antes</th>
+              <th className="w-[16%] px-4 py-4 font-semibold">Depois / Resultado</th>
+              <th className="w-[15%] px-4 py-4 font-semibold">Data e Hora</th>
             </tr>
           </thead>
 
@@ -249,50 +313,41 @@ export default function ListaAuditoria({ registros, onSelecionar }: ListaAuditor
                 onClick={() => onSelecionar(registro)}
               >
                 <td className="px-4 py-4 align-top">
-                  <p className="text-sm font-semibold text-white">#{registro.codigo}</p>
-                  <p className="mt-1 truncate text-xs text-white/45" title={registro.tabela}>
-                    {registro.tabela}
-                  </p>
+                  <TextoLimitado destaque>{`#${registro.codigo}`}</TextoLimitado>
+                  <p className="mt-1 text-xs text-white/45">{registro.tabela}</p>
                 </td>
 
                 <td className="px-4 py-4 align-top">
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold ${getAcaoClasses(registro.acao)}`}>
+                  <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getAcaoClasses(registro.acao)}`}>
                     {registro.acao}
                   </span>
                 </td>
 
                 <td className="px-4 py-4 align-top">
-                  <TextoLimitado destaque>{registro.responsavel.nome}</TextoLimitado>
-                  <p
-                    title={registro.responsavel.email}
-                    className="mt-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-xs text-white/45"
-                  >
-                    {registro.responsavel.email}
-                  </p>
+                  <AutorResumo registro={registro} />
                 </td>
 
                 <td className="px-4 py-4 align-top">
-                  <span className="rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200">
+                  <span className="inline-flex rounded-full border border-violet-400/20 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-200">
                     {getModuloLabel(registro.modulo)}
                   </span>
-                  <p
-                    title={registro.local}
-                    className="mt-2 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap text-sm text-white/65"
-                  >
-                    {registro.local}
+                  <div className="mt-2">
+                    <TextoLimitado>{registro.local}</TextoLimitado>
+                  </div>
+                </td>
+
+                <td className="px-4 py-4 align-top">
+                  <TextoLimitado>{resumirValor(registro.valorAnterior)}</TextoLimitado>
+                </td>
+
+                <td className="px-4 py-4 align-top">
+                  <TextoLimitado destaque>{resumirValor(registro.novoValor)}</TextoLimitado>
+                </td>
+
+                <td className="px-4 py-4 align-top">
+                  <p className="whitespace-nowrap text-sm text-white/70">
+                    {formatarDataHora(registro.dataHora)}
                   </p>
-                </td>
-
-                <td className="px-4 py-4 align-top">
-                  <TextoLimitado>{registro.valorAnterior}</TextoLimitado>
-                </td>
-
-                <td className="px-4 py-4 align-top">
-                  <TextoLimitado destaque>{registro.novoValor}</TextoLimitado>
-                </td>
-
-                <td className="px-4 py-4 align-top">
-                  <p className="text-sm text-white/70">{formatarDataHora(registro.dataHora)}</p>
                 </td>
               </tr>
             ))}
