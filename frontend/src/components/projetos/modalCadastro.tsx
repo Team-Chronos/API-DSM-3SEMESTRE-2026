@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { projetoService } from "../../services/gateway"
 import { useAuth } from "../../contexts/AuthContext"
-import { toast } from "react-toastify"
 
 type TipoProjeto = "HORA_FECHADA" | "ALOCACAO"
 
