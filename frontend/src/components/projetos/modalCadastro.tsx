@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { projetoService } from "../../services/gateway"
 import { useAuth } from "../../contexts/AuthContext"
+import { toast } from "react-toastify"
 
 type TipoProjeto = "HORA_FECHADA" | "ALOCACAO"
 
@@ -239,18 +240,17 @@ export default function ModalCadastro({
       }
 
       throw new Error("Não foi possível gerar um código de projeto disponível. Tente novamente.")
-    } catch (error) {
-      setErro(
-        error instanceof Error ? error.message : "Não foi possível cadastrar o projeto.",
-      )
+    } catch (error: any) {
+      const erro = ehErroCodigoDuplicado(Number(error.status ?? "0"), error.message ?? null) ? "Código de projeto já existe" : "Erro no servidor ao cadastrar projeto"
+      setErro(error.message ?? erro)
     } finally {
       setSalvando(false)
     }
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-[#232329] text-white shadow-2xl">
+    <div className="fixed inset-0 z-1000 flex items-center justify-center bg-black/70 p-4">
+      <div className="w-full max-w-3xl rounded-3xl border border-white/10 bg-[#232329] text-white shadow-2xl overflow-y-auto max-h-full">
         <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-violet-300/80">

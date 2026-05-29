@@ -114,7 +114,7 @@ export default function ModalVisualizarTarefa({
       await carregarTarefaComItem();
       if (onAtualizar) onAtualizar();
     } catch {
-      toastError("Erro ao atualizar responsável. Tente novamente.");
+      toastError("Erro no servidor ao atualizar responsável. Tente novamente.");
     } finally {
       setSalvando(false);
     }
