@@ -135,27 +135,28 @@ function ApontamentoTempo() {
 
             <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div>
-                <button
-                  onClick={() => navigate(`/projetos/${projetoId}`)}
-                  className="mb-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/15"
-                >
-                  <svg
-                    width="14"
-                    height="14"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                <div className="flex gap-4 mb-3 flex-wrap">
+                  <button
+                    onClick={() => navigate(`/projetos/${projetoId}`)}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/85 transition hover:bg-white/15"
                   >
-                    <polyline points="15 18 9 12 15 6" />
-                  </svg>
-                  Voltar ao projeto
-                </button>
-
-                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
-                  Apontamento de horas
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                    Voltar ao projeto
+                  </button>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white/80">
+                    Apontamento de horas
+                  </div>
                 </div>
 
                 <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
