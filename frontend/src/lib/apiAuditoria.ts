@@ -69,6 +69,9 @@ function removerAcentos(valor: string): string {
 function normalizarOperacao(operacao: string | null | undefined): string {
   const operacaoNormalizada = removerAcentos(valorOuPadrao(operacao).trim().toUpperCase());
 
+  if (["CREATE", "INSERT", "POST", "CRIACAO", "CADASTRO"].includes(operacaoNormalizada)) {
+    return "Criação";
+  }
 
   if (["UPDATE", "PUT", "PATCH", "ALTERACAO", "ATUALIZACAO", "EDICAO"].includes(operacaoNormalizada)) {
     return "Atualização";
@@ -123,6 +126,10 @@ function formatarValorPorOperacao(
     return valorTratado;
   }
 
+  if (operacao === "Criação") {
+    return tipo === "anterior" ? "Registro não existia" : "Registro criado";
+  }
+
   if (operacao === "Remoção") {
     return tipo === "anterior" ? "Dados anteriores não informados" : "Registro removido";
   }
@@ -142,6 +149,10 @@ function criarDescricaoAuditoria({
   campo: string;
 }): string {
   const registro = entidadeId ? ` #${entidadeId}` : "";
+
+  if (operacao === "Criação") {
+    return `Registro criado em ${tabela}${registro}.`;
+  }
 
   if (operacao === "Atualização") {
     return `Campo "${campo}" alterado em ${tabela}${registro}.`;
@@ -359,11 +370,42 @@ async function enriquecerAutores(registros: AuditoriaRegistro[]): Promise<Audito
   });
 }
 
+async function buscarGrupoDireto(origem: AuditoriaModuloRegistro): Promise<AuditoriaRegistro[]> {
+  try {
+    const response = await api.get<unknown>(`/${origem}`);
+    return extrairListaAuditoria(response.data).map((registro) =>
+      normalizarRegistroAuditoria(registro, origem),
+    );
+  } catch (error) {
+    console.warn(`Não foi possível buscar auditoria de ${origem}.`, error);
+    return [];
+  }
+}
+
+async function completarGruposFaltantes(registros: AuditoriaRegistro[]): Promise<AuditoriaRegistro[]> {
+  const grupos: AuditoriaModuloRegistro[] = ["tarefas", "projetos", "profissionais"];
+  const gruposSemRegistro = grupos.filter(
+    (grupo) => !registros.some((registro) => registro.modulo === grupo),
+  );
+
+  if (gruposSemRegistro.length === 0) {
+    return registros;
+  }
+
+  const complementos = await Promise.all(
+    gruposSemRegistro.map((grupo) => buscarGrupoDireto(grupo)),
+  );
+
+  return [...registros, ...complementos.flat()];
+}
+
 export const apiAuditoria = {
   async listarTodas(): Promise<AuditoriaRegistro[]> {
     const response = await api.get<unknown>("/todas");
+    const registrosNormalizados = normalizarRespostaTodas(response.data);
+    const registrosComComplemento = await completarGruposFaltantes(registrosNormalizados);
     const registros = ordenarPorDataMaisRecente(
-      removerDuplicados(normalizarRespostaTodas(response.data)),
+      removerDuplicados(registrosComComplemento),
     );
 
     return enriquecerAutores(registros);

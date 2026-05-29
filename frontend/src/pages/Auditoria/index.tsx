@@ -54,6 +54,7 @@ const ABAS_AUDITORIA: AbaAuditoria[] = [
 
 const FILTROS_EVENTO: { id: AuditoriaTipoEvento; label: string }[] = [
   { id: "todos", label: "Todos" },
+  { id: "criacao", label: "Criação" },
   { id: "atualizacao", label: "Atualização" },
   { id: "remocao", label: "Remoção" },
 ];
@@ -187,7 +188,7 @@ export default function AuditoriaPage() {
                 </p>
                 <h1 className="mt-2 text-2xl font-bold text-white sm:text-3xl">Tela de Auditoria</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-white/75">
-                  Acompanhe eventos de atualização e remoção em profissionais, projetos e tarefas.
+                  Acompanhe eventos de criação, atualização e remoção em profissionais, projetos e tarefas.
                 </p>
               </div>
 
