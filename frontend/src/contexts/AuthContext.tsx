@@ -136,7 +136,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       return true;
     } catch (error) {
-      toastError(`Erro no login: ${error}`);
+      toastError(`Erro no login: ${String(error)}`);
       return false;
     }
   }

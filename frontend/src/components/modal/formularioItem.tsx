@@ -44,7 +44,7 @@ export default function ModalCadastroItem({
       toastSuccess(itemParaEditar ? "Item atualizado!" : "Item criado!");
       onSucesso();
     } catch {
-      toastError("Erro ao salvar item.");
+      toastError("Erro no servidor ao salvar item.");
     } finally {
       setSalvando(false);
     }

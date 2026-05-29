@@ -92,7 +92,7 @@ function CadastroProfissional() {
     e.preventDefault();
 
     if (!nome || !email || !senhaHash || !cargoId) {
-      toastError("Preencha os campos obrigatórios.");
+      toastError(`Preencha os campos obrigatórios: ${nome ? "nome" : email ? "email" : senhaHash ? "senha" : "cargo"}`);
       return;
     }
 
@@ -120,7 +120,7 @@ function CadastroProfissional() {
       toastSuccess(`Profissional cadastrado! ${quantidade} projeto(s) vinculado(s).`);
       limparFormulario();
     } catch (error) {
-      toastError("Erro ao cadastrar profissional.");
+      toastError("Erro no servidor ao cadastrar profissional.");
     } finally {
       setSalvando(false);
     }
