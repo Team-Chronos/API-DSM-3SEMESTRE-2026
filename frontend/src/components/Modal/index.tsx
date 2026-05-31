@@ -11,18 +11,18 @@ function Modal({ open, onClose, children }: ModalProps) {
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto p-3 sm:items-center sm:p-4">
       
       <div
         className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
 
-      <div className={`relative bg-mist-900 rounded-2xl shadow-xl min-w-sm p-4`}>
+      <div className="relative my-3 w-full max-w-[min(96vw,560px)] max-h-[94vh] overflow-y-auto rounded-2xl bg-mist-900 p-3 shadow-xl sm:my-0 sm:p-4">
 
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 cursor-pointer text-zinc-500 hover:text-zinc-200 px-1"
+          className="absolute right-3 top-3 cursor-pointer px-1 text-zinc-500 hover:text-zinc-200 sm:right-4 sm:top-4"
           >
           ✕
         </button>

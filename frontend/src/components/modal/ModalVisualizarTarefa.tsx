@@ -114,7 +114,7 @@ export default function ModalVisualizarTarefa({
       await carregarTarefaComItem();
       if (onAtualizar) onAtualizar();
     } catch {
-      toastError("Erro ao atualizar responsável. Tente novamente.");
+      toastError("Erro no servidor ao atualizar responsável. Tente novamente.");
     } finally {
       setSalvando(false);
     }
@@ -139,7 +139,7 @@ export default function ModalVisualizarTarefa({
   const handleExcluirItem = async (idItem: number) => {
     setExcluindoItem(true);
     try {
-      await ApiTarefas.delete(`/itens/${idItem}`);
+      await ApiTarefas.delete(`/tarefas/itens/${idItem}`);
       toastSuccess("Item excluído com sucesso!");
       setConfirmandoExclusaoItem(null);
       await carregarTarefaComItem();

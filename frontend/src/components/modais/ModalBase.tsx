@@ -1,4 +1,5 @@
-import { useEffect, type ReactNode } from "react";
+import { type ReactNode, useEffect } from "react";
+import { createPortal } from "react-dom";
 
 interface ModalBaseProps {
   aberto: boolean;
@@ -41,17 +42,17 @@ export default function ModalBase({
     return null;
   }
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 sm:px-6">
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] flex items-start justify-center overflow-y-auto px-3 py-3 sm:items-center sm:px-6 sm:py-6">
       <button
         type="button"
         aria-label="Fechar modal"
-        className="absolute inset-0 bg-black/65 backdrop-blur-[4px]"
+        className="fixed inset-0 bg-black/65 backdrop-blur-[4px]"
         onClick={onFechar}
       />
 
       <div
-        className={`relative z-10 w-full ${larguraClasse} animate-[modalFadeIn_0.22s_ease-out]`}
+        className={`relative z-10 my-2 w-full ${larguraClasse} animate-[modalFadeIn_0.22s_ease-out] sm:my-0`}
       >
         <div className="overflow-hidden rounded-[15px] border border-white/10 bg-[#232329] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
           <div className="relative border-b border-white/8 bg-gradient-to-r from-[#6627cc] via-[#5b21b6] to-[#4a1898] px-6 py-6 sm:px-8">
@@ -97,11 +98,12 @@ export default function ModalBase({
             </div>
           </div>
 
-          <div className="max-h-[78vh] overflow-y-auto px-6 py-6 sm:px-8 sm:py-8">
+          <div className="max-h-[86vh] overflow-y-auto px-4 py-4 sm:max-h-[78vh] sm:px-8 sm:py-8">
             {children}
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

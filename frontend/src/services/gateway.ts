@@ -82,6 +82,11 @@ export const projetoService = {
   deletar: (id: number) => apiFetch(`/projeto/projetos/${id}`, {
     method: 'DELETE',
   }),
+  alterarStatus: (id: number, status: 'ATIVO' | 'INATIVO' | 'CONCLUIDO') =>
+    apiFetch(`/projeto/projetos/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    }),
 };
 
 export const financeiroService = {

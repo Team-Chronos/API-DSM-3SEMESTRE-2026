@@ -1,15 +1,10 @@
+import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { apiFinanceiro } from "../lib/apiFinanceiro";
-import type {
-  DashboardData,
-  ProfissionalGanhos,
-  ProjetoFinanceiro,
-} from "../types/financeiro";
+import { apiAuditoria } from "../lib/apiAuditoria";
+import type { AuditoriaRegistro } from "../types/auditoria";
 
-interface UseDashboardFinanceiroResult {
-  dashboard: DashboardData | null;
-  projetos: ProjetoFinanceiro[];
-  profissionais: ProfissionalGanhos[];
+interface UseAuditoriaResult {
+  registros: AuditoriaRegistro[];
   loading: boolean;
   carregandoInicial: boolean;
   atualizando: boolean;
@@ -17,13 +12,26 @@ interface UseDashboardFinanceiroResult {
   recarregar: () => Promise<void>;
 }
 
-export function useDashboardFinanceiro(
-  ano: number,
-  mes: number,
-): UseDashboardFinanceiroResult {
-  const [dashboard, setDashboard] = useState<DashboardData | null>(null);
-  const [projetos, setProjetos] = useState<ProjetoFinanceiro[]>([]);
-  const [profissionais, setProfissionais] = useState<ProfissionalGanhos[]>([]);
+function extrairMensagemErro(error: unknown): string {
+  if (axios.isAxiosError(error)) {
+    const resposta = error.response?.data as { message?: string; erro?: string } | string | undefined;
+
+    if (typeof resposta === "string") {
+      return resposta;
+    }
+
+    return resposta?.message || resposta?.erro || error.message || "Erro ao carregar auditoria";
+  }
+
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return "Erro ao carregar auditoria";
+}
+
+export function useAuditoria(): UseAuditoriaResult {
+  const [registros, setRegistros] = useState<AuditoriaRegistro[]>([]);
   const [loading, setLoading] = useState(true);
   const [carregandoInicial, setCarregandoInicial] = useState(true);
   const [atualizando, setAtualizando] = useState(false);
@@ -36,41 +44,31 @@ export function useDashboardFinanceiro(
     const requestId = requestIdRef.current + 1;
     requestIdRef.current = requestId;
 
-    const possuiDados = possuiDadosRef.current;
-
     try {
       setLoading(true);
       setError(null);
 
-      if (possuiDados) {
+      if (possuiDadosRef.current) {
         setAtualizando(true);
       } else {
         setCarregandoInicial(true);
       }
 
-      const [dashboardResponse, projetosResponse, profissionaisResponse] =
-        await Promise.all([
-          apiFinanceiro.buscarDashboard(ano, mes),
-          apiFinanceiro.buscarProjetos(ano, mes),
-          apiFinanceiro.buscarProfissionais(ano, mes),
-        ]);
+      const response = await apiAuditoria.listarTodas();
 
       if (requestId !== requestIdRef.current) {
         return;
       }
 
-      setDashboard(dashboardResponse);
-      setProjetos(projetosResponse);
-      setProfissionais(profissionaisResponse);
+      setRegistros(response);
       possuiDadosRef.current = true;
     } catch (err) {
       if (requestId !== requestIdRef.current) {
         return;
       }
 
-      const mensagem =
-        err instanceof Error ? err.message : "Erro ao carregar dados";
-      setError(mensagem);
+      setRegistros([]);
+      setError(extrairMensagemErro(err));
     } finally {
       if (requestId !== requestIdRef.current) {
         return;
@@ -80,16 +78,14 @@ export function useDashboardFinanceiro(
       setCarregandoInicial(false);
       setAtualizando(false);
     }
-  }, [ano, mes]);
+  }, []);
 
   useEffect(() => {
     void carregar();
   }, [carregar]);
 
   return {
-    dashboard,
-    projetos,
-    profissionais,
+    registros,
     loading,
     carregandoInicial,
     atualizando,
