@@ -37,9 +37,9 @@ export default function ModalCadastroItem({
     try {
       const payload = { nome, descricao, tarefaId };
       if (itemParaEditar) {
-        await ApiTarefas.put(`/itens/${itemParaEditar.idItem}`, payload);
+        await ApiTarefas.put(`/tarefas/itens/${itemParaEditar.idItem}`, payload);
       } else {
-        await ApiTarefas.post("/itens", payload);
+        await ApiTarefas.post("/tarefas/itens", payload);
       }
       toastSuccess(itemParaEditar ? "Item atualizado!" : "Item criado!");
       onSucesso();

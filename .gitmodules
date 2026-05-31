@@ -31,13 +31,29 @@
 [submodule "auth/gateway"]
 	path = services/gateway
 	url = https://github.com/Team-Chronos/API3-servico-auth-gateway.git
+	branch = main
 	
 [submodule "services/visualizar-tarefas"]
 	path = services/visualizar-tarefas
 	url = https://github.com/Team-Chronos/API3-servico-visualizar-tarefas.git
+	branch = main
+
 [submodule "services/visualizar-horas"]
 	path = services/visualizar-horas
-	url = https://github.com/Team-Chronos/API3-servico-visualizar-horas
+	url = https://github.com/Team-Chronos/API3-servico-visualizar-horas.git
+	branch = main
+
 [submodule "services/auditoria"]
 	path = services/auditoria
-	url = https://github.com/Team-Chronos/API3-servico-auditoria
+	url = https://github.com/Team-Chronos/API3-servico-auditoria.git
+	branch = main
+
+[submodule "services-visualizar-projetos"]
+	path = services/visualizar-projetos
+	url = https://github.com/Team-Chronos/API3-servico-visualizar-projetos.git
+	branch = dev
+
+[submodule "services-visualizar-profissionais"]
+	path = services/visualizar-profissionais
+	url = https://github.com/Team-Chronos/API3-servico-visualizar-profissionais.git
+	branch = dev

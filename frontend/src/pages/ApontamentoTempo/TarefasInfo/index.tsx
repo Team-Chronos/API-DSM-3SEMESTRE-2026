@@ -31,6 +31,8 @@ function TarefasInfo({
   const [loadingRegistros, setLoadingRegistros] = useState<boolean>(false);
 
   async function buscarRegistroHorasTarefa() {
+    if (!tarefa?.id) return;
+
     setLoadingRegistros(true);
 
     try {
@@ -40,6 +42,7 @@ function TarefasInfo({
       setRegistroHorasTarefa(response.data);
     } catch (error: any) {
       toastError("Erro ao buscar registro de horas da tarefa");
+      setRegistroHorasTarefa(undefined);
     } finally {
       setLoadingRegistros(false);
     }
@@ -47,7 +50,7 @@ function TarefasInfo({
 
   useEffect(() => {
     const tempoRegistrado = Number(registroHorasTarefa?.tempoMinutos ?? 0);
-    const tempoMaximo = Number(tarefa.tempoMaximoMinutos ?? 0);
+    const tempoMaximo = Number(tarefa?.tempoMaximoMinutos ?? 0);
 
     if (!tempoMaximo || tempoMaximo <= 0) {
       setPorcentagemTempo(0);
@@ -63,7 +66,7 @@ function TarefasInfo({
 
   useEffect(() => {
     buscarRegistroHorasTarefa();
-  }, [tarefa.id]);
+  }, [tarefa?.id]);
 
   const formatarTempo = (minutos?: number | null) => {
     const total = Number(minutos ?? 0);
@@ -80,7 +83,7 @@ function TarefasInfo({
   };
 
   const tempoRegistrado = Number(registroHorasTarefa?.tempoMinutos ?? 0);
-  const tempoMaximo = Number(tarefa.tempoMaximoMinutos ?? 0);
+  const tempoMaximo = Number(tarefa?.tempoMaximoMinutos ?? 0);
   const tempoRestante = Math.max(tempoMaximo - tempoRegistrado, 0);
   const tempoEsgotado = tempoMaximo > 0 && tempoRegistrado >= tempoMaximo;
 
@@ -101,6 +104,8 @@ function TarefasInfo({
     ];
   }, [tempoRegistrado, tempoRestante, tempoMaximo]);
 
+  if (!tarefa) return null;
+
   return (
     <>
       <div className="flex h-full flex-col">
@@ -118,9 +123,7 @@ function TarefasInfo({
                 </span>
               </div>
 
-              <h2 className="text-2xl font-bold text-white">
-                {tarefa.titulo}
-              </h2>
+              <h2 className="text-2xl font-bold text-white">{tarefa.titulo}</h2>
 
               <p className="mt-2 max-w-3xl text-sm text-slate-400">
                 {tarefa.descricao || "Essa tarefa não possui descrição."}

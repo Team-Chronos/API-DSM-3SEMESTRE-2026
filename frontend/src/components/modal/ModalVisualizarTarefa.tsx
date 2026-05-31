@@ -139,7 +139,7 @@ export default function ModalVisualizarTarefa({
   const handleExcluirItem = async (idItem: number) => {
     setExcluindoItem(true);
     try {
-      await ApiTarefas.delete(`/itens/${idItem}`);
+      await ApiTarefas.delete(`/tarefas/itens/${idItem}`);
       toastSuccess("Item excluído com sucesso!");
       setConfirmandoExclusaoItem(null);
       await carregarTarefaComItem();

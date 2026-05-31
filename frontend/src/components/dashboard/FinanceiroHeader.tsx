@@ -126,10 +126,6 @@ export default function FinanceiroHeader({
         <p className="min-w-0 shrink-0">
           Projetos: {totalProjetosFiltrados}/{totalProjetos} • Profissionais: {totalProfissionaisFiltrados}/{totalProfissionais}
         </p>
-
-        <p className="min-w-0 text-left md:text-right">
-          Navegação livre para meses anteriores. Meses futuros permanecem bloqueados.
-        </p>
       </div>
     </div>
   );
