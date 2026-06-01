@@ -133,7 +133,7 @@ function ApontamentoTempo() {
             <div className="pointer-events-none absolute -right-16 -top-16 h-44 w-44 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -bottom-20 left-24 h-40 w-40 rounded-full bg-purple-300/10 blur-3xl" />
 
-            <div className="relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+            <div className="@container relative flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <div className="flex gap-4 mb-3 flex-wrap">
                   <button
@@ -169,7 +169,7 @@ function ApontamentoTempo() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:min-w-155">
+              <div className="grid grid-cols-2 gap-3 @sm:grid-cols-4 xl:min-w-155">
                 <div className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur">
                   <p className="text-xs text-white/60">Tarefas</p>
                   <p className="mt-1 text-2xl font-bold">

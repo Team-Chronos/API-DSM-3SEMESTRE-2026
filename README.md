@@ -68,22 +68,17 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 
 ## 🏃‍ DoR - Definition of Ready <a id="dor"></a>
 
-* **Mockup/Protótipo:** incluir representação visual da funcionalidade quando aplicável.
-* **Descrição clara:** explicar de forma objetiva o que deve ser desenvolvido.
+* **Protótipos e interface validados:** Verificar se o protótipo existe e se existe responsividade para ele.
 * **Critérios de aceitação:** definir as condições necessárias para considerar a tarefa concluída.
-* **Dicionário de dados:** listar campos existentes, seus tipos e descrições.
 * **Dependências:** verificar e registrar se a tarefa depende de outra.
 * **Mensagens do sistema:** definir mensagens de confirmação, erro e aviso.
 
 ## 🏆 DoD - Definition of Done <a id="dod"></a>
 
-* **Funcionalidade implementada:** o desenvolvimento foi realizado conforme a descrição definida no DoR.
-* **Critérios de aceitação atendidos:** todos os critérios de aceitação foram validados e aprovados.
-* **Validação dos dados:** os campos definidos no dicionário de dados foram implementados corretamente e estão sendo armazenados de forma adequada.
-* **Integrações e dependências:** todas as dependências foram atendidas e a funcionalidade não impacta negativamente outras partes do sistema.
-* **Testes realizados:** testes manuais executados garantindo que a funcionalidade funciona corretamente.
-*  **Estabilidade do sistema:** a funcionalidade não quebra funcionalidades existentes.
-*  **Versionamento:** código commitado no repositório com mensagem clara seguindo o padrão definido.
+* **Revisão de Código:** o código deve ser passado por um Pull Request e ser inspecionado e aprovado por pelo menos um outro colega da equipe. 
+* **Documentação Atualizada:** Garanta que os manuais de sistema, os guias dos perfis de acesso e as documentações do repositório foram atualizados para refletir as novas funcionalidades entregues. 
+* **Validação de Responsividade:** testes de interface devem ser feitos, assegurando que o layout se adapta adequadamente a dispositivos móveis e navegadores diferentes. 
+* **Padronização e Qualidade:** Certifique-se de que o código submetido não apresenta avisos ou erros nas ferramentas de formatação e análise estática, mantendo a base de código limpa.
 
 ---
 
@@ -96,14 +91,15 @@ A plataforma substituirá registros dispersos, como planilhas, mensagens e anota
 * **RF01** - Gestão de Projetos: O sistema deve permitir o cadastro, edição e inativação de projetos, categorizando-os obrigatoriamente como "Alocação" ou "Hora Fechada".
 * **RF02** - Estruturação de Tarefas: O sistema deve permitir a criação de uma hierarquia de "Itens" e "Atividades" dentro de cada projeto.
 * **RF03** - Controle de Acessos e Perfis: O sistema deve permitir o cadastro de usuários com diferentes níveis de permissão (ex: Desenvolvedor, Gestor, Financeiro, Administrador) e vinculá-los aos projetos.
-* **RF04** - Apontamento de Horas: O sistema deve prover uma interface para que os profissionais registrem suas horas trabalhadas informando a data, projeto, item, atividade e uma descrição opcional.
+* **RF04** - Apontamento de Horas: O sistema deve prover uma interface para que os profissionais registrem suas horas trabalhadas informando a data, projeto, item e atividade. 
 * **RF05** - Relatórios: O sistema deve gerar relatórios consolidados de horas consumidas e faturamento, permitindo a aplicação de filtros por data, projeto e profissional, com opção de exportação de dados.
-* **RF06** - Dashboard de Gestão: O sistema deve exibir um painel centralizado para gestores contendo indicadores de saúde do projeto, totalizadores financeiros e alertas de capacidade da equipe.
+* **RF06** - Dashboard de Gestão: O sistema deve exibir um painel centralizado para gestores contendo indicadores de saúde do projeto e totalizadores financeiros.
 
 ## 🎯 Requisitos Não Funcionais(RNF)
+
 * **RNF01** - Performance (Tempo de Resposta): O sistema deve processar e carregar as telas de apontamento de horas e dashboards em um tempo máximo de 3 segundos em condições normais de rede, garantindo a fluidez do trabalho diário. (Ataca a dor da lentidão)
 * **RNF02** - Escalabilidade: A arquitetura do sistema deve suportar o crescimento do volume de dados e o acesso simultâneo de múltiplos usuários (ex: 500 conexões simultâneas) sem degradação perceptível da performance. (Ataca a dor de não suportar a demanda)
-* **RNF03** - Usabilidade (Eficiência): A interface de apontamento de horas deve ser intuitiva e otimizada, permitindo que o usuário realize seu registro diário com o menor número de cliques possível (ex: máximo de 3 cliques após o login). (Ataca a dor da falta de autonomia e ferramentas dispersas)
+* **RNF03** - Usabilidade (Eficiência): A interface de apontamento de horas deve ser intuitiva e otimizada, permitindo que o usuário realize seu registro diário com o menor número de cliques possível. (Ataca a dor da falta de autonomia e ferramentas dispersas)
 * **RNF04** - Segurança e Privacidade: Dados sensíveis de custos, valores hora e faturamento devem ser criptografados no banco de dados e visíveis exclusivamente para os perfis de Gestor, Administrador e Financeiro.
 * **RNF05** - Rastreabilidade (Auditoria): O sistema deve registrar logs de todas as alterações críticas, como edição de valores financeiros ou exclusão de horas já apontadas, identificando o usuário e a data da ação.
 
