@@ -141,7 +141,7 @@ function TarefasInfo({
 
         <div className="grid flex-1 gap-4 p-4 sm:p-5 xl:grid-cols-[minmax(0,1fr)_340px] xl:gap-5">
           <section className="min-w-0 rounded-2xl border border-white/10 bg-[#1f1f24] p-5">
-            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between flex-wrap">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">
                   Histórico
